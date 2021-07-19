@@ -1,4 +1,5 @@
 const QueryEnums = {
+  Languages: ["De", "En", "Es", "Fr", "It"],
   Operators: [
     {
       display: "=",

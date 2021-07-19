@@ -29,7 +29,9 @@ function CollectionSelector({ onCollectionChange }) {
 
     setCollection(value);
 
-    console.log(value);
+    onCollectionChange(value);
+
+    // console.log(value);
   } 
 
   return (
@@ -41,7 +43,7 @@ function CollectionSelector({ onCollectionChange }) {
         value={collection}
         onChange={handleCollectionChange}
       >
-        <option aria-label="None" value="">None</option>
+        {/* <option aria-label="None" value="">None</option> */}
         {collectionItems}
       </NativeSelect>
     </div>
