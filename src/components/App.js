@@ -8,8 +8,9 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { Container, Grid, Paper } from "@material-ui/core";
 import "../styles/App.css";
-import ServiceKeyForm from "./ServiceKeyForm";
+import ServiceKeyForm from "./queries/ServiceKeyForm";
 import { pink, amber } from "@material-ui/core/colors";
+import CollectionSelector from "./queries/CollectionSelector";
 
 const dbgcensus = require("dbgcensus");
 
@@ -17,8 +18,14 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
-  grid: {
+  container: {
+    "margin-top": theme.spacing(3),
+  },
+  gridContainer: {
     padding: theme.spacing(2),
+  },
+  gridItem: {
+    "padding-bottom": theme.spacing(2),
   },
   paper: {
     padding: theme.spacing(2),
@@ -64,28 +71,38 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className={classes.root}>
-        <Grid container className={classes.grid}>
-          <Grid item xs={12} sm={6} className={classes.grid}>
-            <Paper className={classes.paper}>
-              <h1 className={classes.header1}>Query Creator</h1>
-              <ServiceKeyForm onServiceKeyChange={onServiceKeyChange} />
-            </Paper>
+      {/* <div className={classes.root}> */}
+      <Container maxWidth="lg" className={classes.container}>
+        <Grid container>
+          <Grid container item xs={12} sm={6} className={classes.gridContainer}>
+            <Grid item xs={12} className={classes.gridItem}>
+              <Paper className={classes.paper}>
+                <h1 className={classes.header1}>Set Service Key</h1>
+                <ServiceKeyForm onServiceKeyChange={onServiceKeyChange} />
+              </Paper>
+            </Grid>
+            <Grid item xs={12} className={classes.gridItem}>
+              <Paper className={classes.paper}>
+                <h1 className={classes.header1}>Query Creator</h1>
+                <CollectionSelector />
+                {/* <ServiceKeyForm onServiceKeyChange={onServiceKeyChange} /> */}
+              </Paper>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Grid item xs={12} className={classes.grid}>
+          <Grid container item xs={12} sm={6} className={classes.gridContainer}>
+            <Grid item xs={12} className={classes.gridItem}>
               <Paper className={classes.paper}>
                 <h1 className={classes.header1}>Query String</h1>
               </Paper>
             </Grid>
-            <Grid item xs={12} className={classes.grid}>
+            <Grid item xs={12} className={classes.gridItem}>
               <Paper className={classes.paper}>
                 <h1 className={classes.header1}>Query Results</h1>
               </Paper>
             </Grid>
           </Grid>
         </Grid>
-      </div>
+      </Container>
     </ThemeProvider>
   );
 }
