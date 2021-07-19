@@ -12,6 +12,7 @@ import ServiceKeyForm from "./queries/ServiceKeyForm";
 import { pink, amber } from "@material-ui/core/colors";
 import CollectionSelector from "./queries/CollectionSelector";
 import QueryConfig from "../planetside/QueryConfig";
+import ReactJson from "react-json-view";
 
 const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
@@ -38,19 +39,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function App() {
-  // const [queryClass, setQueryClass] = useState(new QueryConfig("character"));
-
-  const [serviceKey, setServiceKey] = useState("example");
-  const [namespace, setNamespace] = useState("ps2:v2");
-  const [collection, setCollection] = useState("character");
-
   const [query, setQuery] = useState({
     serviceKey: "example",
     namespace: "ps2:v2",
     collection: "character",
     language: null,
     conditions: [],
-    limit: null,
+    limit: 10, //null,
     start: null,
     show: [],
     hide: [],
@@ -59,9 +54,6 @@ function App() {
     trees: [],
     lang: null,
   });
-
-  // const [queryUrl, setQueryUrl] = useState(query.convertToCensusQuery().toUrl());
-  const [queryUrl, setQueryUrl] = useState("");
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
@@ -80,48 +72,25 @@ function App() {
 
   dbgcensus.SetGlobalNamespace("ps2:v2");
 
-  // const [serviceKey, setServiceKey] = useState("example");
-
   function onServiceKeyChange(key) {
-    const value = key;
-
-    const updatedValue = {
-      serviceKey: value,
-    };
-
-    // setQuery((prevQuery) => ({ ...prevQuery, serviceKey: value }));
-    setQuery({ ...query, ...{ serviceKey: value } });
-    // query.serviceKey = key;
-
-    setServiceKey(key);
-
-    dbgcensus.SetGlobalServiceKey(value);
-
-    // setServiceKey(value);
-
-    // console.log(value);
-
-    console.log(query);
+    setQuery({ ...query, ...{ serviceKey: key } });
+    dbgcensus.SetGlobalServiceKey(key);
   }
 
   function onCollectionChange(value) {
-    const newValue = (value === "None" || !value) ? null : value;
-    
+    const newValue = value === "None" || !value ? null : value;
     setQuery({ ...query, ...{ collection: newValue } });
-    // query.collection = value;
-
-    console.log(query);
-
-    setCollection(value);
   }
 
   function onGetQuery() {
     // let censusQuery = query.convertToCensusQuery();
   }
 
+  const [queryUrl, setQueryUrl] = useState("");
+  const [dbgQuery, setDbgQuery] = useState(
+    new CensusQuery(query.collection, query.namespace, query.serviceKey)
+  );
   useEffect(() => {
-    // console.log(query);
-
     function convertToCensusQuery() {
       let censusQuery = new CensusQuery(
         query.collection,
@@ -130,46 +99,80 @@ function App() {
       );
 
       if (!!query.language) {
-        censusQuery.setLanguage(censusQuery.language.toLowerCase());
+        censusQuery.setLanguage(query.language.toLowerCase());
       }
 
       if (query.limit !== null) {
-        censusQuery.setLimit(censusQuery.limit);
+        censusQuery.setLimit(query.limit);
       }
 
       if (query.start !== null) {
-        censusQuery.setStart(censusQuery.start);
+        censusQuery.setStart(query.start);
       }
 
       if (query.show.length > 0) {
-        censusQuery.showFields(censusQuery.show);
+        censusQuery.showFields(query.show);
       }
 
       if (query.hide.length > 0) {
-        censusQuery.hideFields(censusQuery.hide);
+        censusQuery.hideFields(query.hide);
       }
 
       return censusQuery;
     }
+    try {
+      const censusQuery = convertToCensusQuery();
 
-    // console.log('Encoded: ', encodeURI(query.convertToCensusQuery()));
+      console.log(censusQuery);
 
-    const url = convertToCensusQuery().toUrl();
+      setDbgQuery(censusQuery);
 
-    console.log(url);
+      // const url = censusQuery.toUrl();
+      console.log(query);
 
-    setQueryUrl(url);
+      const url = convertToCensusQuery().toUrl();
+      setQueryUrl(url);
+    } catch (error) {
+      console.log("Error getting query URL: ", error);
+    }
+  }, [query]);
 
-    // console.log(queryUrl);
-  }, [collection, query, namespace]);
-  // }, [ collection, query.serviceKey, namespace, query.language, query.limit, query.start, query.show, query.hide, ]);
+  const [queryResult, setQueryResult] = useState("");
+  async function onSubmitQuery() {
+    if (!!dbgQuery) {
+      try {
+        const response = await fetch(dbgQuery.toUrl());
+        const responseJson = await response.json();
+
+        console.log(responseJson);
+
+        console.log(JSON.stringify(responseJson, null, 2));
+
+        setQueryResult(responseJson);
+      } catch (error) {
+        console.log("Error getting data from query: ", error);
+      }
+
+      // dbgQuery.get((error, data) => {
+      //   if (error) {
+      //     console.log('Error getting data from query: ', error);
+      //   }
+
+      //   const jsonData = JSON.parse(JSON.stringify(data));
+
+      //   console.log(jsonData);
+
+      //   setQueryResult(data);
+      // });
+    }
+  }
 
   const classes = useStyles();
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg" className={classes.container}>
-        <Grid container>
+        <Grid container alignItems="flex-start">
           <Grid container item xs={12} sm={6} className={classes.gridContainer}>
             <Grid item xs={12} className={classes.gridItem}>
               <Paper className={classes.paper}>
@@ -182,7 +185,11 @@ function App() {
               <Paper className={classes.paper}>
                 <h1 className={classes.header1}>Query Creator</h1>
                 <CollectionSelector onCollectionChange={onCollectionChange} />
-                <Button color="primary" onClick={onGetQuery} value="Get Query">
+                <Button
+                  color="primary"
+                  onClick={onSubmitQuery}
+                  value="Get Query"
+                >
                   Get Query
                 </Button>
               </Paper>
@@ -200,6 +207,15 @@ function App() {
             <Grid item xs={12} className={classes.gridItem}>
               <Paper className={classes.paper}>
                 <h1 className={classes.header1}>Query Results</h1>
+                {!!queryResult ? (
+                  <ReactJson
+                    src={queryResult}
+                    enableDelete={true}
+                    iconStyle="circle"
+                    displayObjectSize={false}
+                    displayDataTypes={false}
+                  />
+                ) : null}
               </Paper>
             </Grid>
           </Grid>
