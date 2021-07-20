@@ -4,34 +4,42 @@ const QueryEnums = {
     {
       display: "=",
       name: "Equals",
+      value: "=",
     },
     {
       display: "≠",
       name: "NotEquals",
+      value: "=!",
     },
     {
       display: "<",
       name: "IsLessThan",
+      value: "=<",
     },
     {
       display: "≤",
       name: "IsLessThanOrEquals",
+      value: "=[",
     },
     {
       display: ">",
       name: "IsGreaterThan",
+      value: "=>",
     },
     {
       display: "≥",
       name: "Is Greater Than Or Equals",
+      value: "=]",
     },
     {
       display: "Starts With",
       name: "StartsWith",
+      value: "=^",
     },
     {
       display: "Contains",
       name: "Contains",
+      value: "=*",
     },
   ],
   Collections: [

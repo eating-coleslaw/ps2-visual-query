@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { InputLabel, NativeSelect, MenuItem } from "@material-ui/core";
+import { InputLabel, NativeSelect, MenuItem, Select, FormControl } from "@material-ui/core";
 import QueryEnums from "../../planetside/QueryEnums";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -36,18 +36,26 @@ function CollectionSelector({ onCollectionChange }) {
   } 
 
   return (
-    <React.Fragment>
-      <InputLabel htmlFor="collection">Collection</InputLabel>
-      <NativeSelect
-        id="collection"
+    <FormControl variant="outlined">
+      <InputLabel htmlFor="collection-select">Collection</InputLabel>
+      <Select
+        native
+        // id="collection"
+        margin="dense"
+        label="Collection"
+        // variant="outlined"
         className={classes.selectControl}
         value={collection}
         onChange={handleCollectionChange}
+        inputProps={{
+          name: "collection",
+          id: "collection-select"
+        }}
       >
         {/* <option aria-label="None" value="">None</option> */}
         {collectionItems}
-      </NativeSelect>
-    </React.Fragment>
+      </Select>
+    </FormControl>
   );
 }
 

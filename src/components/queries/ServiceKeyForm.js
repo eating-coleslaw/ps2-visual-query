@@ -24,6 +24,8 @@ function ServiceKeyForm({ onServiceKeyChange }) {
       <TextField
         id="service-key"
         label="Service Key"
+        margin="dense"
+        variant="outlined"
         required
         name="service-key"
         onChange={(e) => setServiceKey(e.target.value)}

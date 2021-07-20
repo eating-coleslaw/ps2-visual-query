@@ -15,6 +15,9 @@ import ReactJson from "react-json-view";
 
 import CollectionSelector from "./queries/CollectionSelector";
 import LimitSlider from './queries/LimitSlider';
+import LanguageSelector from "./queries/LanguageSelector";
+
+import FieldsEntryForm from './queries/FieldsEntryForm';
 
 const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
@@ -50,6 +53,11 @@ function App() {
     collection: "character",
     language: null,
     conditions: [],
+    condition: {
+      field: "name.first",
+      operand: "=",
+      value: "Chirtle",
+    },
     limit: 10, //null,
     start: null,
     show: [],
@@ -91,6 +99,68 @@ function App() {
     setQuery({ ...query, ...{ limit: value } });
   }
 
+  function onLanguageChange(value) {
+    setQuery({ ...query, ...{ language: value.toLowerCase() }});
+  }
+
+  function onAddSimpleArrayValue(arrayPropertyName, value) {
+    const array = query[arrayPropertyName];
+    
+    if (value !== '' && !array.includes(value)) {
+      let updatedFields = array;
+      updatedFields.push(value);
+      setQuery({ ...query, ...{ [arrayPropertyName]: updatedFields }});
+    }
+  }
+
+  function onRemoveSimpleArrayValue(arrayPropertyName, value) {
+    const array = query[arrayPropertyName];
+    
+    const index = array.indexOf(value);
+
+    if (index !== -1) {
+      let updatedFields = array;
+      updatedFields.splice(index, 1);
+      setQuery({ ...query, ...{ [arrayPropertyName]: updatedFields }});
+    }
+  }
+
+  function onAddShowField(value) {
+    if (value !== '' && !query.show.includes(value)) {
+      let updatedFields = query.show;
+      updatedFields.push(value);
+      setQuery({ ...query, ...{ show: updatedFields }});
+    }
+  }
+
+  function onRemoveShowField(value) {
+    const index = query.show.indexOf(value);
+
+    if (index !== -1) {
+      let updatedFields = query.show;
+      updatedFields.splice(index, 1);
+      setQuery({ ...query, ...{ show: updatedFields }});
+    }
+  }
+
+  function onAddHideField(value) {
+    if (value !== '' && !query.hide.includes(value)) {
+      let updatedFields = query.hide;
+      updatedFields.push(value);
+      setQuery({ ...query, ...{ hide: updatedFields }});
+    }
+  }
+
+  function onRemoveHideField(value) {
+    const index = query.hide.indexOf(value);
+
+    if (index !== -1) {
+      let updatedFields = query.hide;
+      updatedFields.splice(index, 1);
+      setQuery({ ...query, ...{ hide: updatedFields }});
+    }
+  }
+
   function onGetQuery() {
     // let censusQuery = query.convertToCensusQuery();
   }
@@ -125,6 +195,12 @@ function App() {
 
       if (query.hide.length > 0) {
         censusQuery.hideFields(query.hide);
+      }
+
+      if (query.resolves.length > 0) {
+        console.log(query.resolves);
+        // query.resolves.forEach((resolve) => censusQuery.resolve(resolve));
+        censusQuery.resolve(query.resolves);
       }
 
       return censusQuery;
@@ -203,6 +279,26 @@ function App() {
                     <LimitSlider value={query.limit} onChange={onLimitChange} label="Limit" />
                   </Grid>
                 </Grid>
+
+                <Grid item sm={6} md={3} style={{ width: 120 }}>
+                  <LanguageSelector value={query.language} onChange={onLanguageChange} />
+                </Grid>
+
+                <Grid item container xs={12}>
+                  {/* <FieldsEntryForm label="Show Fields" fields={query.show} onAddField={onAddShowField} onRemoveField={onRemoveShowField} /> */}
+                  <FieldsEntryForm label="Show Fields" fields={query.show} onAddField={(value) => onAddSimpleArrayValue("show", value)} onRemoveField={(value) => onRemoveSimpleArrayValue("show", value)} />
+                </Grid>
+                
+                <Grid item container xs={12} justifyContent="flex-start" alignItems="center">
+                  {/* <FieldsEntryForm label="Hide Fields" fields={query.hide} onAddField={onAddHideField} onRemoveField={onRemoveHideField} /> */}
+                  <FieldsEntryForm label="Hide Fields" fields={query.hide} onAddField={(value) => onAddSimpleArrayValue("hide", value)} onRemoveField={(value) => onRemoveSimpleArrayValue("hide", value)} />
+                </Grid>
+
+                <Grid item container xs={12} justifyContent="flex-start" alignItems="center">
+                  {/* <FieldsEntryForm label="Hide Fields" fields={query.hide} onAddField={onAddHideField} onRemoveField={onRemoveHideField} /> */}
+                  <FieldsEntryForm label="Resolves" fields={query.resolves} onAddField={(value) => onAddSimpleArrayValue("resolves", value)} onRemoveField={(value) => onRemoveSimpleArrayValue("resolves", value)} />
+                </Grid>
+
                 <Button
                   color="primary"
                   onClick={onSubmitQuery}
