@@ -10,9 +10,11 @@ import { Container, Grid, Paper, Button } from "@material-ui/core";
 import "../styles/App.css";
 import ServiceKeyForm from "./queries/ServiceKeyForm";
 import { pink, amber } from "@material-ui/core/colors";
-import CollectionSelector from "./queries/CollectionSelector";
 import QueryConfig from "../planetside/QueryConfig";
 import ReactJson from "react-json-view";
+
+import CollectionSelector from "./queries/CollectionSelector";
+import LimitSlider from './queries/LimitSlider';
 
 const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
@@ -82,6 +84,10 @@ function App() {
     setQuery({ ...query, ...{ collection: newValue } });
   }
 
+  function onLimitChange(value) {
+    setQuery({ ...query, ...{ limit: value } });
+  }
+
   function onGetQuery() {
     // let censusQuery = query.convertToCensusQuery();
   }
@@ -123,12 +129,12 @@ function App() {
     try {
       const censusQuery = convertToCensusQuery();
 
-      console.log(censusQuery);
+      // console.log(censusQuery);
 
       setDbgQuery(censusQuery);
 
       // const url = censusQuery.toUrl();
-      console.log(query);
+      // console.log(query);
 
       const url = convertToCensusQuery().toUrl();
       setQueryUrl(url);
@@ -144,9 +150,9 @@ function App() {
         const response = await fetch(dbgQuery.toUrl());
         const responseJson = await response.json();
 
-        console.log(responseJson);
+        // console.log(responseJson);
 
-        console.log(JSON.stringify(responseJson, null, 2));
+        // console.log(JSON.stringify(responseJson, null, 2));
 
         setQueryResult(responseJson);
       } catch (error) {
@@ -185,6 +191,7 @@ function App() {
               <Paper className={classes.paper}>
                 <h1 className={classes.header1}>Query Creator</h1>
                 <CollectionSelector onCollectionChange={onCollectionChange} />
+                <LimitSlider value={query.limit} onChange={onLimitChange} label="Limit" />
                 <Button
                   color="primary"
                   onClick={onSubmitQuery}
