@@ -38,6 +38,9 @@ const useStyles = makeStyles((theme) => ({
   header1: {
     margin: `0 0 ${theme.spacing(1)}px 0`,
   },
+  splitQueryField: {
+    width: 250,
+  },
 }));
 
 function App() {
@@ -190,8 +193,16 @@ function App() {
             <Grid item xs={12} className={classes.gridItem}>
               <Paper className={classes.paper}>
                 <h1 className={classes.header1}>Query Creator</h1>
-                <CollectionSelector onCollectionChange={onCollectionChange} />
-                <LimitSlider value={query.limit} onChange={onLimitChange} label="Limit" />
+                <Grid container spacing={3} alignItems="flex-start">
+
+                  <Grid item sm={12} md={6} className={classes.splitQueryField}>
+                    <CollectionSelector onCollectionChange={onCollectionChange} />
+                  </Grid>
+
+                  <Grid item sm={12} md={6} className={classes.splitQueryField}>
+                    <LimitSlider value={query.limit} onChange={onLimitChange} label="Limit" />
+                  </Grid>
+                </Grid>
                 <Button
                   color="primary"
                   onClick={onSubmitQuery}

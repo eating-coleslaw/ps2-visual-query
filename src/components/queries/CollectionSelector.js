@@ -6,6 +6,7 @@ import { makeStyles } from "@material-ui/core/styles";
 const useStyles = makeStyles((theme) => ({
   selectControl: {
     minWidth: 120,
+    width: 250,
   },
 }));
 
@@ -35,7 +36,7 @@ function CollectionSelector({ onCollectionChange }) {
   } 
 
   return (
-    <div>
+    <React.Fragment>
       <InputLabel htmlFor="collection">Collection</InputLabel>
       <NativeSelect
         id="collection"
@@ -46,7 +47,7 @@ function CollectionSelector({ onCollectionChange }) {
         {/* <option aria-label="None" value="">None</option> */}
         {collectionItems}
       </NativeSelect>
-    </div>
+    </React.Fragment>
   );
 }
 
