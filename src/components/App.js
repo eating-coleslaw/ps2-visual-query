@@ -51,7 +51,7 @@ function App() {
     serviceKey: "example",
     namespace: "ps2:v2",
     collection: "character",
-    language: null,
+    language: "All",
     conditions: [],
     condition: {
       field: "name.first",
@@ -91,8 +91,8 @@ function App() {
   }
 
   function onCollectionChange(value) {
-    const newValue = value === "None" || !value ? null : value;
-    setQuery({ ...query, ...{ collection: newValue } });
+    // const newValue = value === "None" || !value ? null : value;
+    setQuery({ ...query, ...{ collection: value } });
   }
 
   function onLimitChange(value) {
@@ -125,41 +125,41 @@ function App() {
     }
   }
 
-  function onAddShowField(value) {
-    if (value !== '' && !query.show.includes(value)) {
-      let updatedFields = query.show;
-      updatedFields.push(value);
-      setQuery({ ...query, ...{ show: updatedFields }});
-    }
-  }
+  // function onAddShowField(value) {
+  //   if (value !== '' && !query.show.includes(value)) {
+  //     let updatedFields = query.show;
+  //     updatedFields.push(value);
+  //     setQuery({ ...query, ...{ show: updatedFields }});
+  //   }
+  // }
 
-  function onRemoveShowField(value) {
-    const index = query.show.indexOf(value);
+  // function onRemoveShowField(value) {
+  //   const index = query.show.indexOf(value);
 
-    if (index !== -1) {
-      let updatedFields = query.show;
-      updatedFields.splice(index, 1);
-      setQuery({ ...query, ...{ show: updatedFields }});
-    }
-  }
+  //   if (index !== -1) {
+  //     let updatedFields = query.show;
+  //     updatedFields.splice(index, 1);
+  //     setQuery({ ...query, ...{ show: updatedFields }});
+  //   }
+  // }
 
-  function onAddHideField(value) {
-    if (value !== '' && !query.hide.includes(value)) {
-      let updatedFields = query.hide;
-      updatedFields.push(value);
-      setQuery({ ...query, ...{ hide: updatedFields }});
-    }
-  }
+  // function onAddHideField(value) {
+  //   if (value !== '' && !query.hide.includes(value)) {
+  //     let updatedFields = query.hide;
+  //     updatedFields.push(value);
+  //     setQuery({ ...query, ...{ hide: updatedFields }});
+  //   }
+  // }
 
-  function onRemoveHideField(value) {
-    const index = query.hide.indexOf(value);
+  // function onRemoveHideField(value) {
+  //   const index = query.hide.indexOf(value);
 
-    if (index !== -1) {
-      let updatedFields = query.hide;
-      updatedFields.splice(index, 1);
-      setQuery({ ...query, ...{ hide: updatedFields }});
-    }
-  }
+  //   if (index !== -1) {
+  //     let updatedFields = query.hide;
+  //     updatedFields.splice(index, 1);
+  //     setQuery({ ...query, ...{ hide: updatedFields }});
+  //   }
+  // }
 
   function onGetQuery() {
     // let censusQuery = query.convertToCensusQuery();
@@ -177,7 +177,7 @@ function App() {
         query.serviceKey
       );
 
-      if (!!query.language) {
+      if (!!query.language && query.language !== "All") {
         censusQuery.setLanguage(query.language.toLowerCase());
       }
 
@@ -272,7 +272,7 @@ function App() {
                 <Grid container spacing={3} alignItems="flex-start">
 
                   <Grid item sm={12} md={6} className={classes.splitQueryField}>
-                    <CollectionSelector onCollectionChange={onCollectionChange} />
+                    <CollectionSelector collection={query.collection} onChange={onCollectionChange} />
                   </Grid>
 
                   <Grid item sm={12} md={6} className={classes.splitQueryField}>

@@ -19,7 +19,7 @@ export default function LanguageSelector({ language, onChange }) {
   }, []);
 
   const languageItems = languages.map((c) => (
-    <option key={c} value={c}>
+    <option key={c} value={c} aria-label={c}>
       {c}
     </option>
   ));
