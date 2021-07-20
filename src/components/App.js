@@ -91,7 +91,6 @@ function App() {
   }
 
   function onCollectionChange(value) {
-    // const newValue = value === "None" || !value ? null : value;
     setQuery({ ...query, ...{ collection: value } });
   }
 
@@ -123,46 +122,6 @@ function App() {
       updatedFields.splice(index, 1);
       setQuery({ ...query, ...{ [arrayPropertyName]: updatedFields }});
     }
-  }
-
-  // function onAddShowField(value) {
-  //   if (value !== '' && !query.show.includes(value)) {
-  //     let updatedFields = query.show;
-  //     updatedFields.push(value);
-  //     setQuery({ ...query, ...{ show: updatedFields }});
-  //   }
-  // }
-
-  // function onRemoveShowField(value) {
-  //   const index = query.show.indexOf(value);
-
-  //   if (index !== -1) {
-  //     let updatedFields = query.show;
-  //     updatedFields.splice(index, 1);
-  //     setQuery({ ...query, ...{ show: updatedFields }});
-  //   }
-  // }
-
-  // function onAddHideField(value) {
-  //   if (value !== '' && !query.hide.includes(value)) {
-  //     let updatedFields = query.hide;
-  //     updatedFields.push(value);
-  //     setQuery({ ...query, ...{ hide: updatedFields }});
-  //   }
-  // }
-
-  // function onRemoveHideField(value) {
-  //   const index = query.hide.indexOf(value);
-
-  //   if (index !== -1) {
-  //     let updatedFields = query.hide;
-  //     updatedFields.splice(index, 1);
-  //     setQuery({ ...query, ...{ hide: updatedFields }});
-  //   }
-  // }
-
-  function onGetQuery() {
-    // let censusQuery = query.convertToCensusQuery();
   }
 
   const [queryUrl, setQueryUrl] = useState("");
@@ -198,8 +157,6 @@ function App() {
       }
 
       if (query.resolves.length > 0) {
-        console.log(query.resolves);
-        // query.resolves.forEach((resolve) => censusQuery.resolve(resolve));
         censusQuery.resolve(query.resolves);
       }
 
@@ -207,14 +164,7 @@ function App() {
     }
     try {
       const censusQuery = convertToCensusQuery();
-
-      // console.log(censusQuery);
-
       setDbgQuery(censusQuery);
-
-      // const url = censusQuery.toUrl();
-      // console.log(query);
-
       const url = convertToCensusQuery().toUrl();
       setQueryUrl(url);
     } catch (error) {
@@ -228,11 +178,6 @@ function App() {
       try {
         const response = await fetch(dbgQuery.toUrl());
         const responseJson = await response.json();
-
-        // console.log(responseJson);
-
-        // console.log(JSON.stringify(responseJson, null, 2));
-
         setQueryResult(responseJson);
       } catch (error) {
         console.log("Error getting data from query: ", error);
@@ -285,17 +230,14 @@ function App() {
                 </Grid>
 
                 <Grid item container xs={12}>
-                  {/* <FieldsEntryForm label="Show Fields" fields={query.show} onAddField={onAddShowField} onRemoveField={onRemoveShowField} /> */}
                   <FieldsEntryForm label="Show Fields" fields={query.show} onAddField={(value) => onAddSimpleArrayValue("show", value)} onRemoveField={(value) => onRemoveSimpleArrayValue("show", value)} />
                 </Grid>
                 
                 <Grid item container xs={12} justifyContent="flex-start" alignItems="center">
-                  {/* <FieldsEntryForm label="Hide Fields" fields={query.hide} onAddField={onAddHideField} onRemoveField={onRemoveHideField} /> */}
                   <FieldsEntryForm label="Hide Fields" fields={query.hide} onAddField={(value) => onAddSimpleArrayValue("hide", value)} onRemoveField={(value) => onRemoveSimpleArrayValue("hide", value)} />
                 </Grid>
 
                 <Grid item container xs={12} justifyContent="flex-start" alignItems="center">
-                  {/* <FieldsEntryForm label="Hide Fields" fields={query.hide} onAddField={onAddHideField} onRemoveField={onRemoveHideField} /> */}
                   <FieldsEntryForm label="Resolves" fields={query.resolves} onAddField={(value) => onAddSimpleArrayValue("resolves", value)} onRemoveField={(value) => onRemoveSimpleArrayValue("resolves", value)} />
                 </Grid>
 

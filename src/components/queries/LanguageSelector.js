@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { InputLabel, NativeSelect, FormControl, Select } from "@material-ui/core";
+import { InputLabel, FormControl, Select } from "@material-ui/core";
 import QueryEnums from "../../planetside/QueryEnums";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -34,10 +34,8 @@ export default function LanguageSelector({ language, onChange }) {
       <InputLabel htmlFor='language-select'>Language</InputLabel>
       <Select
         native
-        // id="language"
         margin="dense"
         label="Language"
-        // variant="outlined"
         className={classes.selectControl}
         value={language}
         onChange={handleChange}

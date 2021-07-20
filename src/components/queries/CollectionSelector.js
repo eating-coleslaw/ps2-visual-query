@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { InputLabel, NativeSelect, FormControl, Select } from "@material-ui/core";
+import { InputLabel, FormControl, Select } from "@material-ui/core";
 import QueryEnums from "../../planetside/QueryEnums";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -34,11 +34,8 @@ export default function CollectionSelector({ collection, onChange }) {
       <InputLabel htmlFor="collection-select">Collection</InputLabel>
       <Select
         native
-        // defaultValue={collection}
-        // id="collection"
         margin="dense"
         label="Collection"
-        // variant="outlined"
         className={classes.selectControl}
         value={collection}
         onChange={handleChange}

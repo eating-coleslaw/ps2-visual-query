@@ -1,7 +1,5 @@
 import React from 'react';
 import Slider from '@material-ui/core/Slider';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import { makeStyles } from "@material-ui/core/styles";
 
