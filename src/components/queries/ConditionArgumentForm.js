@@ -1,14 +1,102 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import QueryEnums from "../../planetside/QueryEnums";
+import { InputLabel, FormControl, Select, TextField, Button, Grid } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 
-export default function ConditionArgumentForm({ conditionData, onFieldChange, onOperandChange, onValueChange }) {
-  const [fieldInput, setFieldInput] = useState(conditionData?.field);
-  const [operandInput, setOperandInput] = useState(conditionData?.operand);
-  const [valueInput, setValueInput] = useState(conditionData?.value);
+const useStyles = makeStyles((theme) => ({
+  fieldGridItem: {
+    marginTop: theme.spacing(1),
+    marginBottom: 4,
+    marginLeft: theme.spacing(1),
+  },
+  operatorGrid: {
+    marginTop: 4, 
+  }
+}));
 
+export default function ConditionArgumentForm({ conditionData, onFieldChange, onOperatorChange, onValueChange }) {
+  const classes = useStyles();
+  
+  const [operators, setOperators] =  useState([]);
+  useEffect(() => {
+    setOperators(QueryEnums.Operators);
+  }, []);
+
+  const operatorItems = operators.map((o) => (
+    <option key={o.name} value={o.value} title={o.title}>
+      {o.display}
+    </option>
+  ));
+
+  function handleFieldChange(event) {
+    const value = event.target.value;
+    onFieldChange(value);
+  }
+
+  function handleOperatorChange(event) {
+    const value = event.target.value;
+    const operator = operators.find((o) => o.value === value);
+    console.log(operator);
+    onOperatorChange(operator);
+  }
+
+  function handleValueChange(event) {
+    const value = event.target.value;
+    onValueChange(value);
+  }
 
   return(
     <React.Fragment>
-
+      <Grid item xs={12} md={4}>
+        <TextField
+          id="condition-field"
+          label="Condition Field"
+          margin="dense"
+          variant="outlined"
+          name="condition-field"
+          onChange={handleFieldChange}
+          value={conditionData.field}
+        />
+      </Grid>
+      <Grid item xs={3} md={3} className={classes.operatorGrid}>
+        <FormControl variant="outlined">
+          <InputLabel htmlFor="operator-select">Operator</InputLabel>
+          <Select
+            native
+            margin="dense"
+            label="Operator"
+            value={conditionData.operator.value}
+            onChange={handleOperatorChange}
+            inputProps={{
+              name: "operator",
+              id: "operator-select",
+            }}
+          >
+            {operatorItems}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid item xs={9} md={4}>
+        <TextField
+          id="condition-value"
+          label="Condition value"
+          margin="dense"
+          variant="outlined"
+          name="condition-value"
+          onChange={handleValueChange}
+          value={conditionData.value}
+        />
+      </Grid>
+      {/* <Button
+        type="submit"
+        variant="outlined"
+        color="primary"
+        size="large"
+        className={classes.button}
+        startIcon={<SaveIcon />}
+      >
+        Save
+      </Button> */}
     </React.Fragment>
   );
 }

@@ -10,14 +10,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ServiceKeyForm({ onServiceKeyChange }) {
+  const classes = useStyles();
+
   const [serviceKey, setServiceKey] = useState("example"); // TODO: get service key from localStorage
 
   function onSubmitForm(e) {
     e.preventDefault();
     onServiceKeyChange(serviceKey);
   }
-
-  const classes = useStyles();
 
   return (
     <form noValidate autoComplete="off" onSubmit={onSubmitForm}>

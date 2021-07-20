@@ -24,8 +24,8 @@ export default function CollectionSelector({ collection, onChange }) {
     </option>
   ));
 
-  function handleChange(e) {
-    const value = e.target.value;
+  function handleChange(event) {
+    const value = event.target.value;
     onChange(value);
   } 
 

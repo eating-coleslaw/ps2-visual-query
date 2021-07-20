@@ -18,6 +18,7 @@ import LimitSlider from './queries/LimitSlider';
 import LanguageSelector from "./queries/LanguageSelector";
 
 import FieldsEntryForm from './queries/FieldsEntryForm';
+import ConditionArgumentForm from "./queries/ConditionArgumentForm";
 
 const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
@@ -46,7 +47,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function App() {
+export default function App() {
+  const classes = useStyles();
+  
   const [query, setQuery] = useState({
     serviceKey: "example",
     namespace: "ps2:v2",
@@ -55,8 +58,13 @@ function App() {
     conditions: [],
     condition: {
       field: "name.first",
-      operand: "=",
-      value: "Chirtle",
+      operator: {
+        display: "=",
+        name: "equals",
+        title: "Equals",
+        value: "=",
+      },
+      value: "",
     },
     limit: 10, //null,
     start: null,
@@ -91,7 +99,14 @@ function App() {
   }
 
   function onCollectionChange(value) {
-    setQuery({ ...query, ...{ collection: value } });
+    setQuery({ ...query, ...{
+      collection: value,
+      condition: {
+        field: '',
+        operator: query.condition.operator,
+        value: '',
+      },
+     } });
   }
 
   function onLimitChange(value) {
@@ -122,6 +137,33 @@ function App() {
       updatedFields.splice(index, 1);
       setQuery({ ...query, ...{ [arrayPropertyName]: updatedFields }});
     }
+  }
+
+  function onConditionOperatorChange(operator) {
+    setQuery({ ...query, ...{ condition: {
+        field: query.condition.field,
+        operator,
+        value: query.condition.value }
+      }
+    });
+  }
+
+  function onConditionFieldChange(field) {
+    setQuery({ ...query, ...{ condition: {
+        field,
+        operator: query.condition.operator,
+        value: query.condition.value }
+      }
+    });
+  }
+
+  function onConditionValueChange(value) {
+    setQuery({ ...query, ...{ condition: {
+        field: query.condition.field,
+        operator: query.condition.operator,
+        value, }
+      }
+    });
   }
 
   const [queryUrl, setQueryUrl] = useState("");
@@ -160,6 +202,11 @@ function App() {
         censusQuery.resolve(query.resolves);
       }
 
+      if (query.condition.field !== '' && !!query.condition.operator && query.condition.value !== '') {
+        censusQuery.where(query.condition.field)[query.condition.operator.name](query.condition.value);
+      }
+
+
       return censusQuery;
     }
     try {
@@ -197,7 +244,9 @@ function App() {
     }
   }
 
-  const classes = useStyles();
+  console.log(query.condition);
+
+  
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -214,8 +263,18 @@ function App() {
             <Grid item xs={12} className={classes.gridItem}>
               <Paper className={classes.paper}>
                 <h1 className={classes.header1}>Query Creator</h1>
-                <Grid container spacing={3} alignItems="flex-start">
 
+                <Grid container spacing={1} alignItems="flex-start">
+                  <Grid item sm={12} md={6} className={classes.splitQueryField}>
+                    <CollectionSelector collection={query.collection} onChange={onCollectionChange} />
+                  </Grid>
+
+                  <Grid item sm={12} md={6} className={classes.splitQueryField}>
+                    <LanguageSelector value={query.language} onChange={onLanguageChange} />
+                  </Grid>
+                </Grid>
+
+                {/* <Grid container spacing={3} alignItems="flex-start">
                   <Grid item sm={12} md={6} className={classes.splitQueryField}>
                     <CollectionSelector collection={query.collection} onChange={onCollectionChange} />
                   </Grid>
@@ -223,28 +282,36 @@ function App() {
                   <Grid item sm={12} md={6} className={classes.splitQueryField}>
                     <LimitSlider value={query.limit} onChange={onLimitChange} label="Limit" />
                   </Grid>
+                </Grid> */}
+
+                <Grid item container xs={12} justifyContent="flex-start" alignItems="center" spacing={1}>
+                  <ConditionArgumentForm conditionData={query.condition} onFieldChange={onConditionFieldChange} onOperatorChange={onConditionOperatorChange} onValueChange={onConditionValueChange} />
                 </Grid>
 
-                <Grid item sm={6} md={3} style={{ width: 120 }}>
-                  <LanguageSelector value={query.language} onChange={onLanguageChange} />
-                </Grid>
-
-                <Grid item container xs={12}>
+                <Grid item container xs={12} justifyContent="flex-start" alignItems="center" spacing={0}>
                   <FieldsEntryForm label="Show Fields" fields={query.show} onAddField={(value) => onAddSimpleArrayValue("show", value)} onRemoveField={(value) => onRemoveSimpleArrayValue("show", value)} />
                 </Grid>
                 
-                <Grid item container xs={12} justifyContent="flex-start" alignItems="center">
+                <Grid item container xs={12} justifyContent="flex-start" alignItems="center" spacing={0}>
                   <FieldsEntryForm label="Hide Fields" fields={query.hide} onAddField={(value) => onAddSimpleArrayValue("hide", value)} onRemoveField={(value) => onRemoveSimpleArrayValue("hide", value)} />
                 </Grid>
 
-                <Grid item container xs={12} justifyContent="flex-start" alignItems="center">
+                <Grid item container xs={12} justifyContent="flex-start" alignItems="center" spacing={0}>
                   <FieldsEntryForm label="Resolves" fields={query.resolves} onAddField={(value) => onAddSimpleArrayValue("resolves", value)} onRemoveField={(value) => onRemoveSimpleArrayValue("resolves", value)} />
                 </Grid>
+
+                <Grid item sm={6} md={3} style={{ width: 120, marginTop: 8 }}>
+                  <LanguageSelector value={query.language} onChange={onLanguageChange} />
+                </Grid>
+
+                {/* <Grid item sm={12}>
+                    <LimitSlider value={query.limit} onChange={onLimitChange} label="Limit" />
+                </Grid> */}
 
                 <Button
                   color="primary"
                   onClick={onSubmitQuery}
-                  value="Get Query"
+                  value="Run Query"
                 >
                   Get Query
                 </Button>
@@ -270,6 +337,7 @@ function App() {
                     iconStyle="circle"
                     displayObjectSize={false}
                     displayDataTypes={false}
+                    style={{ maxHeight: "600px", overflow: "auto", lineHeight: "1.1" }}
                   />
                 ) : null}
               </Paper>
@@ -280,5 +348,3 @@ function App() {
     </ThemeProvider>
   );
 }
-
-export default App;
