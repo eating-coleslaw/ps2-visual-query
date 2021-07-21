@@ -18,7 +18,6 @@ import {
 import "../styles/App.css";
 import ServiceKeyForm from "./queries/ServiceKeyForm";
 import { pink, amber } from "@material-ui/core/colors";
-import ReactJson from "react-json-view";
 
 import CollectionSelector from "./queries/CollectionSelector";
 import LimitSlider from "./queries/LimitSlider";
@@ -27,6 +26,7 @@ import LanguageSelector from "./queries/LanguageSelector";
 import FieldsEntryForm from "./queries/FieldsEntryForm";
 import ConditionArgumentForm from "./queries/ConditionArgumentForm";
 import QueryResults from "./queries/QueryResults";
+import QueryStringContainer from "./queries/QueryStringContainer";
 
 const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
@@ -471,32 +471,11 @@ export default function App() {
 
           <Grid container item xs={12} sm={6} className={classes.gridContainer}>
             <Grid item xs={12} className={classes.gridContainerItem}>
-              <Paper className={classes.paper}>
-                <h1 className={classes.header1}>Query String</h1>
-                <div>{queryUrl}</div>
-              </Paper>
+              <QueryStringContainer queryUrl={queryUrl} />
             </Grid>
 
             <Grid item xs={12} className={classes.gridContainerItem}>
               <QueryResults data={queryResult} />
-              {/* <Paper className={classes.paper}>
-                <h1 className={classes.header1}>Query Results</h1>
-                {!!queryResult ? (
-                  <ReactJson
-                    src={queryResult}
-                    enableDelete={true}
-                    iconStyle="circle"
-                    displayObjectSize={false}
-                    displayDataTypes={false}
-                    style={{
-                      maxHeight: "600px",
-                      overflow: "auto",
-                      lineHeight: "1.1",
-                      marginTop: theme.spacing(1),
-                    }}
-                  />
-                ) : null}
-              </Paper> */}
             </Grid>
           </Grid>
         </Grid>
