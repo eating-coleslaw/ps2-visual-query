@@ -322,6 +322,7 @@ export default function App() {
         setLoading(false);
       } catch (error) {
         console.log("Error getting data from query: ", error);
+        setQueryResult(`Error getting data from query: ${error}`);
         setLoading(false);
       }
     }
