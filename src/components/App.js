@@ -303,7 +303,8 @@ export default function App() {
     try {
       const censusQuery = convertToCensusQuery();
       setDbgQuery(censusQuery);
-      const url = convertToCensusQuery().toUrl();
+      let url = convertToCensusQuery().toUrl();
+      url = url.replace('http://', 'https://');
       setQueryUrl(url);
     } catch (error) {
       console.log("Error getting query URL: ", error);
@@ -312,11 +313,11 @@ export default function App() {
 
   const [queryResult, setQueryResult] = useState("");
   async function onSubmitQuery() {
-    if (!!dbgQuery && !loading) {
+    if (!!queryUrl && !loading) {
       setLoading(true);
 
       try {
-        const response = await fetch(dbgQuery.toUrl());
+        const response = await fetch(queryUrl);
         const responseJson = await response.json();
         setQueryResult(responseJson);
         setLoading(false);
@@ -510,24 +511,6 @@ export default function App() {
                     }
                   />
                 </Grid>
-
-                {/* <Grid item sm={12}>
-                  <LimitSlider
-                    value={query.limit}
-                    onChange={onLimitChange}
-                    label="Limit"
-                  />
-                </Grid> */}
-
-                {/* <Button
-                  color="primary"
-                  variant="contained"
-                  onClick={onSubmitQuery}
-                  value="Run Query"
-                  style={{ width: "110px" }}
-                >
-                  {loading ? "Loading..." : "Run Query" }
-                </Button> */}
               </Paper>
             </Grid>
           </Grid>

@@ -52,8 +52,6 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
     return queryUrl.replace(regex, '/s:example/');
   }
 
-  const preventDefault = (event) => event.preventDefault();
-
   return (
     <Paper className={classes.paper}>
       <h1>Query String</h1>
