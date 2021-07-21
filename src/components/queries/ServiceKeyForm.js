@@ -31,7 +31,9 @@ function ServiceKeyForm({ onServiceKeyChange }) {
         onChange={(e) => setServiceKey(e.target.value)}
         placeholder="example"
         value={serviceKey}
+        helperText="Omit the leading 's:'"
       />
+
       <Button
         type="submit"
         variant="outlined"

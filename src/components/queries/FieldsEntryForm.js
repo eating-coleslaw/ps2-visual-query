@@ -5,6 +5,7 @@ import {
   IconButton,
   InputAdornment,
   Paper,
+  Chip,
 } from "@material-ui/core";
 import AddCircleOutline from "@material-ui/icons/AddCircleOutline";
 import DeleteOutline from "@material-ui/icons/DeleteOutline";
@@ -29,7 +30,18 @@ const useStyles = makeStyles((theme) => ({
   },
   removeFieldButton: {
     padding: 0,
-  }
+  },
+  chipList: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    padding: theme.spacing(0.5),
+    margin: 0,
+  },
+  chip: {
+    margin: theme.spacing(0.5),
+  },
 }));
 
 export default function FieldsEntryForm({
@@ -52,6 +64,7 @@ export default function FieldsEntryForm({
   }
 
   function handleRemoveField(field) {
+    console.log(field);
     const value = field;
     onRemoveField(value);
   }
@@ -66,23 +79,31 @@ export default function FieldsEntryForm({
 
   const fieldItems = fields.map((field) => {
     return (
-      <Grid key={field} item  className={classes.fieldGridItem}>
-        <Paper className={classes.paper}>
-          <Grid container>
+        <li key={field}>
+          <Chip
+            label={field}
+            onDelete={() => handleRemoveField(field)}
+            className={classes.chip}
+            size="small"
+          />
+        </li>
+      // <Grid key={field} item  className={classes.fieldGridItem}>
+      //   <Paper className={classes.paper}>
+      //     <Grid container>
 
-            <Grid item className={classes.fieldName}>
-              {field}
-            </Grid>
+      //       <Grid item className={classes.fieldName}>
+      //         {field}
+      //       </Grid>
             
-            <Grid item>
-              <IconButton name={field} value={field} onClick={() => handleRemoveField(field)} aria-label={`Remove ${field}`} className={classes.removeFieldButton} title={`Remove ${field}`}>
-                <DeleteOutline fontSize="small"/>
-              </IconButton>
-            </Grid>
+      //       <Grid item>
+      //         <IconButton name={field} value={field} onClick={() => handleRemoveField(field)} aria-label={`Remove ${field}`} className={classes.removeFieldButton} title={`Remove ${field}`}>
+      //           <DeleteOutline fontSize="small"/>
+      //         </IconButton>
+      //       </Grid>
 
-          </Grid>
-        </Paper>
-      </Grid>
+      //     </Grid>
+      //   </Paper>
+      // </Grid>
     );
   });
 
@@ -96,6 +117,7 @@ export default function FieldsEntryForm({
             margin="dense"
             variant="outlined"
             name="show-field"
+            size="small"
             onChange={(e) => setInputField(e.target.value)}
             placeholder="example"
             value={inputField}
@@ -118,7 +140,9 @@ export default function FieldsEntryForm({
           />
         </form>
       </Grid>
-      {fieldItems}
+      <ul className={classes.chipList}>
+        {fieldItems}
+      </ul>
     </React.Fragment>
   );
 }
