@@ -27,7 +27,7 @@ export default function CollectionSelector({ collection, onChange }) {
   function handleChange(event) {
     const value = event.target.value;
     onChange(value);
-  } 
+  }
 
   return (
     <FormControl variant="outlined">
@@ -41,7 +41,7 @@ export default function CollectionSelector({ collection, onChange }) {
         onChange={handleChange}
         inputProps={{
           name: "collection",
-          id: "collection-select"
+          id: "collection-select",
         }}
       >
         {collectionItems}
