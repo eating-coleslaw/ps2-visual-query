@@ -7,10 +7,11 @@ import {
   TextField,
   Grid,
   IconButton,
-  InputAdornment
+  InputAdornment,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import SaveIcon from "@material-ui/icons/Save";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 const useStyles = makeStyles((theme) => ({
   fieldGridItem: {
@@ -32,11 +33,11 @@ export default function ConditionArgumentForm({
   onFieldChange,
   onOperatorChange,
   onValueChange,
+  onDelete,
 }) {
   const classes = useStyles();
 
   const [field, setField] = useState(conditionData.field);
-  const [operatorValue, setOperatorValue] = useState(conditionData.operator.value);
   const [value, setValue] = useState(conditionData.value);
 
   // const [condition, setCondition] = useState({
@@ -56,11 +57,6 @@ export default function ConditionArgumentForm({
     </option>
   ));
 
-  function handleFieldChange(event) {
-    const value = event.target.value;
-    onFieldChange(value);
-  }
-
   function isValidInput(value) {
     return value !== "";
   }
@@ -69,44 +65,30 @@ export default function ConditionArgumentForm({
     const value = event.target.value;
     const operator = operators.find((o) => o.value === value);
     console.log(operator);
-    onOperatorChange(operator);
-  }
-
-  function handleValueChange(event) {
-    const value = event.target.value;
-    onValueChange(value);
-  }
-
-  function handleSaveCondition() {
-    
+    onOperatorChange(conditionData.id, operator);
   }
 
   function onSubmitField(event) {
     event.preventDefault();
-    onFieldChange(field);
+    onFieldChange(conditionData.id, field);
   }
 
   function onSubmitValue(event) {
     event.preventDefault();
-    onValueChange(value);
+    onValueChange(conditionData.id, value);
+  }
+
+  function handleDeleteCondition() {
+    onDelete(conditionData.id);
   }
 
   return (
     <React.Fragment>
       <Grid item xs={12} md={4}>
-        {/* <TextField
-          id="condition-field"
-          label="Condition Field"
-          margin="dense"
-          variant="outlined"
-          name="condition-field"
-          onChange={handleFieldChange}
-          value={conditionData.field}
-        /> */}
         <form noValidate autoComplete="off" onSubmit={onSubmitField}>
           <TextField
             id="condition-field"
-            label="Condition Field"
+            label="Field"
             margin="dense"
             variant="outlined"
             name="condition-field"
@@ -120,11 +102,13 @@ export default function ConditionArgumentForm({
                     type="submit"
                     variant="outlined"
                     color="primary"
-                    disabled={!isValidInput(field) || (field === conditionData.field)}
+                    disabled={
+                      !isValidInput(field) || field === conditionData.field
+                    }
                     aria-label="Update the condition's field"
                     className={classes.button}
                   >
-                    <SaveIcon fontSize="small"/>
+                    <SaveIcon fontSize="small" />
                   </IconButton>
                 </InputAdornment>
               ),
@@ -151,19 +135,10 @@ export default function ConditionArgumentForm({
         </FormControl>
       </Grid>
       <Grid item xs={8} md={4}>
-        {/* <TextField
-          id="condition-value"
-          label="Condition value"
-          margin="dense"
-          variant="outlined"
-          name="condition-value"
-          onChange={handleValueChange}
-          value={conditionData.value}
-        /> */}
         <form noValidate autoComplete="off" onSubmit={onSubmitValue}>
           <TextField
             id="condition-value"
-            label="Condition Value"
+            label="Value"
             margin="dense"
             variant="outlined"
             name="condition-value"
@@ -177,11 +152,13 @@ export default function ConditionArgumentForm({
                     type="submit"
                     variant="outlined"
                     color="primary"
-                    disabled={!isValidInput(value) || (value === conditionData.value)}
+                    disabled={
+                      !isValidInput(value) || value === conditionData.value
+                    }
                     aria-label="Update the condition's filter value"
                     className={classes.button}
                   >
-                    <SaveIcon fontSize="small"/>
+                    <SaveIcon fontSize="small" />
                   </IconButton>
                 </InputAdornment>
               ),
@@ -189,11 +166,15 @@ export default function ConditionArgumentForm({
           />
         </form>
       </Grid>
-      {/* <Grid item xs={1} md={1}>
-        <IconButton aria-label="Save query condition" onClick={handleSaveCondition} color="primary" >
-          <SaveIcon fontSize="small"/>
+      <Grid item xs={1} md={1}>
+        <IconButton
+          aria-label="Delete this query condition"
+          title="Delete this query condition"
+          onClick={handleDeleteCondition}
+        >
+          <DeleteIcon fontSize="small" />
         </IconButton>
-      </Grid> */}
+      </Grid>
     </React.Fragment>
   );
 }

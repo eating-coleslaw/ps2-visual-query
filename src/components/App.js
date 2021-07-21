@@ -16,9 +16,10 @@ import {
   Select,
 } from "@material-ui/core";
 import "../styles/App.css";
-import ServiceKeyForm from "./queries/ServiceKeyForm";
 import { pink, amber } from "@material-ui/core/colors";
+import AddIcon from "@material-ui/icons/Add";
 
+import ServiceKeyForm from "./queries/ServiceKeyForm";
 import CollectionSelector from "./queries/CollectionSelector";
 import LimitSlider from "./queries/LimitSlider";
 import LanguageSelector from "./queries/LanguageSelector";
@@ -27,6 +28,8 @@ import FieldsEntryForm from "./queries/FieldsEntryForm";
 import ConditionArgumentForm from "./queries/ConditionArgumentForm";
 import QueryResults from "./queries/QueryResults";
 import QueryUrlContainer from "./queries/QueryUrlContainer";
+
+import { v4 as uuidv4 } from "uuid";
 
 const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
@@ -63,6 +66,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.primary,
     fontWeight: 500,
     width: "100%",
+    marginTop: theme.spacing(1),
   },
   itemParagraph: {
     marginTop: theme.spacing(1),
@@ -76,6 +80,10 @@ const useStyles = makeStyles((theme) => ({
   },
   inlineSelectItem: {
     marginTop: 4,
+  },
+  textButton: {
+    marginTop: -4,
+    marginBottom: theme.spacing(1),
   },
 }));
 
@@ -124,7 +132,9 @@ export default function App() {
     [prefersDarkMode]
   );
 
-  dbgcensus.SetGlobalNamespace("ps2:v2");
+  useEffect(() => {
+    dbgcensus.SetGlobalNamespace("ps2:v2");
+  }, []);
 
   function onServiceKeyChange(key) {
     setQuery({ ...query, ...{ serviceKey: key } });
@@ -185,43 +195,102 @@ export default function App() {
     }
   }
 
-  function onConditionOperatorChange(operator) {
-    setQuery({
-      ...query,
-      ...{
-        condition: {
-          field: query.condition.field,
-          operator,
-          value: query.condition.value,
-        },
-      },
+  function onConditionOperatorChange(id, operator) {
+    const updatedConditions = query.conditions.map((condition) => {
+      if (condition.id === id) {
+        condition.operator = operator;
+      }
+
+      return condition;
     });
+
+    setQuery({ ...query, ...{ conditions: updatedConditions } });
+
+    // setQuery({
+    //   ...query,
+    //   ...{
+    //     condition: {
+    //       field: query.condition.field,
+    //       operator,
+    //       value: query.condition.value,
+    //     },
+    //   },
+    // });
   }
 
-  function onConditionFieldChange(field) {
-    setQuery({
-      ...query,
-      ...{
-        condition: {
-          field,
-          operator: query.condition.operator,
-          value: query.condition.value,
-        },
-      },
+  function onConditionFieldChange(id, field) {
+    const updatedConditions = query.conditions.map((condition) => {
+      if (condition.id === id) {
+        condition.field = field;
+      }
+
+      return condition;
     });
+
+    setQuery({ ...query, ...{ conditions: updatedConditions } });
+
+    // setQuery({
+    //   ...query,
+    //   ...{
+    //     condition: {
+    //       field,
+    //       operator: query.condition.operator,
+    //       value: query.condition.value,
+    //     },
+    //   },
+    // });
   }
 
-  function onConditionValueChange(value) {
+  function onConditionValueChange(id, value) {
+    const updatedConditions = query.conditions.map((condition) => {
+      if (condition.id === id) {
+        condition.value = value;
+      }
+
+      return condition;
+    });
+
+    setQuery({ ...query, ...{ conditions: updatedConditions } });
+
+    // setQuery({
+    //   ...query,
+    //   ...{
+    //     condition: {
+    //       field: query.condition.field,
+    //       operator: query.condition.operator,
+    //       value,
+    //     },
+    //   },
+    // });
+  }
+
+  function onAddNewCondition() {
+    const newCondition = {
+      id: uuidv4(),
+      field: "",
+      value: "",
+      operator: {
+        display: "=",
+        name: "equals",
+        title: "Equals",
+        value: "=",
+      },
+    };
+
     setQuery({
       ...query,
-      ...{
-        condition: {
-          field: query.condition.field,
-          operator: query.condition.operator,
-          value,
-        },
-      },
+      ...{ conditions: [...query.conditions, newCondition] },
     });
+
+    console.log(query.conditions);
+  }
+
+  function onDeleteCondition(id) {
+    const updatedConditions = query.conditions.filter((condition) => {
+      return condition.id !== id;
+    });
+
+    setQuery({ ...query, ...{ conditions: updatedConditions } });
   }
 
   const [queryUrl, setQueryUrl] = useState("");
@@ -260,15 +329,29 @@ export default function App() {
         censusQuery.sort(query.sort);
       }
 
-      if (
-        query.condition.field !== "" &&
-        !!query.condition.operator &&
-        query.condition.value !== ""
-      ) {
-        censusQuery
-          .where(query.condition.field)
-          [query.condition.operator.name](query.condition.value);
+      if (query.conditions.length > 0) {
+        query.conditions.forEach((condition) => {
+          if (
+            condition.field !== "" &&
+            !!condition.operator &&
+            condition.value !== ""
+          ) {
+            censusQuery
+              .where(condition.field)
+              [condition.operator.name](condition.value);
+          }
+        });
       }
+
+      // if (
+      //   query.condition.field !== "" &&
+      //   !!query.condition.operator &&
+      //   query.condition.value !== ""
+      // ) {
+      //   censusQuery
+      //     .where(query.condition.field)
+      //     [query.condition.operator.name](query.condition.value);
+      // }
 
       return censusQuery;
     }
@@ -294,6 +377,8 @@ export default function App() {
       }
     }
   }
+
+  console.log(queryUrl);
 
   return (
     <ThemeProvider theme={theme}>
@@ -337,6 +422,7 @@ export default function App() {
                   for more information on using the API.
                 </p>
 
+                <h2 className={classes.header2}>Collection</h2>
                 <Grid
                   container
                   spacing={1}
@@ -368,12 +454,35 @@ export default function App() {
                   spacing={1}
                   className={classes.gridRow}
                 >
-                  <ConditionArgumentForm
+                  {query.conditions.map((condition) => {
+                    return (
+                      <ConditionArgumentForm
+                        key={condition.id}
+                        conditionData={condition}
+                        onFieldChange={onConditionFieldChange}
+                        onOperatorChange={onConditionOperatorChange}
+                        onValueChange={onConditionValueChange}
+                        onDelete={onDeleteCondition}
+                      />
+                    );
+                  })}
+                  {/* <ConditionArgumentForm
                     conditionData={query.condition}
                     onFieldChange={onConditionFieldChange}
                     onOperatorChange={onConditionOperatorChange}
                     onValueChange={onConditionValueChange}
-                  />
+                  /> */}
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    color="primary"
+                    startIcon={<AddIcon fontSize="small" />}
+                    size="small"
+                    onClick={onAddNewCondition}
+                    className={classes.textButton}
+                  >
+                    New Condition
+                  </Button>
                 </Grid>
 
                 <h2 className={classes.header2}>Filter Displayed Fields</h2>
