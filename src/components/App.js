@@ -26,6 +26,7 @@ import LanguageSelector from "./queries/LanguageSelector";
 
 import FieldsEntryForm from "./queries/FieldsEntryForm";
 import ConditionArgumentForm from "./queries/ConditionArgumentForm";
+import QueryResults from "./queries/QueryResults";
 
 const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
@@ -477,7 +478,8 @@ export default function App() {
             </Grid>
 
             <Grid item xs={12} className={classes.gridContainerItem}>
-              <Paper className={classes.paper}>
+              <QueryResults data={queryResult} />
+              {/* <Paper className={classes.paper}>
                 <h1 className={classes.header1}>Query Results</h1>
                 {!!queryResult ? (
                   <ReactJson
@@ -490,10 +492,11 @@ export default function App() {
                       maxHeight: "600px",
                       overflow: "auto",
                       lineHeight: "1.1",
+                      marginTop: theme.spacing(1),
                     }}
                   />
                 ) : null}
-              </Paper>
+              </Paper> */}
             </Grid>
           </Grid>
         </Grid>
