@@ -45,7 +45,7 @@ export default function QueryResults({ data, isLoading }) {
 
   return (
     <Paper className={classes.paper}>
-      <h1>Query Results</h1>
+      <h1 className={classes.header1}>Query Results</h1>
       {!!data ? (
         <div className={classes.textView}>
           <pre>{JSON.stringify(data, null, 2)}</pre>

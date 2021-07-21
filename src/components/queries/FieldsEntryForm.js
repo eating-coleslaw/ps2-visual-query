@@ -47,7 +47,6 @@ export default function FieldsEntryForm({
   }
 
   function handleRemoveField(field) {
-    console.log(field);
     const value = field;
     onRemoveField(value);
   }

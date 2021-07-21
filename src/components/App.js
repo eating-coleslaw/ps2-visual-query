@@ -305,8 +305,11 @@ export default function App() {
       const censusQuery = convertToCensusQuery();
       setDbgQuery(censusQuery);
 
-      let url = censusQuery().toUrl();
+      console.log('CensusQuery: ', censusQuery);
+
+      let url = censusQuery.toUrl();
       url = url.replace('http://', 'https://');
+      console.log('Set Query URL: ', url);
       setQueryUrl(url);
     } catch (error) {
       console.log("Error getting query URL: ", error);
@@ -331,8 +334,6 @@ export default function App() {
       }
     }
   }
-
-  console.log(queryUrl);
 
   return (
     <ThemeProvider theme={theme}>

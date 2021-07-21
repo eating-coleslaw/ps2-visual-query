@@ -6,6 +6,12 @@ import AssignmentIcon from '@material-ui/icons/Assignment';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 
 const useStyles = makeStyles((theme) => ({
+  header1: {
+    margin: 0,
+    fontSize: "1.4em",
+    color: theme.palette.text.primary,
+    fontWeight: 500,
+  },
   paper: {
     padding: theme.spacing(2),
   },
@@ -54,7 +60,7 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
 
   return (
     <Paper className={classes.paper}>
-      <h1>Query String</h1>
+      <h1 className={classes.header1}>Query String</h1>
       <div className={classes.urlBox}>{queryUrl}</div>
       <Grid container justifyContent="flex-start" alignItems="center" spacing={1} className={classes.container}>
 
