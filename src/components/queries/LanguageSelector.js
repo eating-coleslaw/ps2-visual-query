@@ -27,11 +27,11 @@ export default function LanguageSelector({ language, onChange }) {
   function handleChange(e) {
     const value = e.target.value;
     onChange(value);
-  } 
+  }
 
   return (
     <FormControl variant="outlined">
-      <InputLabel htmlFor='language-select'>Language</InputLabel>
+      <InputLabel htmlFor="language-select">Language</InputLabel>
       <Select
         native
         margin="dense"
@@ -40,11 +40,13 @@ export default function LanguageSelector({ language, onChange }) {
         value={language}
         onChange={handleChange}
         inputProps={{
-          name: 'language',
-          id: 'language-select'
+          name: "language",
+          id: "language-select",
         }}
       >
-        <option aria-label="All" value="All">All</option>
+        <option aria-label="All" value="All">
+          All
+        </option>
         {languageItems}
       </Select>
     </FormControl>

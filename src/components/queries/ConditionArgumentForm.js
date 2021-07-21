@@ -1,6 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import QueryEnums from "../../planetside/QueryEnums";
-import { InputLabel, FormControl, Select, TextField, Button, Grid } from "@material-ui/core";
+import {
+  InputLabel,
+  FormControl,
+  Select,
+  TextField,
+  Grid,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -10,14 +16,19 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(1),
   },
   operatorGrid: {
-    marginTop: 4, 
-  }
+    marginTop: 4,
+  },
 }));
 
-export default function ConditionArgumentForm({ conditionData, onFieldChange, onOperatorChange, onValueChange }) {
+export default function ConditionArgumentForm({
+  conditionData,
+  onFieldChange,
+  onOperatorChange,
+  onValueChange,
+}) {
   const classes = useStyles();
-  
-  const [operators, setOperators] =  useState([]);
+
+  const [operators, setOperators] = useState([]);
   useEffect(() => {
     setOperators(QueryEnums.Operators);
   }, []);
@@ -45,7 +56,7 @@ export default function ConditionArgumentForm({ conditionData, onFieldChange, on
     onValueChange(value);
   }
 
-  return(
+  return (
     <React.Fragment>
       <Grid item xs={12} md={4}>
         <TextField
@@ -87,16 +98,6 @@ export default function ConditionArgumentForm({ conditionData, onFieldChange, on
           value={conditionData.value}
         />
       </Grid>
-      {/* <Button
-        type="submit"
-        variant="outlined"
-        color="primary"
-        size="large"
-        className={classes.button}
-        startIcon={<SaveIcon />}
-      >
-        Save
-      </Button> */}
     </React.Fragment>
   );
 }

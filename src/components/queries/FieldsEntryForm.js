@@ -4,11 +4,9 @@ import {
   TextField,
   IconButton,
   InputAdornment,
-  Paper,
   Chip,
 } from "@material-ui/core";
 import AddCircleOutline from "@material-ui/icons/AddCircleOutline";
-import DeleteOutline from "@material-ui/icons/DeleteOutline";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -16,26 +14,11 @@ const useStyles = makeStyles((theme) => ({
     margin: 0,
     padding: 0,
   },
-  fieldGridItem: {
-    marginTop: theme.spacing(1),
-    marginBottom: 4,
-    marginLeft: theme.spacing(1),
-  },
-  paper: {
-    padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
-    textAlign: 'center',
-  },
-  fieldName: {
-    marginRight: theme.spacing(1),
-  },
-  removeFieldButton: {
-    padding: 0,
-  },
   chipList: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-    flexWrap: 'wrap',
-    listStyle: 'none',
+    display: "flex",
+    justifyContent: "flex-start",
+    flexWrap: "wrap",
+    listStyle: "none",
     padding: theme.spacing(0.5),
     margin: 0,
   },
@@ -79,31 +62,14 @@ export default function FieldsEntryForm({
 
   const fieldItems = fields.map((field) => {
     return (
-        <li key={field}>
-          <Chip
-            label={field}
-            onDelete={() => handleRemoveField(field)}
-            className={classes.chip}
-            size="small"
-          />
-        </li>
-      // <Grid key={field} item  className={classes.fieldGridItem}>
-      //   <Paper className={classes.paper}>
-      //     <Grid container>
-
-      //       <Grid item className={classes.fieldName}>
-      //         {field}
-      //       </Grid>
-            
-      //       <Grid item>
-      //         <IconButton name={field} value={field} onClick={() => handleRemoveField(field)} aria-label={`Remove ${field}`} className={classes.removeFieldButton} title={`Remove ${field}`}>
-      //           <DeleteOutline fontSize="small"/>
-      //         </IconButton>
-      //       </Grid>
-
-      //     </Grid>
-      //   </Paper>
-      // </Grid>
+      <li key={field}>
+        <Chip
+          label={field}
+          onDelete={() => handleRemoveField(field)}
+          className={classes.chip}
+          size="small"
+        />
+      </li>
     );
   });
 
@@ -140,9 +106,7 @@ export default function FieldsEntryForm({
           />
         </form>
       </Grid>
-      <ul className={classes.chipList}>
-        {fieldItems}
-      </ul>
+      <ul className={classes.chipList}>{fieldItems}</ul>
     </React.Fragment>
   );
 }
