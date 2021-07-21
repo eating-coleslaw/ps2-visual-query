@@ -111,17 +111,13 @@ export default function App() {
   const [storeKey, setStoreKey] = useState(localStorage.getItem('DaybreakGamesKey'));
   useEffect(() => {
     const storedKey = localStorage.getItem('DaybreakGamesKey');
-
-    console.log('Stored Key: ', storedKey);
-
     if (storedKey !== null) {
+      dbgcensus.SetGlobalServiceKey(storedKey);
       setStoreKey(storedKey);
     }
   }, [setStoreKey]);
 
   const [loading, setLoading] = useState(false);
-
-  console.log('storeKey: ', storeKey);
 
   const [query, setQuery] = useState({
     serviceKey: storeKey || "example",
@@ -139,8 +135,6 @@ export default function App() {
     lang: null,
     sort: [],
   });
-
-  console.log(query.serviceKey);
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
@@ -161,6 +155,12 @@ export default function App() {
     setQuery({ ...query, ...{ serviceKey: key } });
     dbgcensus.SetGlobalServiceKey(key);
     localStorage.setItem('DaybreakGamesKey', key);
+  }
+
+  function onDeleteStoredServiceKey() {
+    setQuery({ ...query, ...{ serviceKey: 'example' } });
+    dbgcensus.SetGlobalServiceKey('example');
+    localStorage.removeItem('DaybreakGamesKey');
   }
 
   function onCollectionChange(value) {
@@ -311,7 +311,6 @@ export default function App() {
   }, [query]);
 
   const [queryResult, setQueryResult] = useState("");
-  // async function onSubmitQuery() {
   async function onSubmitQuery() {
     if (!!dbgQuery && !loading) {
       setLoading(true);
@@ -324,28 +323,7 @@ export default function App() {
       } catch (error) {
         console.log("Error getting data from query: ", error);
       }
-
-      // fetch(dbgQuery.toUrl())
-      //   .then(response => response.json())
-      //   .then(responseJson => {
-      //     setQueryResult(responseJson);
-      //     setLoading(false);
-      //   })
-      //   .catch(error => {
-      //     console.log("Error getting data from query: ", error);
-      //     setLoading(false);
-      //   });
     }
-    
-    // if (!!dbgQuery) {
-    //   try {
-    //     const response = await fetch(dbgQuery.toUrl());
-    //     const responseJson = await response.json();
-    //     setQueryResult(responseJson);
-    //   } catch (error) {
-    //     console.log("Error getting data from query: ", error);
-    //   }
-    // }
   }
 
   console.log(queryUrl);
@@ -372,7 +350,7 @@ export default function App() {
                   . The 'example' service ID allows up to 10 requests per
                   minute. Saving your service ID will store it to this browser.
                 </p>
-                <ServiceKeyForm serviceId={query.serviceKey} onServiceKeyChange={onServiceKeyChange} />
+                <ServiceKeyForm serviceId={query.serviceKey} onServiceKeyChange={onServiceKeyChange} onDeleteStoredKey={onDeleteStoredServiceKey}/>
               </Paper>
             </Grid>
 

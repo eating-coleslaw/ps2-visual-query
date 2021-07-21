@@ -1,8 +1,9 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Paper, Button, Grid } from "@material-ui/core";
+import { Paper, Button, Grid, Link } from "@material-ui/core";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -23,8 +24,10 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   button: {
-    width: 140,
     // marginTop: theme.spacing(2),
+  },
+  runButton: {
+    width: 120,
   },
   buttonWide: {
     // marginTop: theme.spacing(2),
@@ -49,6 +52,8 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
     return queryUrl.replace(regex, '/s:example/');
   }
 
+  const preventDefault = (event) => event.preventDefault();
+
   return (
     <Paper className={classes.paper}>
       <h1>Query String</h1>
@@ -60,12 +65,12 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
             color="primary"
             variant="contained"
             onClick={onRunQuery}
-            value="Run Query"
-            className={classes.button}
-            startIcon={<PlayArrowIcon />}
+            value="Run"
+            className={classes.runButton}
+            startIcon={isLoading ? null : <PlayArrowIcon />}
             title="Run the query"
           >
-            {isLoading ? "Loading..." : "Run Query" }
+            {isLoading ? "Loading..." : "Run" }
           </Button>
         </Grid>
 
@@ -74,12 +79,12 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
               color="primary"
               variant="outlined"
               onClick={copyToClipboardExact}
-              value="Copy Exact"
+              value="Copy"
               className={classes.button}
               title="Copy the query url to the clipboard"
               startIcon={<AssignmentIcon />}
             >
-              Copy Exact
+              Copy
             </Button>
         </Grid>
         
@@ -95,6 +100,21 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
             >
               Copy Anon.
             </Button>
+        </Grid>
+        
+        <Grid item className={classes.gridItem}>
+          <Link to={queryUrl} href={queryUrl} target="_blank" rel="noreferrer">
+            <Button
+                color="primary"
+                variant="outlined"
+                value="Open Query"
+                className={classes.buttonWide}
+                title="Open the query URL in a new tab"
+                startIcon={<OpenInNewIcon />}
+              >
+                Open
+              </Button>
+          </Link>
         </Grid>
 
       </Grid>
