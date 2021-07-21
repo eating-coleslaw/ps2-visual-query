@@ -358,6 +358,7 @@ export default function App() {
                   </Grid>
                 </Grid>
 
+                <h2 className={classes.header2}>Search Conditions</h2>
                 <Grid
                   item
                   container
