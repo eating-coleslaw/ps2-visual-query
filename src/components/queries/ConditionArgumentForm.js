@@ -30,21 +30,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ConditionArgumentForm({
   conditionData,
-  onFieldChange,
-  onOperatorChange,
-  onValueChange,
+  onDataChange,
   onDelete,
 }) {
   const classes = useStyles();
 
   const [field, setField] = useState(conditionData.field);
   const [value, setValue] = useState(conditionData.value);
-
-  // const [condition, setCondition] = useState({
-  //   field: conditionData.field,
-  //   operator: conditionData.operator.value,
-  //   value: conditionData.value,
-  // })
 
   const [operators, setOperators] = useState([]);
   useEffect(() => {
@@ -64,18 +56,17 @@ export default function ConditionArgumentForm({
   function handleOperatorChange(event) {
     const value = event.target.value;
     const operator = operators.find((o) => o.value === value);
-    console.log(operator);
-    onOperatorChange(conditionData.id, operator);
+    onDataChange(conditionData.id, "operator", operator);
   }
 
   function onSubmitField(event) {
     event.preventDefault();
-    onFieldChange(conditionData.id, field);
+    onDataChange(conditionData.id, "field", field);
   }
 
   function onSubmitValue(event) {
     event.preventDefault();
-    onValueChange(conditionData.id, value);
+    onDataChange(conditionData.id, "value", value);
   }
 
   function handleDeleteCondition() {

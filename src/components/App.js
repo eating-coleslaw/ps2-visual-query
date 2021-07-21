@@ -96,16 +96,6 @@ export default function App() {
     collection: "character",
     language: "All",
     conditions: [],
-    condition: {
-      field: "name.first",
-      operator: {
-        display: "=",
-        name: "equals",
-        title: "Equals",
-        value: "=",
-      },
-      value: "",
-    },
     limit: 10,
     start: null,
     filterType: "show",
@@ -167,9 +157,6 @@ export default function App() {
     const isChecked = event.target.checked;
     const value = isChecked ? "show" : "hide";
 
-    console.log(value);
-    console.log(query.filterFields);
-
     setQuery({ ...query, ...{ filterType: value } });
   }
 
@@ -195,73 +182,16 @@ export default function App() {
     }
   }
 
-  function onConditionOperatorChange(id, operator) {
+  function onConditionDataChange(id, fieldName, fieldvalue) {
     const updatedConditions = query.conditions.map((condition) => {
       if (condition.id === id) {
-        condition.operator = operator;
+        condition[fieldName] = fieldvalue;
       }
 
       return condition;
     });
 
     setQuery({ ...query, ...{ conditions: updatedConditions } });
-
-    // setQuery({
-    //   ...query,
-    //   ...{
-    //     condition: {
-    //       field: query.condition.field,
-    //       operator,
-    //       value: query.condition.value,
-    //     },
-    //   },
-    // });
-  }
-
-  function onConditionFieldChange(id, field) {
-    const updatedConditions = query.conditions.map((condition) => {
-      if (condition.id === id) {
-        condition.field = field;
-      }
-
-      return condition;
-    });
-
-    setQuery({ ...query, ...{ conditions: updatedConditions } });
-
-    // setQuery({
-    //   ...query,
-    //   ...{
-    //     condition: {
-    //       field,
-    //       operator: query.condition.operator,
-    //       value: query.condition.value,
-    //     },
-    //   },
-    // });
-  }
-
-  function onConditionValueChange(id, value) {
-    const updatedConditions = query.conditions.map((condition) => {
-      if (condition.id === id) {
-        condition.value = value;
-      }
-
-      return condition;
-    });
-
-    setQuery({ ...query, ...{ conditions: updatedConditions } });
-
-    // setQuery({
-    //   ...query,
-    //   ...{
-    //     condition: {
-    //       field: query.condition.field,
-    //       operator: query.condition.operator,
-    //       value,
-    //     },
-    //   },
-    // });
   }
 
   function onAddNewCondition() {
@@ -281,8 +211,6 @@ export default function App() {
       ...query,
       ...{ conditions: [...query.conditions, newCondition] },
     });
-
-    console.log(query.conditions);
   }
 
   function onDeleteCondition(id) {
@@ -342,16 +270,6 @@ export default function App() {
           }
         });
       }
-
-      // if (
-      //   query.condition.field !== "" &&
-      //   !!query.condition.operator &&
-      //   query.condition.value !== ""
-      // ) {
-      //   censusQuery
-      //     .where(query.condition.field)
-      //     [query.condition.operator.name](query.condition.value);
-      // }
 
       return censusQuery;
     }
@@ -459,19 +377,11 @@ export default function App() {
                       <ConditionArgumentForm
                         key={condition.id}
                         conditionData={condition}
-                        onFieldChange={onConditionFieldChange}
-                        onOperatorChange={onConditionOperatorChange}
-                        onValueChange={onConditionValueChange}
+                        onDataChange={onConditionDataChange}
                         onDelete={onDeleteCondition}
                       />
                     );
                   })}
-                  {/* <ConditionArgumentForm
-                    conditionData={query.condition}
-                    onFieldChange={onConditionFieldChange}
-                    onOperatorChange={onConditionOperatorChange}
-                    onValueChange={onConditionValueChange}
-                  /> */}
                 </Grid>
                 <Grid item xs={12}>
                   <Button
@@ -539,6 +449,7 @@ export default function App() {
                   />
                 </Grid>
 
+                <h2 className={classes.header2}>Resolves & Joins</h2>
                 <Grid
                   item
                   container
