@@ -19,6 +19,16 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: "1.1",
     marginTop: theme.spacing(1),
   },
+  textView: {
+    maxHeight: "600px",
+    overflow: "auto",
+    lineHeight: "1.1",
+    marginTop: theme.spacing(1),
+  },
+  linearProgres: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+  }
 }));
 
 export default function QueryResults({ data, isLoading }) {
@@ -28,7 +38,7 @@ export default function QueryResults({ data, isLoading }) {
     return (
       <Paper className={classes.paper}>
         <h1>Query Results</h1>
-        <LinearProgress />
+        <LinearProgress className={classes.linearProgres}/>
       </Paper>
     );
   }
@@ -37,12 +47,9 @@ export default function QueryResults({ data, isLoading }) {
     <Paper className={classes.paper}>
       <h1>Query Results</h1>
       {!!data ? (
-        <div style={{
-            maxHeight: "600px",
-            overflow: "auto",
-            lineHeight: "1.1",
-            marginTop: 8,
-          }}><pre>{JSON.stringify(data, null, 2)}</pre></div>
+        <div className={classes.textView}>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        </div>
         /*{/* <ReactJson
           src={data}
           enableDelete={true}

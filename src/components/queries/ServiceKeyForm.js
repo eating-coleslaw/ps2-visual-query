@@ -9,10 +9,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ServiceKeyForm({ onServiceKeyChange }) {
+function ServiceKeyForm({ serviceId, onServiceKeyChange }) {
   const classes = useStyles();
 
-  const [serviceKey, setServiceKey] = useState("example"); // TODO: get service key from localStorage
+  const [serviceKey, setServiceKey] = useState(serviceId); // TODO: get service key from localStorage
 
   function onSubmitForm(e) {
     e.preventDefault();

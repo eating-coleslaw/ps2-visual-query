@@ -14,7 +14,6 @@ import {
   FormControl,
   InputLabel,
   Select,
-  CircularProgress,
 } from "@material-ui/core";
 import "../styles/App.css";
 import { pink, amber } from "@material-ui/core/colors";
@@ -67,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.primary,
     fontWeight: 500,
     width: "100%",
-    marginTop: theme.spacing(1),
+    marginTop: theme.spacing(1.5),
   },
   itemParagraph: {
     marginTop: theme.spacing(1),
@@ -105,10 +104,27 @@ const useStyles = makeStyles((theme) => ({
 export default function App() {
   const classes = useStyles();
 
+  useEffect(() => {
+    dbgcensus.SetGlobalNamespace("ps2:v2");
+  }, []);
+
+  const [storeKey, setStoreKey] = useState(localStorage.getItem('DaybreakGamesKey'));
+  useEffect(() => {
+    const storedKey = localStorage.getItem('DaybreakGamesKey');
+
+    console.log('Stored Key: ', storedKey);
+
+    if (storedKey !== null) {
+      setStoreKey(storedKey);
+    }
+  }, [setStoreKey]);
+
   const [loading, setLoading] = useState(false);
 
+  console.log('storeKey: ', storeKey);
+
   const [query, setQuery] = useState({
-    serviceKey: "example",
+    serviceKey: storeKey || "example",
     namespace: "ps2:v2",
     collection: "character",
     language: "All",
@@ -123,6 +139,8 @@ export default function App() {
     lang: null,
     sort: [],
   });
+
+  console.log(query.serviceKey);
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
@@ -139,13 +157,10 @@ export default function App() {
     [prefersDarkMode]
   );
 
-  useEffect(() => {
-    dbgcensus.SetGlobalNamespace("ps2:v2");
-  }, []);
-
   function onServiceKeyChange(key) {
     setQuery({ ...query, ...{ serviceKey: key } });
     dbgcensus.SetGlobalServiceKey(key);
+    localStorage.setItem('DaybreakGamesKey', key);
   }
 
   function onCollectionChange(value) {
@@ -355,9 +370,9 @@ export default function App() {
                     here
                   </a>
                   . The 'example' service ID allows up to 10 requests per
-                  minute.
+                  minute. Saving your service ID will store it to this browser.
                 </p>
-                <ServiceKeyForm onServiceKeyChange={onServiceKeyChange} />
+                <ServiceKeyForm serviceId={query.serviceKey} onServiceKeyChange={onServiceKeyChange} />
               </Paper>
             </Grid>
 
@@ -524,22 +539,22 @@ export default function App() {
                   />
                 </Grid> */}
 
-                <Button
+                {/* <Button
                   color="primary"
                   variant="contained"
                   onClick={onSubmitQuery}
                   value="Run Query"
                   style={{ width: "110px" }}
                 >
-                  {loading ? "Loading..." : "Get Query" }
-                </Button>
+                  {loading ? "Loading..." : "Run Query" }
+                </Button> */}
               </Paper>
             </Grid>
           </Grid>
 
           <Grid container item xs={12} sm={6} className={classes.gridContainer}>
             <Grid item xs={12} className={classes.gridContainerItem}>
-              <QueryUrlContainer queryUrl={queryUrl} />
+              <QueryUrlContainer queryUrl={queryUrl} isLoading={loading} onRunQuery={onSubmitQuery}/>
             </Grid>
 
             <Grid item xs={12} className={classes.gridContainerItem}>
