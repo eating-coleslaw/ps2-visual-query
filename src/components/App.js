@@ -300,10 +300,12 @@ export default function App() {
 
       return censusQuery;
     }
+
     try {
       const censusQuery = convertToCensusQuery();
       setDbgQuery(censusQuery);
-      let url = convertToCensusQuery().toUrl();
+
+      let url = censusQuery().toUrl();
       url = url.replace('http://', 'https://');
       setQueryUrl(url);
     } catch (error) {
@@ -317,6 +319,7 @@ export default function App() {
       setLoading(true);
 
       try {
+        console.log('Fetch Query URL: ', queryUrl);
         const response = await fetch(queryUrl);
         const responseJson = await response.json();
         setQueryResult(responseJson);
