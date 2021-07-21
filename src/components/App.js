@@ -14,6 +14,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  CircularProgress,
 } from "@material-ui/core";
 import "../styles/App.css";
 import { pink, amber } from "@material-ui/core/colors";
@@ -85,10 +86,26 @@ const useStyles = makeStyles((theme) => ({
     marginTop: -4,
     marginBottom: theme.spacing(1),
   },
+  buttonWrapper: {
+    margin: theme.spacing(1),
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'flex-start',
+  },
+  buttonProgress: {
+    color: 'black',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  },
 }));
 
 export default function App() {
   const classes = useStyles();
+
+  const [loading, setLoading] = useState(false);
 
   const [query, setQuery] = useState({
     serviceKey: "example",
@@ -136,11 +153,6 @@ export default function App() {
       ...query,
       ...{
         collection: value,
-        condition: {
-          field: "",
-          operator: query.condition.operator,
-          value: "",
-        },
       },
     });
   }
@@ -284,16 +296,41 @@ export default function App() {
   }, [query]);
 
   const [queryResult, setQueryResult] = useState("");
+  // async function onSubmitQuery() {
   async function onSubmitQuery() {
-    if (!!dbgQuery) {
+    if (!!dbgQuery && !loading) {
+      setLoading(true);
+
       try {
         const response = await fetch(dbgQuery.toUrl());
         const responseJson = await response.json();
         setQueryResult(responseJson);
+        setLoading(false);
       } catch (error) {
         console.log("Error getting data from query: ", error);
       }
+
+      // fetch(dbgQuery.toUrl())
+      //   .then(response => response.json())
+      //   .then(responseJson => {
+      //     setQueryResult(responseJson);
+      //     setLoading(false);
+      //   })
+      //   .catch(error => {
+      //     console.log("Error getting data from query: ", error);
+      //     setLoading(false);
+      //   });
     }
+    
+    // if (!!dbgQuery) {
+    //   try {
+    //     const response = await fetch(dbgQuery.toUrl());
+    //     const responseJson = await response.json();
+    //     setQueryResult(responseJson);
+    //   } catch (error) {
+    //     console.log("Error getting data from query: ", error);
+    //   }
+    // }
   }
 
   console.log(queryUrl);
@@ -358,6 +395,14 @@ export default function App() {
                     <LanguageSelector
                       value={query.language}
                       onChange={onLanguageChange}
+                    />
+                  </Grid>
+                  
+                  <Grid item sm={12} style={{ marginLeft: 4, marginTop: 8 }}>
+                    <LimitSlider
+                      value={query.limit}
+                      onChange={onLimitChange}
+                      label="Limit"
                     />
                   </Grid>
                 </Grid>
@@ -471,20 +516,22 @@ export default function App() {
                   />
                 </Grid>
 
-                <Grid item sm={12}>
+                {/* <Grid item sm={12}>
                   <LimitSlider
                     value={query.limit}
                     onChange={onLimitChange}
                     label="Limit"
                   />
-                </Grid>
+                </Grid> */}
 
                 <Button
                   color="primary"
+                  variant="contained"
                   onClick={onSubmitQuery}
                   value="Run Query"
+                  style={{ width: "110px" }}
                 >
-                  Get Query
+                  {loading ? "Loading..." : "Get Query" }
                 </Button>
               </Paper>
             </Grid>
@@ -496,7 +543,7 @@ export default function App() {
             </Grid>
 
             <Grid item xs={12} className={classes.gridContainerItem}>
-              <QueryResults data={queryResult} />
+              <QueryResults data={queryResult} isLoading={loading}/>
             </Grid>
           </Grid>
         </Grid>
