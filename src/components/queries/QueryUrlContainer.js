@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: "monospace",
     padding: theme.spacing(1),
     borderRadius: 4,
-    wordWrap: "break-word",
+    wordWrap: "anywhere",
     overflow: "auto",
   },
   container: {

@@ -16,7 +16,7 @@ import {
   Select,
 } from "@material-ui/core";
 import "../styles/App.css";
-import { pink, amber } from "@material-ui/core/colors";
+import { pink, amber, orange } from "@material-ui/core/colors";
 import AddIcon from "@material-ui/icons/Add";
 
 import ServiceKeyForm from "./queries/ServiceKeyForm";
@@ -28,6 +28,10 @@ import FieldsEntryForm from "./queries/FieldsEntryForm";
 import ConditionArgumentForm from "./queries/ConditionArgumentForm";
 import QueryResults from "./queries/QueryResults";
 import QueryUrlContainer from "./queries/QueryUrlContainer";
+
+import JoinsContainer from "./queries/JoinsContainer";
+
+import JoinForm from "./queries/JoinForm";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -87,15 +91,15 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonWrapper: {
     margin: theme.spacing(1),
-    position: 'relative',
-    display: 'flex',
-    justifyContent: 'flex-start',
+    position: "relative",
+    display: "flex",
+    justifyContent: "flex-start",
   },
   buttonProgress: {
-    color: 'black',
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    color: "black",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
     marginTop: -12,
     marginLeft: -12,
   },
@@ -108,9 +112,11 @@ export default function App() {
     dbgcensus.SetGlobalNamespace("ps2:v2");
   }, []);
 
-  const [storeKey, setStoreKey] = useState(localStorage.getItem('DaybreakGamesKey'));
+  const [storeKey, setStoreKey] = useState(
+    localStorage.getItem("DaybreakGamesKey")
+  );
   useEffect(() => {
-    const storedKey = localStorage.getItem('DaybreakGamesKey');
+    const storedKey = localStorage.getItem("DaybreakGamesKey");
     if (storedKey !== null) {
       dbgcensus.SetGlobalServiceKey(storedKey);
       setStoreKey(storedKey);
@@ -144,7 +150,7 @@ export default function App() {
         palette: {
           type: "light", //prefersDarkMode ? "dark" : "light",
           primary: pink,
-          secondary: amber,
+          secondary: orange, //amber,
         },
         contrastThreshold: 5,
       }),
@@ -154,13 +160,13 @@ export default function App() {
   function onServiceKeyChange(key) {
     setQuery({ ...query, ...{ serviceKey: key } });
     dbgcensus.SetGlobalServiceKey(key);
-    localStorage.setItem('DaybreakGamesKey', key);
+    localStorage.setItem("DaybreakGamesKey", key);
   }
 
   function onDeleteStoredServiceKey() {
-    setQuery({ ...query, ...{ serviceKey: 'example' } });
-    dbgcensus.SetGlobalServiceKey('example');
-    localStorage.removeItem('DaybreakGamesKey');
+    setQuery({ ...query, ...{ serviceKey: "example" } });
+    dbgcensus.SetGlobalServiceKey("example");
+    localStorage.removeItem("DaybreakGamesKey");
   }
 
   function onCollectionChange(value) {
@@ -204,10 +210,10 @@ export default function App() {
     }
   }
 
-  function onConditionDataChange(id, fieldName, fieldvalue) {
+  function onConditionDataChange(id, propertyName, propertyValue) {
     const updatedConditions = query.conditions.map((condition) => {
       if (condition.id === id) {
-        condition[fieldName] = fieldvalue;
+        condition[propertyName] = propertyValue;
       }
 
       return condition;
@@ -231,7 +237,7 @@ export default function App() {
 
     setQuery({
       ...query,
-      ...{ conditions: [...query.conditions, newCondition] }
+      ...{ conditions: [...query.conditions, newCondition] },
     });
   }
 
@@ -242,6 +248,35 @@ export default function App() {
 
     setQuery({ ...query, ...{ conditions: updatedConditions } });
   }
+
+  function onJoinDataChange(updatedJoin) {
+    const updatedJoins = query.joins.map((join) => {
+      if (join.id === updatedJoin.id) {
+        return updatedJoin;
+      }
+
+      return join;
+    });
+
+    setQuery({ ...query, ...{ joins: updatedJoins } });
+  }
+
+  function onAddNewJoin(newJoin) {
+    if (!!newJoin.parentId) {
+      return;
+    }
+
+    setQuery({ ...query, ...{ joins: [...query.joins, newJoin] } });
+  }
+
+  function onDeleteJoin(id) {
+    const updatedJoins = query.joins.filter((join) => {
+      return join.id !== id;
+    });
+
+    setQuery({ ...query, ...{ joins: updatedJoins} });
+  }
+
 
   const [queryUrl, setQueryUrl] = useState("");
   const [dbgQuery, setDbgQuery] = useState(
@@ -293,6 +328,29 @@ export default function App() {
         });
       }
 
+      if (query.joins.length > 0) {
+        query.joins.forEach((join) => {
+          if (!!join.collection) {
+            let serviceJoin = censusQuery.joinService(join.collection);
+            
+            serviceJoin.isList(join.isList);
+            serviceJoin.isOuterJoin(join.isOuterJoin);
+            
+            if (!!join.injectAt) {
+              serviceJoin.injectAt(join.injectAt);
+            }
+
+            if (!!join.onField) {
+              serviceJoin.onField(join.onField);
+            }
+
+            if (!!join.toField) {
+              serviceJoin.toField(join.toField);
+            }
+          }
+        });
+      }
+
       return censusQuery;
     }
 
@@ -300,7 +358,7 @@ export default function App() {
       const censusQuery = convertToCensusQuery();
       setDbgQuery(censusQuery);
       let url = censusQuery.toUrl();
-      url = url.replace('http://', 'https://');
+      url = url.replace("http://", "https://");
       setQueryUrl(url);
     } catch (error) {
       console.log("Error getting query URL: ", error);
@@ -347,7 +405,11 @@ export default function App() {
                   . The 'example' service ID allows up to 10 requests per
                   minute. Saving your service ID will store it to this browser.
                 </p>
-                <ServiceKeyForm serviceId={query.serviceKey} onServiceKeyChange={onServiceKeyChange} onDeleteStoredKey={onDeleteStoredServiceKey}/>
+                <ServiceKeyForm
+                  serviceId={query.serviceKey}
+                  onServiceKeyChange={onServiceKeyChange}
+                  onDeleteStoredKey={onDeleteStoredServiceKey}
+                />
               </Paper>
             </Grid>
 
@@ -381,13 +443,19 @@ export default function App() {
                     />
                   </Grid>
 
-                  <Grid item sm={12} md={4} className={classes.splitQueryField} style={{ marginTop: 4 }}>
+                  <Grid
+                    item
+                    sm={12}
+                    md={4}
+                    className={classes.splitQueryField}
+                    style={{ marginTop: 4 }}
+                  >
                     <LanguageSelector
                       value={query.language}
                       onChange={onLanguageChange}
                     />
                   </Grid>
-                  
+
                   <Grid item sm={12} style={{ marginLeft: 4, marginTop: 8 }}>
                     <LimitSlider
                       value={query.limit}
@@ -484,7 +552,7 @@ export default function App() {
                   />
                 </Grid>
 
-                <h2 className={classes.header2}>Resolves & Joins</h2>
+                <h2 className={classes.header2}>Resolves</h2>
                 <Grid
                   item
                   container
@@ -505,17 +573,31 @@ export default function App() {
                     }
                   />
                 </Grid>
+
+                <h2 className={classes.header2}>Joins</h2>
+                <JoinsContainer 
+                  joinsData={query.joins}
+                  depth={0}
+                  onJoinDataChange={onJoinDataChange}
+                  onAddNewJoin={onAddNewJoin}
+                  onDeleteJoin={onDeleteJoin}
+                  />
+
               </Paper>
             </Grid>
           </Grid>
 
           <Grid container item xs={12} sm={6} className={classes.gridContainer}>
             <Grid item xs={12} className={classes.gridContainerItem}>
-              <QueryUrlContainer queryUrl={queryUrl} isLoading={loading} onRunQuery={onSubmitQuery}/>
+              <QueryUrlContainer
+                queryUrl={queryUrl}
+                isLoading={loading}
+                onRunQuery={onSubmitQuery}
+              />
             </Grid>
 
             <Grid item xs={12} className={classes.gridContainerItem}>
-              <QueryResults data={queryResult} isLoading={loading}/>
+              <QueryResults data={queryResult} isLoading={loading} />
             </Grid>
           </Grid>
         </Grid>
