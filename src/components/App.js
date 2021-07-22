@@ -3,8 +3,10 @@ import {
   createTheme,
   ThemeProvider,
   makeStyles,
+  withStyles,
 } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {
   Container,
@@ -14,10 +16,18 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Accordion,
+  // MuiAccordionSummary,
+  AccordionDetails
 } from "@material-ui/core";
+
+import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
+
 import "../styles/App.css";
 import { pink, amber } from "@material-ui/core/colors";
+
 import AddIcon from "@material-ui/icons/Add";
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import ServiceKeyForm from "./queries/ServiceKeyForm";
 import CollectionSelector from "./queries/CollectionSelector";
@@ -71,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
   itemParagraph: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(2),
+    width: '100%',
   },
   splitQueryField: {
     width: 250,
@@ -99,7 +110,37 @@ const useStyles = makeStyles((theme) => ({
     marginTop: -12,
     marginLeft: -12,
   },
+  accordionSummary: {
+    root: {
+      minHeight: 48,
+      '&$expanded': {
+        minHeight: 48,
+      }
+    },
+    content: {
+      '&$expanded': {
+        margin: "12px 0",
+      }
+    }
+  }
 }));
+
+const AccordionSummary = withStyles({
+  root: {
+    borderBottom: '1px solid rgba(0, 0, 0, .125)',
+    marginBottom: -1,
+    minHeight: 48,
+    '&$expanded': {
+      minHeight: 48,
+    },
+  },
+  content: {
+    '&$expanded': {
+      margin: '12px 0 0 0',
+    },
+  },
+  expanded: {},
+})(MuiAccordionSummary);
 
 export default function App() {
   const classes = useStyles();
@@ -332,8 +373,18 @@ export default function App() {
         <Grid container alignItems="flex-start">
           <Grid container item xs={12} sm={6} className={classes.gridContainer}>
             <Grid item xs={12} className={classes.gridContainerItem}>
-              <Paper className={classes.paper}>
-                <h1 className={classes.header1}>Set Service ID</h1>
+              {/* <Paper className={classes.paper}> */}
+              <Accordion defaultExpanded={storeKey === null || storeKey === 'example' || storeKey === ''}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="service-id-content"
+                  id="service-id-content-header"
+                  className={classes.accordionSummary}
+                >
+                  <h1 className={classes.header1}>Set Service ID</h1>
+                </AccordionSummary>
+                <AccordionDetails style={{ flexWrap: "wrap" }}>
+
                 <p className={classes.itemParagraph}>
                   Sign up for a service ID{" "}
                   <a
@@ -348,7 +399,9 @@ export default function App() {
                   minute. Saving your service ID will store it to this browser.
                 </p>
                 <ServiceKeyForm serviceId={query.serviceKey} onServiceKeyChange={onServiceKeyChange} onDeleteStoredKey={onDeleteStoredServiceKey}/>
-              </Paper>
+                </AccordionDetails>
+                </Accordion>
+              {/* </Paper> */}
             </Grid>
 
             <Grid item xs={12} className={classes.gridContainerItem}>
