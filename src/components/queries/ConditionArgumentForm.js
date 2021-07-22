@@ -43,11 +43,11 @@ export default function ConditionArgumentForm({
     setOperators(QueryEnums.Operators);
   }, []);
 
-  const operatorItems = operators.map((o) => (
-    <option key={o.name} value={o.value} title={o.title}>
-      {o.display}
-    </option>
-  ));
+  // const operatorItems = operators.map((o) => (
+  //   <option key={o.name} value={o.value} title={o.title}>
+  //     {o.display}
+  //   </option>
+  // ));
 
   function isValidInput(value) {
     return value !== "";
@@ -55,7 +55,8 @@ export default function ConditionArgumentForm({
 
   function handleOperatorChange(event) {
     const value = event.target.value;
-    const operator = operators.find((o) => o.value === value);
+    // const operator = operators.find((o) => o.value === value);
+    const operator = operators.find((o) => o.name === value);
     onDataChange(conditionData.id, "operator", operator);
   }
 
@@ -121,7 +122,20 @@ export default function ConditionArgumentForm({
               id: "operator-select",
             }}
           >
-            {operatorItems}
+            {/* {operatorItems} */}
+            {/* {operators.map((o) => (
+              <option key={o.name} value={o.value} title={o.title}>
+                {o.display}
+              </option>
+            ))} */}
+            <option key="equals" value="equals" title="Equals">{"="}</option>
+            <option key="notEquals" value="notEquals" title="Not Equals">{"≠"}</option>
+            <option key="isLessThan" value="isLessThan" title="Is Less Than">{"<"}</option>
+            <option key="isLessThanOrEquals" value="isLessThanOrEquals" title="Is Less Than Or Equals">{"≤"}</option>
+            <option key="isGreaterThan" value="isGreaterThan" title="Is Greater Than">{">"}</option>
+            <option key="isGreaterThanOrEquals" value="isGreaterThanOrEquals" title="Is Greater Than Or Equals">{"≥"}</option>
+            <option key="startsWith" value="startsWith">Starts With</option>
+            <option key="contains" value="contains">Contains</option>
           </Select>
         </FormControl>
       </Grid>
