@@ -18,9 +18,9 @@ export default function LanguageSelector({ language, onChange }) {
     setLanguages(QueryEnums.Languages);
   }, []);
 
-  const languageItems = languages.map((c) => (
-    <option key={c} value={c} aria-label={c}>
-      {c}
+  const languageItems = languages.map((lang) => (
+    <option key={lang} value={lang} aria-label={lang}>
+      {lang}
     </option>
   ));
 

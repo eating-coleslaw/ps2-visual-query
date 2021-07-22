@@ -35,6 +35,9 @@ const useStyles = makeStyles((theme) => ({
   runButton: {
     width: 120,
   },
+  runButtonIcon: {
+    marginLeft: -8,
+  },
   buttonWide: {
     // marginTop: theme.spacing(2),
     whiteSpace: 'nowrap',
@@ -71,7 +74,7 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
             onClick={onRunQuery}
             value="Run"
             className={classes.runButton}
-            startIcon={isLoading ? null : <PlayArrowIcon />}
+            startIcon={isLoading ? null : <PlayArrowIcon className={classes.runButtonIcon} />}
             title="Run the query"
           >
             {isLoading ? "Loading..." : "Run" }

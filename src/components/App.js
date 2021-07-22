@@ -164,12 +164,7 @@ export default function App() {
   }
 
   function onCollectionChange(value) {
-    setQuery({
-      ...query,
-      ...{
-        collection: value,
-      },
-    });
+    setQuery({ ...query, ...{ collection: value } });
   }
 
   function onLimitChange(value) {
@@ -236,7 +231,7 @@ export default function App() {
 
     setQuery({
       ...query,
-      ...{ conditions: [...query.conditions, newCondition] },
+      ...{ conditions: [...query.conditions, newCondition] }
     });
   }
 
@@ -381,17 +376,18 @@ export default function App() {
                 <Grid
                   container
                   spacing={1}
-                  alignItems="flex-start"
+                  // alignItems="flex-start"
+                  alignItems="center"
                   className={classes.gridRow}
                 >
-                  <Grid item sm={12} md={6} className={classes.splitQueryField}>
+                  <Grid item sm={12} md={7} className={classes.splitQueryField}>
                     <CollectionSelector
                       collection={query.collection}
                       onChange={onCollectionChange}
                     />
                   </Grid>
 
-                  <Grid item sm={12} md={6} className={classes.splitQueryField}>
+                  <Grid item sm={12} md={4} className={classes.splitQueryField} style={{ marginTop: 4 }}>
                     <LanguageSelector
                       value={query.language}
                       onChange={onLanguageChange}
