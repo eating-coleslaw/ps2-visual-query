@@ -7,7 +7,7 @@ const useStyles = makeStyles((theme) => ({
   header1: {
     margin: 0,
     fontSize: "1.4em",
-    color: theme.palette.text.primary,
+    // color: theme.palette.text.primary,
     fontWeight: 500,
   },
   paper: {

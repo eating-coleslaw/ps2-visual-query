@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
   header1: {
     margin: 0,
     fontSize: "1.4em",
-    color: theme.palette.text.primary,
+    // color: theme.palette.text.primary,
     fontWeight: 500,
   },
   paper: {
@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
   },
   urlBox: {
     marginTop: theme.spacing(1),
-    backgroundColor: "#303030",
+    backgroundColor: "#1F2330", //"#303030",
     color: "#fff",
     fontFamily: "monospace",
     padding: theme.spacing(1),

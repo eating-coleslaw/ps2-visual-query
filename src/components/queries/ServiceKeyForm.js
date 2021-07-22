@@ -42,7 +42,7 @@ function ServiceKeyForm({ serviceId, onServiceKeyChange, onDeleteStoredKey }) {
 
       <Button
         type="submit"
-        variant="outlined"
+        variant="contained"
         color="primary"
         size="large"
         className={classes.button}

@@ -16,7 +16,7 @@ import {
   Select,
 } from "@material-ui/core";
 import "../styles/App.css";
-import { pink, amber, orange } from "@material-ui/core/colors";
+import { pink, amber, orange, blue, cyan } from "@material-ui/core/colors";
 import AddIcon from "@material-ui/icons/Add";
 
 import ServiceKeyForm from "./queries/ServiceKeyForm";
@@ -61,13 +61,13 @@ const useStyles = makeStyles((theme) => ({
   header1: {
     margin: 0,
     fontSize: "1.4em",
-    color: theme.palette.text.primary,
+    // color: theme.palette.text.primary,
     fontWeight: 500,
   },
   header2: {
     margin: 0,
     fontSize: "1.2em",
-    color: theme.palette.text.primary,
+    // color: theme.palette.text.primary,
     fontWeight: 500,
     width: "100%",
     marginTop: theme.spacing(1.5),
@@ -148,9 +148,13 @@ export default function App() {
     () =>
       createTheme({
         palette: {
-          type: "light", //prefersDarkMode ? "dark" : "light",
-          primary: pink,
+          type: prefersDarkMode ? "dark" : "light",
+          primary: prefersDarkMode ? { main: "#E7ADFB" } : pink, //24E8D8 cyan : pink, //"#E34F8C" : pink, //amber : pink,
           secondary: orange, //amber,
+          background: {
+            paper: "#27273A",
+            default: "#0F1320",
+          },
         },
         contrastThreshold: 5,
       }),
@@ -399,6 +403,7 @@ export default function App() {
                     aria-label="Service ID sign up page"
                     target="_blank"
                     rel="noreferrer"
+                    style={{ color: "#40afee" }}
                   >
                     here
                   </a>
@@ -423,6 +428,7 @@ export default function App() {
                     aria-label="Official census API documentation page"
                     target="_blank"
                     rel="noreferrer"
+                    style={{ color: "#40afee" }}
                   >
                     official documentation
                   </a>{" "}
