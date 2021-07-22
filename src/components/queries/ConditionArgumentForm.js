@@ -43,19 +43,12 @@ export default function ConditionArgumentForm({
     setOperators(QueryEnums.Operators);
   }, []);
 
-  // const operatorItems = operators.map((o) => (
-  //   <option key={o.name} value={o.value} title={o.title}>
-  //     {o.display}
-  //   </option>
-  // ));
-
   function isValidInput(value) {
     return value !== "";
   }
 
   function handleOperatorChange(event) {
     const value = event.target.value;
-    // const operator = operators.find((o) => o.value === value);
     const operator = operators.find((o) => o.name === value);
     onDataChange(conditionData.id, "operator", operator);
   }
@@ -115,19 +108,13 @@ export default function ConditionArgumentForm({
             native
             margin="dense"
             label="Operator"
-            value={conditionData.operator.value}
+            value={conditionData.operator.name}
             onChange={handleOperatorChange}
             inputProps={{
               name: "operator",
               id: "operator-select",
             }}
           >
-            {/* {operatorItems} */}
-            {/* {operators.map((o) => (
-              <option key={o.name} value={o.value} title={o.title}>
-                {o.display}
-              </option>
-            ))} */}
             <option key="equals" value="equals" title="Equals">{"="}</option>
             <option key="notEquals" value="notEquals" title="Not Equals">{"≠"}</option>
             <option key="isLessThan" value="isLessThan" title="Is Less Than">{"<"}</option>

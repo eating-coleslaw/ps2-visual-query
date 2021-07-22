@@ -299,12 +299,8 @@ export default function App() {
     try {
       const censusQuery = convertToCensusQuery();
       setDbgQuery(censusQuery);
-
-      console.log('CensusQuery: ', censusQuery);
-
       let url = censusQuery.toUrl();
       url = url.replace('http://', 'https://');
-      console.log('Set Query URL: ', url);
       setQueryUrl(url);
     } catch (error) {
       console.log("Error getting query URL: ", error);
@@ -317,7 +313,6 @@ export default function App() {
       setLoading(true);
 
       try {
-        console.log('Fetch Query URL: ', queryUrl);
         const response = await fetch(queryUrl);
         const responseJson = await response.json();
         setQueryResult(responseJson);
@@ -376,7 +371,6 @@ export default function App() {
                 <Grid
                   container
                   spacing={1}
-                  // alignItems="flex-start"
                   alignItems="center"
                   className={classes.gridRow}
                 >
