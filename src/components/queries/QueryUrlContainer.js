@@ -22,6 +22,8 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: "monospace",
     padding: theme.spacing(1),
     borderRadius: 4,
+    wordWrap: "break-word",
+    overflow: "auto",
   },
   container: {
     marginTop: theme.spacing(1),
