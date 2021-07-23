@@ -186,7 +186,11 @@ export default function App() {
   }
 
   function onLanguageChange(value) {
-    setQuery({ ...query, ...{ language: value.toLowerCase() } });
+    if (value === "All") {
+      setQuery({ ...query, ...{ language: "" } });
+    } else {
+      setQuery({ ...query, ...{ language: value.toLowerCase() } });
+    }
   }
 
   function onFilterTypeChange(event) {
