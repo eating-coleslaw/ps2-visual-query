@@ -42,6 +42,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(0),
     marginBottom: theme.spacing(0),
   },
+  inlineSelectItem: {
+    marginTop: 4,
+  },
 }));
 
 export default function JoinForm({ joinData, depth, onChange, onDelete }) {
@@ -206,8 +209,8 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
   }
 
   const rootStyle = {
-    borderWidth: depth === 0 ? 1 : "0 0 0 1px",
-    marginLeft: depth * 4,
+    borderWidth: depth === 0 ? 1 : "2px 0 0 1px",
+    marginLeft: depth === 0 ? 0 : 8,
   };
 
   const showAddSubJoin = depth < maxDepth;
@@ -220,6 +223,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
         spacing={1}
         alignItems="center"
         className={classes.gridRow}
+        style={{ marginBottom: 0 }}
       >
         <Grid item xs={12} sm={8}>
           <CollectionSelector
@@ -284,7 +288,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
         alignItems="center"
         className={classes.gridRow}
       >
-        <Grid item xs={6} sm={3}>
+        <Grid item sm={6} md={4}>
           <BooleanSelector
             label="Join Type"
             value={joinChanges.isOuterJoin}
@@ -296,7 +300,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
           />
         </Grid>
 
-        <Grid item xs={6} sm={3}>
+        <Grid item sm={6} md={4}>
           <BooleanSelector
             label="Is List"
             value={joinChanges.isList}
@@ -309,7 +313,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
         id="join-conditions"
         headerLevel={3}
         headerText="Join Conditions"
-        defaultExtended={true}
+        defaultExtended={false}
       >
         {joinChanges.terms.length > 0 && (
           <Grid
@@ -351,7 +355,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
         id="field-filters"
         headerLevel={3}
         headerText="Filter Displayed Fields"
-        defaultExtended={true}
+        defaultExtended={false}
       >
         <Grid
           item
@@ -421,8 +425,9 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
           spacing={2}
           alignItems="center"
           justifyContent="flex-end"
+          style={{ textAlign: "right" }}
         >
-          <Grid item>
+          <Grid item md={6}>
             <Button
               color="default"
               startIcon={<DeleteIcon fontSize="small" />}
@@ -433,7 +438,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
             </Button>
           </Grid>
 
-          <Grid item>
+          <Grid item md={6}>
             <Button
               color="primary"
               variant="outlined"
