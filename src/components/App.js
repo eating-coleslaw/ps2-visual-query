@@ -182,7 +182,8 @@ export default function App() {
   }
 
   function onLimitChange(value) {
-    setQuery({ ...query, ...{ limit: value } });
+    const newLimit = value === 0 ? null : value;
+    setQuery({ ...query, ...{ limit: newLimit } });
   }
 
   function onLanguageChange(value) {
@@ -305,7 +306,7 @@ export default function App() {
         censusQuery.setLanguage(query.language.toLowerCase());
       }
 
-      if (query.limit !== null) {
+      if (query.limit !== null && query.limit !== 0) {
         censusQuery.setLimit(query.limit);
       }
 
@@ -340,12 +341,8 @@ export default function App() {
       }
 
       if (query.joins.length > 0) {
-        console.log("==================");
-        console.log(query.joins);
         censusQuery = addQueryJoins(censusQuery, query.joins);
       }
-
-      console.log("==================");
 
       return censusQuery;
     }
@@ -518,7 +515,7 @@ export default function App() {
                       />
                     </Grid>
 
-                    <Grid item sm={12} style={{ marginLeft: 4, marginTop: 8 }}>
+                    <Grid item sm={12} style={{ marginLeft: 16, marginTop: 8 }}>
                       <LimitSlider
                         value={query.limit}
                         onChange={onLimitChange}

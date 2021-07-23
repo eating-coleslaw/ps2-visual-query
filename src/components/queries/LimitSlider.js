@@ -11,6 +11,10 @@ const useStyles = makeStyles((theme) => ({
 
 const marks = [
   {
+    value: 0,
+    label: "None",
+  },
+  {
     value: 10,
     label: 10,
   },
@@ -29,7 +33,9 @@ const marks = [
 ];
 
 const getScaledValue = (x) => {
-  if (x <= 10) {
+  if (x === 0) {
+    return x;
+  } else if (x <= 10) {
     return x;
   } else if (x <= 20) {
     return (x - 10) * 10;
@@ -41,7 +47,9 @@ const getScaledValue = (x) => {
 }
 
 const getUnscaledValue = (x) => {
-  if (x <= 10) {
+  if (x === 0) {
+    return x;
+  } else if (x <= 10) {
     return x;
   } else if (x <= 100) {
     return (x / 10)  + 10;
@@ -68,7 +76,7 @@ export default function LimitSlider({ value,  onChange, label }) {
         className={classes.root}
         id="limit-slider"
         value={typeof sliderValue === 'number' ? sliderValue : 0}
-        min={1}
+        min={0}
         step={1}
         max={40}
         defaultValue={10}
