@@ -194,7 +194,7 @@ export default function App() {
   }
 
   function onAddSimpleArrayValue(arrayPropertyName, value) {
-    const array = query[arrayPropertyName];
+    const array = [ ...query[arrayPropertyName] ];
 
     if (value !== "" && !array.includes(value)) {
       let updatedFields = array;
@@ -204,7 +204,7 @@ export default function App() {
   }
 
   function onRemoveSimpleArrayValue(arrayPropertyName, value) {
-    const array = query[arrayPropertyName];
+    const array = [ ...query[arrayPropertyName] ];
 
     const index = array.indexOf(value);
 
@@ -336,29 +336,8 @@ export default function App() {
         console.log("==================");
         console.log(query.joins);
         censusQuery = addQueryJoins(censusQuery, query.joins);
-        // query.joins.forEach((join) => {
-        //   if (!!join.collection) {
-        //     let serviceJoin = censusQuery.joinService(join.collection);
-
-        //     serviceJoin.isList(join.isList);
-        //     serviceJoin.isOuterJoin(join.isOuterJoin);
-
-        //     if (!!join.injectAt) {
-        //       serviceJoin.injectAt(join.injectAt);
-        //     }
-
-        //     if (!!join.onField) {
-        //       serviceJoin.onField(join.onField);
-        //     }
-
-        //     if (!!join.toField) {
-        //       serviceJoin.toField(join.toField);
-        //     }
-        //   }
-        // });
       }
 
-      // console.log(censusQuery);
       console.log("==================");
 
       return censusQuery;
@@ -368,7 +347,6 @@ export default function App() {
       if (joinsArray.length > 0) {
         joinsArray.forEach((join) => {
           if (!!join.collection) {
-            // console.log(join.collection);
             let serviceJoin = censusJoin !== null ? censusJoin.joinService(join.collection) : censusQuery.joinService(join.collection);
 
             serviceJoin.isList(join.isList);
@@ -384,6 +362,22 @@ export default function App() {
 
             if (!!join.toField) {
               serviceJoin.toField(join.toField);
+            }
+
+            if (join.filterFields.length > 0) {
+              serviceJoin[`${join.filterType}Fields`](join.filterFields);
+            }
+            
+            if (join.terms.length > 0) {
+              join.terms.forEach((term) => {
+                if (
+                  term.field !== "" &&
+                  !!term.operator &&
+                  term.value !== ""
+                ) {
+                  serviceJoin.where(term.field)[term.operator.name](term.value);
+                }
+              });
             }
 
             if (join.joins.length > 0) {
@@ -405,7 +399,7 @@ export default function App() {
     } catch (error) {
       console.log("Error getting query URL: ", error);
     }
-  }, [query ]);
+  }, [ query ]);
 
   const [queryResult, setQueryResult] = useState("");
   async function onSubmitQuery() {

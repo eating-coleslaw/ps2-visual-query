@@ -9,6 +9,12 @@ export default function BinarySelector({
   onChange,
   className = null,
 }) {
+  
+  function handleChange(event) {
+    event.preventDefault();
+    onChange(event.target.value);
+  }
+  
   return (
     <FormControl variant="outlined" style={{ minWidth: 120 }}>
       <InputLabel htmlFor="binary-select">{label}</InputLabel>
@@ -18,7 +24,7 @@ export default function BinarySelector({
         label={label}
         className={className}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={handleChange}
         inputProps={{
           name: "binary-select",
           id: "binary-select",

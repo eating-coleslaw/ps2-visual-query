@@ -42,7 +42,7 @@ export default function FieldsEntryForm({
 
     if (isValidInput()) {
       setInputField("");
-      onAddField(inputField.toLowerCase());
+      onAddField(inputField);
     }
   }
 
@@ -55,7 +55,7 @@ export default function FieldsEntryForm({
     if (inputField === "") {
       return false;
     } else {
-      return !fields.includes(inputField.toLowerCase());
+      return !fields.includes(inputField);
     }
   }
 
