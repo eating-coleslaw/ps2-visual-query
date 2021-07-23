@@ -29,7 +29,6 @@ export default function JoinsContainer({
   onJoinDataChange,
   onAddNewJoin,
   onDeleteJoin,
-  depth,
 }) {
   const classes = useStyles();
 
@@ -76,6 +75,7 @@ export default function JoinsContainer({
             <JoinForm
               key={join.id}
               joinData={join}
+              depth={0}
               onChange={handleDataChange}
               onDelete={handleDeleteJoin}
             />
