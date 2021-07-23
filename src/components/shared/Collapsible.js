@@ -51,20 +51,12 @@ const useStyles = makeStyles((theme) => ({
   content: {
     height: 0,
     width: "100%",
-    // transform: "scaleY(0)",
-    // transformOrigin: "top",
     display: "none",
     transition: "all 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
   },
   contentOpen: {
-    // height: "auto",
-    // minHeight: 1,
     width: "100%",
-    // display: "block",
-    // transform: "scaleY(1)",
-    // transformOrigin: "top",
     transition: "all 100ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-    // transition: "all 100ms cubic-bezier(.18,.89,.32,1.28) 0ms",
   },
 }));
 
@@ -104,54 +96,30 @@ export default function Collapsible({
       : `${classes.toggle} ${classes.toggleCollapsed}`;
   }
 
-  function getContentId() {
-    return `collapsible-content-${id}`;
-  }
-
-  // function getContentHeight() {
-  //   if (!extended) {
-  //     return 0;
-  //   }
-
-  //   const content = document.getElementById("collapsible-content");
-    
-  //   if (!!content) {
-  //     console.log(content.offsetHeight);
-  //     return content.offsetHeight;
-  //   } else {
-  //     return 0;
-  //   }
-  // }
-
   const [contentHeight, setcontentHeight] = useState();
   useEffect(() => {
     function getContentHeight() {
       if (!extended) {
         return 0;
       }
-  
-      const content = document.getElementById(getContentId());
-      
-      if (!!content) {
-        // let childrenHeight = 0;
 
+      const content = document.getElementById(`collapsible-content-${id}`);
+
+      if (!!content) {
         const contentChildren = Array.from(content.children);
-        
+
         let total = contentChildren.reduce((sum, child) => {
-          console.log(child);
-          return sum += child.offsetHeight;
+          return (sum += child.offsetHeight);
         }, 0);
 
-        // console.log(content.offsetHeight);
-        console.log(total);
-        return total; // content.offsetHeight;
+        return total;
       } else {
         return 0;
       }
     }
 
     setcontentHeight(getContentHeight());
-  }, [ extended, getContentId, children ])
+  }, [extended, children, id]);
 
   return (
     <div className={classes.root}>
@@ -175,7 +143,11 @@ export default function Collapsible({
         </Grid>
       </Grid>
 
-      <div id={getContentId()} style={{ height: `${contentHeight}px` }} className={extended ? classes.contentOpen : classes.content}>
+      <div
+        id={`collapsible-content-${id}`}
+        style={{ height: `${contentHeight}px` }}
+        className={extended ? classes.contentOpen : classes.content}
+      >
         {children}
       </div>
     </div>
