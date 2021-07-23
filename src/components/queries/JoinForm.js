@@ -313,7 +313,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
         id="join-conditions"
         headerLevel={3}
         headerText="Join Conditions"
-        defaultExtended={false}
+        defaultExtended={true}
       >
         {joinChanges.terms.length > 0 && (
           <Grid
@@ -355,7 +355,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
         id="field-filters"
         headerLevel={3}
         headerText="Filter Displayed Fields"
-        defaultExtended={false}
+        defaultExtended={true}
       >
         <Grid
           item

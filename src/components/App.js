@@ -153,9 +153,12 @@ export default function App() {
           primary: prefersDarkMode ? { main: "#E7ADFB" } : pink, //24E8D8 cyan : pink, //"#E34F8C" : pink, //amber : pink,
           secondary: orange, //amber,
           background: {
-            paper: "#27273A",
-            default: "#0F1320",
+            paper: prefersDarkMode ? "#27273A" : "#fff",
+            default: prefersDarkMode ? "#0F1320" : "#fafafa",
           },
+          text: {
+
+          }
         },
         contrastThreshold: 5,
       }),
