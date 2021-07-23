@@ -16,6 +16,9 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     padding: theme.spacing(1),
     marginBottom: theme.spacing(2),
+    borderStyle: "solid",
+    borderColor: "#919cb930",
+    // border: "1px solid #919cb930",
   },
   gridRow: {
     marginTop: theme.spacing(0.5),
@@ -31,20 +34,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNewJoin }) {
+
+export default function JoinForm({ joinData, depth, onChange, onDelete }) {
   const classes = useStyles();
+  const maxDepth = 4;
   
   const [joinChanges, setJoinChanges] = useState(joinData);
- 
-  // isList(bool)
-  // isOuterJoin(bool)
-  // showFields(array): See the 'Show certain fields' section above
-  // hideFields(array): See the 'Hide certain fields' section above
-  // onField(string)
-  // toField(string)
-  // injectAt(string)
-  // where(string): See the 'Defining a condition' section above
-  // joinService(string): Returns another join object for sub joining
 
   function handleFormSubmit(event) {
     event.preventDefault();
@@ -60,7 +55,21 @@ export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNew
   }
 
   function handleSimplePropertyChange(propertyName, value) {
-    setJoinChanges({ ...joinChanges, ...{ [propertyName]: value } } );
+    setJoinChanges({ ...joinData, ...joinChanges, ...{ [propertyName]: value } } );
+  }
+
+  function handleSubJoinDataChange(updatedJoin) {
+    const updatedJoins = joinChanges.joins.map((join) => {
+      if (join.id === updatedJoin.id) {
+        return updatedJoin;
+      }
+      
+      return join;
+    });
+
+    handleSimplePropertyChange("joins", updatedJoins);
+
+    handleSaveChanges();
   }
 
   function handleCollectionChange(value) {
@@ -79,7 +88,11 @@ export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNew
     handleSimplePropertyChange("toField", value);
   }
 
-  function handleAddSubJoin() {
+  function handleAddSubJoin() { 
+    if (depth === maxDepth) {
+      throw new Error("Can't add new sub-join. Max join depth already reached");
+    }
+
     const newJoin = {
       id: uuidv4(),
       parentId: joinData.id,
@@ -91,22 +104,37 @@ export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNew
       terms: [], // aka Conditions
       isOuterJoin: false,
       joins: [],
+      onField: "",
+      toField: "",
     };
 
-    const updatedJoins = [ ...joinData.joins, newJoin ];
+    const updatedJoins = [ ...joinChanges.joins, newJoin ];
+
     handleSimplePropertyChange("joins", updatedJoins);
+
+    handleSaveChanges();
   }
 
   function handleDeleteSubJoin(id) {
-    const updatedJoins = joinData.joins.filter((join) => {
+    const updatedJoins = joinChanges.joins.filter((join) => {
       return join.id !== id;
     });
 
-    setJoinChanges({ ...joinData, ...{ joins: updatedJoins} });
+    setJoinChanges({ ...joinChanges, ...{ joins: updatedJoins} });
+
+    handleSaveChanges();
   }
 
+  const rootStyle = {
+    borderWidth: (depth === 0) ? 1 : "0 0 0 1px",
+    marginLeft: depth * 4,
+  };
+
+  const showAddSubJoin = depth < maxDepth;
+  const disableAddSubJoin = (depth === maxDepth || !joinChanges.collection);
+
   return (
-    <Paper className={classes.paper}>
+    <Paper className={classes.paper} style={{ ...rootStyle }}>
       <form onSubmit={handleFormSubmit}>
       <Grid container spacing={1} alignItems="center" className={classes.gridRow}>
         <Grid item xs={12} sm={8}>
@@ -148,6 +176,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNew
           <ForwardIcon style={{ marginTop: 8 }}/>
         </Grid>
 
+      
         <Grid item xs={4}>
           <TextField
             id="join-to-field"
@@ -161,14 +190,14 @@ export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNew
         </Grid>
       </Grid>
 
-      {/* <Grid container spacing={1} alignItems="center" className={classes.gridRow}>
+      <Grid container spacing={1} alignItems="center" className={classes.gridRow}>
         <Grid item xs={3}>
           <BooleanSelector label="Is List" value={joinChanges.isList} onChange={(value) => handleSimplePropertyChange("isList", value)} />
         </Grid>
-        <Grid item xs={3}>
+        {/* <Grid item xs={3}>
           <BinarySelector label="Filter Type" value={joinChanges.filterType} optionA="Show" optionB="Hide" onChange={(value) => handleSimplePropertyChange("filterType", value)} />
-        </Grid>
-      </Grid> */}
+        </Grid> */}
+      </Grid>
 
       <Grid 
         container
@@ -178,11 +207,12 @@ export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNew
         className={classes.footer}
       >
         <Grid item container xs={6} alignItems="center" justifyContent="flex-start">
-          <Grid item xs={3}>
+          {/* <Grid item xs={3}>
             <BooleanSelector label="Is List" value={joinChanges.isList} onChange={(value) => handleSimplePropertyChange("isList", value)} />
-          </Grid>
-          {/* <Grid item>
+          </Grid> */}
+          {showAddSubJoin && <Grid item>
             <Button 
+              disabled={disableAddSubJoin}
               color="primary"
               startIcon={<AddIcon fontSize="small" />}
               size="small"
@@ -190,7 +220,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNew
             >
               Sub Join
             </Button>
-          </Grid> */}
+          </Grid>}
 
         </Grid>
         
@@ -223,7 +253,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNew
       </Grid>
       </form>
 
-      { joinData.joins.length > 0 &&
+      { joinChanges.joins.length > 0 &&
         <Grid
           item
           container
@@ -233,19 +263,21 @@ export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNew
           spacing={1}
           className={classes.gridRow}
         >
-          {joinData.joins.map((join) => {
+          {joinChanges.joins.map((join) => {
             return (
               <JoinForm
                 key={join.id}
+                depth={depth + 1}
                 joinData={join}
-                onDataChange={handleSimplePropertyChange}
-                onDelete={handleDeleteJoin}
+                // onAddNewJoin={handleAddSubJoin}
+                onChange={handleSubJoinDataChange}
+                onDelete={handleDeleteSubJoin}
               />
             );
           })}
         </Grid>
+        
       }
-     
     </Paper>
   );
 }

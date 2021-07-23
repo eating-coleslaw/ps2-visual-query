@@ -333,9 +333,43 @@ export default function App() {
       }
 
       if (query.joins.length > 0) {
-        query.joins.forEach((join) => {
+        console.log("==================");
+        console.log(query.joins);
+        censusQuery = addQueryJoins(censusQuery, query.joins);
+        // query.joins.forEach((join) => {
+        //   if (!!join.collection) {
+        //     let serviceJoin = censusQuery.joinService(join.collection);
+
+        //     serviceJoin.isList(join.isList);
+        //     serviceJoin.isOuterJoin(join.isOuterJoin);
+
+        //     if (!!join.injectAt) {
+        //       serviceJoin.injectAt(join.injectAt);
+        //     }
+
+        //     if (!!join.onField) {
+        //       serviceJoin.onField(join.onField);
+        //     }
+
+        //     if (!!join.toField) {
+        //       serviceJoin.toField(join.toField);
+        //     }
+        //   }
+        // });
+      }
+
+      // console.log(censusQuery);
+      console.log("==================");
+
+      return censusQuery;
+    }
+
+    function addQueryJoins(censusQuery, joinsArray, censusJoin = null) {
+      if (joinsArray.length > 0) {
+        joinsArray.forEach((join) => {
           if (!!join.collection) {
-            let serviceJoin = censusQuery.joinService(join.collection);
+            // console.log(join.collection);
+            let serviceJoin = censusJoin !== null ? censusJoin.joinService(join.collection) : censusQuery.joinService(join.collection);
 
             serviceJoin.isList(join.isList);
             serviceJoin.isOuterJoin(join.isOuterJoin);
@@ -350,6 +384,10 @@ export default function App() {
 
             if (!!join.toField) {
               serviceJoin.toField(join.toField);
+            }
+
+            if (join.joins.length > 0) {
+              addQueryJoins(censusQuery, join.joins, serviceJoin);
             }
           }
         });
@@ -367,7 +405,7 @@ export default function App() {
     } catch (error) {
       console.log("Error getting query URL: ", error);
     }
-  }, [query]);
+  }, [query ]);
 
   const [queryResult, setQueryResult] = useState("");
   async function onSubmitQuery() {
