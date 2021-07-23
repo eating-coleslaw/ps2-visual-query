@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function JoinForm({ joinData, onChange, onDelete, onAddNewJoin }) {
+export default function JoinForm({ joinData, depth, onChange, onDelete, onAddNewJoin }) {
   const classes = useStyles();
   
   const [joinChanges, setJoinChanges] = useState(joinData);

@@ -30,8 +30,9 @@ import QueryResults from "./queries/QueryResults";
 import QueryUrlContainer from "./queries/QueryUrlContainer";
 
 import JoinsContainer from "./queries/JoinsContainer";
+// import JoinForm from "./queries/JoinForm";
 
-import JoinForm from "./queries/JoinForm";
+import Collapsible from "./shared/Collapsible";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -278,9 +279,8 @@ export default function App() {
       return join.id !== id;
     });
 
-    setQuery({ ...query, ...{ joins: updatedJoins} });
+    setQuery({ ...query, ...{ joins: updatedJoins } });
   }
-
 
   const [queryUrl, setQueryUrl] = useState("");
   const [dbgQuery, setDbgQuery] = useState(
@@ -336,10 +336,10 @@ export default function App() {
         query.joins.forEach((join) => {
           if (!!join.collection) {
             let serviceJoin = censusQuery.joinService(join.collection);
-            
+
             serviceJoin.isList(join.isList);
             serviceJoin.isOuterJoin(join.isOuterJoin);
-            
+
             if (!!join.injectAt) {
               serviceJoin.injectAt(join.injectAt);
             }
@@ -395,26 +395,33 @@ export default function App() {
           <Grid container item xs={12} sm={6} className={classes.gridContainer}>
             <Grid item xs={12} className={classes.gridContainerItem}>
               <Paper className={classes.paper}>
-                <h1 className={classes.header1}>Set Service ID</h1>
-                <p className={classes.itemParagraph}>
-                  Sign up for a service ID{" "}
-                  <a
-                    href="https://census.daybreakgames.com/#service-id"
-                    aria-label="Service ID sign up page"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ color: "#40afee" }}
-                  >
-                    here
-                  </a>
-                  . The 'example' service ID allows up to 10 requests per
-                  minute. Saving your service ID will store it to this browser.
-                </p>
-                <ServiceKeyForm
-                  serviceId={query.serviceKey}
-                  onServiceKeyChange={onServiceKeyChange}
-                  onDeleteStoredKey={onDeleteStoredServiceKey}
-                />
+                <Collapsible
+                  id="service-id"
+                  headerLevel={1}
+                  headerText="Service ID"
+                  defaultExtended={!storeKey || storeKey === "example"}
+                >
+                  <p className={classes.itemParagraph}>
+                    Sign up for a service ID{" "}
+                    <a
+                      href="https://census.daybreakgames.com/#service-id"
+                      aria-label="Service ID sign up page"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: "#40afee" }}
+                    >
+                      here
+                    </a>
+                    . The 'example' service ID allows up to 10 requests per
+                    minute. Saving your service ID will store it to this
+                    browser.
+                  </p>
+                  <ServiceKeyForm
+                    serviceId={query.serviceKey}
+                    onServiceKeyChange={onServiceKeyChange}
+                    onDeleteStoredKey={onDeleteStoredServiceKey}
+                  />
+                </Collapsible>
               </Paper>
             </Grid>
 
@@ -435,160 +442,197 @@ export default function App() {
                   for more information on using the API.
                 </p>
 
-                <h2 className={classes.header2}>Collection</h2>
-                <Grid
-                  container
-                  spacing={1}
-                  alignItems="center"
-                  className={classes.gridRow}
+                <Collapsible
+                  id="collection"
+                  headerLevel={2}
+                  headerText="Collection"
+                  defaultExtended={true}
                 >
-                  <Grid item sm={12} md={7} className={classes.splitQueryField}>
-                    <CollectionSelector
-                      collection={query.collection}
-                      onChange={onCollectionChange}
-                    />
-                  </Grid>
-
                   <Grid
-                    item
-                    sm={12}
-                    md={4}
-                    className={classes.splitQueryField}
-                    style={{ marginTop: 4 }}
+                    container
+                    spacing={1}
+                    alignItems="center"
+                    className={classes.gridRow}
                   >
-                    <LanguageSelector
-                      value={query.language}
-                      onChange={onLanguageChange}
-                    />
-                  </Grid>
-
-                  <Grid item sm={12} style={{ marginLeft: 4, marginTop: 8 }}>
-                    <LimitSlider
-                      value={query.limit}
-                      onChange={onLimitChange}
-                      label="Limit"
-                    />
-                  </Grid>
-                </Grid>
-
-                <h2 className={classes.header2}>Search Conditions</h2>
-                <Grid
-                  item
-                  container
-                  xs={12}
-                  justifyContent="flex-start"
-                  alignItems="center"
-                  spacing={1}
-                  className={classes.gridRow}
-                >
-                  {query.conditions.map((condition) => {
-                    return (
-                      <ConditionArgumentForm
-                        key={condition.id}
-                        conditionData={condition}
-                        onDataChange={onConditionDataChange}
-                        onDelete={onDeleteCondition}
+                    <Grid
+                      item
+                      sm={12}
+                      md={7}
+                      className={classes.splitQueryField}
+                    >
+                      <CollectionSelector
+                        collection={query.collection}
+                        onChange={onCollectionChange}
                       />
-                    );
-                  })}
-                </Grid>
-                <Grid item xs={12}>
-                  <Button
-                    color="primary"
-                    startIcon={<AddIcon fontSize="small" />}
-                    size="small"
-                    onClick={onAddNewCondition}
-                    className={classes.textButton}
-                  >
-                    New Condition
-                  </Button>
-                </Grid>
+                    </Grid>
 
-                <h2 className={classes.header2}>Filter Displayed Fields</h2>
-                <Grid
-                  item
-                  container
-                  xs={12}
-                  justifyContent="flex-start"
-                  alignItems="center"
-                  spacing={0}
-                  className={classes.gridRow}
+                    <Grid
+                      item
+                      sm={12}
+                      md={4}
+                      className={classes.splitQueryField}
+                      style={{ marginTop: 4 }}
+                    >
+                      <LanguageSelector
+                        value={query.language}
+                        onChange={onLanguageChange}
+                      />
+                    </Grid>
+
+                    <Grid item sm={12} style={{ marginLeft: 4, marginTop: 8 }}>
+                      <LimitSlider
+                        value={query.limit}
+                        onChange={onLimitChange}
+                        label="Limit"
+                      />
+                    </Grid>
+                  </Grid>
+                </Collapsible>
+
+                <Collapsible
+                  id="search-conditions"
+                  headerLevel={2}
+                  headerText="Search Conditions"
+                  defaultExtended={true}
+                >
+                  {query.conditions.length > 0 && (
+                    <Grid
+                      item
+                      container
+                      xs={12}
+                      justifyContent="flex-start"
+                      alignItems="center"
+                      spacing={1}
+                      className={classes.gridRow}
+                    >
+                      {query.conditions.map((condition) => {
+                        return (
+                          <ConditionArgumentForm
+                            key={condition.id}
+                            conditionData={condition}
+                            onDataChange={onConditionDataChange}
+                            onDelete={onDeleteCondition}
+                          />
+                        );
+                      })}
+                    </Grid>
+                  )}
+
+                  <Grid item xs={12}>
+                    <Button
+                      color="primary"
+                      startIcon={<AddIcon fontSize="small" />}
+                      size="small"
+                      onClick={onAddNewCondition}
+                      className={classes.textButton}
+                    >
+                      New Condition
+                    </Button>
+                  </Grid>
+                </Collapsible>
+
+                <Collapsible
+                  id="field-filters"
+                  headerLevel={2}
+                  headerText="Filter Displayed Fields"
+                  defaultExtended={true}
                 >
                   <Grid
                     item
+                    container
                     xs={12}
-                    sm={6}
-                    md={3}
-                    className={classes.inlineSelectItem}
+                    justifyContent="flex-start"
+                    alignItems="center"
+                    spacing={0}
+                    className={classes.gridRow}
                   >
-                    <FormControl variant="outlined">
-                      <InputLabel htmlFor="filter-type-select">
-                        Filter Type
-                      </InputLabel>
-                      <Select
-                        native
-                        margin="dense"
-                        label="Filter Type"
-                        className={classes.filterSelect}
-                        value={query.filterType}
-                        onChange={onFilterTypeChange}
-                        inputProps={{
-                          name: "filter-type",
-                          id: "filter-type-select",
-                        }}
-                      >
-                        <option aria-label="Show" value="show">
-                          Show
-                        </option>
-                        <option aira-label="Hide" value="hide">
-                          Hide
-                        </option>
-                      </Select>
-                    </FormControl>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      md={3}
+                      className={classes.inlineSelectItem}
+                    >
+                      <FormControl variant="outlined">
+                        <InputLabel htmlFor="filter-type-select">
+                          Filter Type
+                        </InputLabel>
+                        <Select
+                          native
+                          margin="dense"
+                          label="Filter Type"
+                          className={classes.filterSelect}
+                          value={query.filterType}
+                          onChange={onFilterTypeChange}
+                          inputProps={{
+                            name: "filter-type",
+                            id: "filter-type-select",
+                          }}
+                        >
+                          <option aria-label="Show" value="show">
+                            Show
+                          </option>
+                          <option aira-label="Hide" value="hide">
+                            Hide
+                          </option>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <FieldsEntryForm
+                      label="Add Field"
+                      fields={query.filterFields}
+                      onAddField={(value) =>
+                        onAddSimpleArrayValue("filterFields", value)
+                      }
+                      onRemoveField={(value) =>
+                        onRemoveSimpleArrayValue("filterFields", value)
+                      }
+                    />
                   </Grid>
-                  <FieldsEntryForm
-                    label="Add Field"
-                    fields={query.filterFields}
-                    onAddField={(value) =>
-                      onAddSimpleArrayValue("filterFields", value)
-                    }
-                    onRemoveField={(value) =>
-                      onRemoveSimpleArrayValue("filterFields", value)
-                    }
-                  />
-                </Grid>
+                </Collapsible>
 
-                <h2 className={classes.header2}>Resolves</h2>
-                <Grid
-                  item
-                  container
-                  xs={12}
-                  justifyContent="flex-start"
-                  alignItems="center"
-                  spacing={0}
-                  className={classes.gridRow}
+                <Collapsible
+                  id="resolves-container"
+                  headerLevel={2}
+                  headerText="Resolves"
+                  defaultExtended={true}
                 >
-                  <FieldsEntryForm
-                    label="Resolves"
-                    fields={query.resolves}
-                    onAddField={(value) =>
-                      onAddSimpleArrayValue("resolves", value)
-                    }
-                    onRemoveField={(value) =>
-                      onRemoveSimpleArrayValue("resolves", value)
-                    }
-                  />
-                </Grid>
+                  <Grid
+                    item
+                    container
+                    xs={12}
+                    justifyContent="flex-start"
+                    alignItems="center"
+                    spacing={0}
+                    className={classes.gridRow}
+                  >
+                    <FieldsEntryForm
+                      label="Resolves"
+                      fields={query.resolves}
+                      onAddField={(value) =>
+                        onAddSimpleArrayValue("resolves", value)
+                      }
+                      onRemoveField={(value) =>
+                        onRemoveSimpleArrayValue("resolves", value)
+                      }
+                    />
+                  </Grid>
+                </Collapsible>
 
-                <h2 className={classes.header2}>Joins</h2>
-                <JoinsContainer 
-                  joinsData={query.joins}
-                  depth={0}
-                  onJoinDataChange={onJoinDataChange}
-                  onAddNewJoin={onAddNewJoin}
-                  onDeleteJoin={onDeleteJoin}
+                <Collapsible
+                  id="joins-container"
+                  headerLevel={2}
+                  headerText="Joins"
+                  defaultExtended={true}
+                >
+                  <JoinsContainer
+                    joinsData={query.joins}
+                    depth={0}
+                    onJoinDataChange={onJoinDataChange}
+                    onAddNewJoin={onAddNewJoin}
+                    onDeleteJoin={onDeleteJoin}
                   />
-
+                </Collapsible>
               </Paper>
             </Grid>
           </Grid>
