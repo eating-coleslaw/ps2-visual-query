@@ -65,7 +65,7 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
 
   return (
     <Paper className={classes.paper}>
-      <h1 className={classes.header1}>Query String</h1>
+      <h1 className={classes.header1}>Query URL</h1>
       <div className={classes.urlBox}>{queryUrl}</div>
       <Grid container justifyContent="flex-start" alignItems="center" spacing={1} className={classes.container}>
 
