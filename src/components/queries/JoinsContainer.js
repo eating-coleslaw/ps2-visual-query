@@ -1,17 +1,9 @@
 import React from "react";
-import {
-  Container,
-  Grid,
-  Paper,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-} from "@material-ui/core";
+import { Grid, Button } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import { makeStyles } from "@material-ui/core/styles";
 import JoinForm from "./JoinForm";
-import { v4 as uuidv4 } from "uuid";
+import QueryJoin from "../../planetside/QueryJoin";
 
 const useStyles = makeStyles((theme) => ({
   gridRow: {
@@ -33,20 +25,7 @@ export default function JoinsContainer({
   const classes = useStyles();
 
   function handleAddNewJoin() {
-    const newJoin = {
-      id: uuidv4(),
-      parentId: null,
-      collection: "",
-      isList: false, //0 if joined data is not a list, 1 if it is a list. Defaults to 0- not a list.
-      filterType: "show",
-      filterFields: [],
-      injectAt: "",
-      terms: [], // aka Conditions
-      isOuterJoin: false,
-      joins: [],
-      onField: "",
-      toField: "",
-    };
+    const newJoin = QueryJoin();
 
     onAddNewJoin(newJoin);
   }

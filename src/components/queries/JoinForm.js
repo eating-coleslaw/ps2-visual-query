@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import {
-  Paper,
-  TextField,
-  Grid,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-} from "@material-ui/core";
+import { Paper, TextField, Grid, Button } from "@material-ui/core";
 import ForwardIcon from "@material-ui/icons/Forward";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -20,6 +12,7 @@ import ConditionArgumentForm from "./ConditionArgumentForm";
 import BinarySelector from "../BinarySelector";
 import BooleanSelector from "../shared/BooleanSelector";
 import Collapsible from "../shared/Collapsible";
+import QueryJoin from "../../planetside/QueryJoin";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -111,20 +104,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
       throw new Error("Can't add new sub-join. Max join depth already reached");
     }
 
-    const newJoin = {
-      id: uuidv4(),
-      parentId: joinData.id,
-      collection: "",
-      injectAt: "",
-      isOuterJoin: false,
-      isList: false, //0 if joined data is not a list, 1 if it is a list. Defaults to 0- not a list.
-      onField: "",
-      toField: "",
-      filterType: "show",
-      filterFields: [],
-      terms: [], // aka Conditions
-      joins: [],
-    };
+    const newJoin = QueryJoin(joinData.id);
 
     const updatedJoins = [...joinChanges.joins, newJoin];
 
