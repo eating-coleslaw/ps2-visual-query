@@ -195,9 +195,7 @@ export default function App() {
   }
 
   function onFilterTypeChange(event) {
-    const isChecked = event.target.checked;
-    const value = isChecked ? "show" : "hide";
-
+    const value = event.target.value.toLowerCase();
     setQuery({ ...query, ...{ filterType: value } });
   }
 
