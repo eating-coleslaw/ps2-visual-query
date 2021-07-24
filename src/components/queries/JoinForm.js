@@ -13,6 +13,7 @@ import BinarySelector from "../BinarySelector";
 import BooleanSelector from "../shared/BooleanSelector";
 import Collapsible from "../shared/Collapsible";
 import QueryJoin from "../../planetside/QueryJoin";
+import QueryCondition from "../../planetside/QueryCondition";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -124,17 +125,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
   }
 
   function handleAddNewTerm() {
-    const newTerm = {
-      id: uuidv4(),
-      field: "",
-      value: "",
-      operator: {
-        display: "=",
-        name: "equals",
-        title: "Equals",
-        value: "=",
-      },
-    };
+    const newTerm = QueryCondition();
 
     const updatedTerms = [...joinChanges.terms, newTerm];
 
@@ -144,7 +135,7 @@ export default function JoinForm({ joinData, depth, onChange, onDelete }) {
   function handleTermDataChange(id, propertyName, propertyValue) {
     const updatedTerms = joinChanges.terms.map((term) => {
       if (term.id === id) {
-        term[propertyName] = propertyValue;
+        term.setProperty(propertyName, propertyValue);
       }
 
       return term;

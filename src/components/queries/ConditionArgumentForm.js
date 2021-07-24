@@ -88,7 +88,7 @@ export default function ConditionArgumentForm({
                     variant="outlined"
                     color="primary"
                     disabled={
-                      !isValidInput(field) || field === conditionData.field
+                      !isValidInput(field) || field === conditionData.getField()
                     }
                     aria-label="Update the condition's field"
                     className={classes.button}
@@ -108,7 +108,7 @@ export default function ConditionArgumentForm({
             native
             margin="dense"
             label="Operator"
-            value={conditionData.operator.name}
+            value={conditionData.getOperator().name}
             onChange={handleOperatorChange}
             inputProps={{
               name: "operator",
@@ -145,7 +145,7 @@ export default function ConditionArgumentForm({
                     variant="outlined"
                     color="primary"
                     disabled={
-                      !isValidInput(value) || value === conditionData.value
+                      !isValidInput(value) || value === conditionData.getValue()
                     }
                     aria-label="Update the condition's filter value"
                     className={classes.button}

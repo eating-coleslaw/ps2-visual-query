@@ -32,6 +32,8 @@ import QueryUrlContainer from "./queries/QueryUrlContainer";
 import JoinsContainer from "./queries/JoinsContainer";
 // import JoinForm from "./queries/JoinForm";
 
+import QueryCondition from "../planetside/QueryCondition";
+
 import Collapsible from "./shared/Collapsible";
 
 import { v4 as uuidv4 } from "uuid";
@@ -156,9 +158,7 @@ export default function App() {
             paper: prefersDarkMode ? "#27273A" : "#fff",
             default: prefersDarkMode ? "#0F1320" : "#fafafa",
           },
-          text: {
-
-          }
+          text: {},
         },
         contrastThreshold: 5,
       }),
@@ -200,7 +200,7 @@ export default function App() {
   }
 
   function onAddSimpleArrayValue(arrayPropertyName, value) {
-    const array = [ ...query[arrayPropertyName] ];
+    const array = [...query[arrayPropertyName]];
 
     if (value !== "" && !array.includes(value)) {
       let updatedFields = array;
@@ -210,7 +210,7 @@ export default function App() {
   }
 
   function onRemoveSimpleArrayValue(arrayPropertyName, value) {
-    const array = [ ...query[arrayPropertyName] ];
+    const array = [...query[arrayPropertyName]];
 
     const index = array.indexOf(value);
 
@@ -224,7 +224,7 @@ export default function App() {
   function onConditionDataChange(id, propertyName, propertyValue) {
     const updatedConditions = query.conditions.map((condition) => {
       if (condition.id === id) {
-        condition[propertyName] = propertyValue;
+        condition.setProperty(propertyName, propertyValue);
       }
 
       return condition;
@@ -234,22 +234,10 @@ export default function App() {
   }
 
   function onAddNewCondition() {
-    const newCondition = {
-      id: uuidv4(),
-      field: "",
-      value: "",
-      operator: {
-        display: "=",
-        name: "equals",
-        title: "Equals",
-        value: "=",
-      },
-    };
+    const newCondition = QueryCondition();
+    const updatedConditions = [...query.conditions, newCondition];
 
-    setQuery({
-      ...query,
-      ...{ conditions: [...query.conditions, newCondition] },
-    });
+    setQuery({ ...query, ...{ conditions: updatedConditions } });
   }
 
   function onDeleteCondition(id) {
@@ -289,9 +277,6 @@ export default function App() {
   }
 
   const [queryUrl, setQueryUrl] = useState("");
-  const [dbgQuery, setDbgQuery] = useState(
-    new CensusQuery(query.collection, query.namespace, query.serviceKey)
-  );
   useEffect(() => {
     function convertToCensusQuery() {
       let censusQuery = new CensusQuery(
@@ -326,14 +311,10 @@ export default function App() {
 
       if (query.conditions.length > 0) {
         query.conditions.forEach((condition) => {
-          if (
-            condition.field !== "" &&
-            !!condition.operator &&
-            condition.value !== ""
-          ) {
+          if (condition.isValid()) {
             censusQuery
-              .where(condition.field)
-              [condition.operator.name](condition.value);
+              .where(condition.getField())
+              [condition.getOperator().name](condition.getValue());
           }
         });
       }
@@ -349,7 +330,10 @@ export default function App() {
       if (joinsArray.length > 0) {
         joinsArray.forEach((join) => {
           if (!!join.collection) {
-            let serviceJoin = censusJoin !== null ? censusJoin.joinService(join.collection) : censusQuery.joinService(join.collection);
+            let serviceJoin =
+              censusJoin !== null
+                ? censusJoin.joinService(join.collection)
+                : censusQuery.joinService(join.collection);
 
             serviceJoin.isList(join.isList);
             serviceJoin.isOuterJoin(join.isOuterJoin);
@@ -369,15 +353,13 @@ export default function App() {
             if (join.filterFields.length > 0) {
               serviceJoin[`${join.filterType}Fields`](join.filterFields);
             }
-            
+
             if (join.terms.length > 0) {
               join.terms.forEach((term) => {
-                if (
-                  term.field !== "" &&
-                  !!term.operator &&
-                  term.value !== ""
-                ) {
-                  serviceJoin.where(term.field)[term.operator.name](term.value);
+                if (term.isValid()) {
+                  serviceJoin
+                    .where(term.getField())
+                    [term.getOperator().name](term.getValue());
                 }
               });
             }
@@ -394,14 +376,13 @@ export default function App() {
 
     try {
       const censusQuery = convertToCensusQuery();
-      setDbgQuery(censusQuery);
       let url = censusQuery.toUrl();
       url = url.replace("http://", "https://");
       setQueryUrl(url);
     } catch (error) {
       console.log("Error getting query URL: ", error);
     }
-  }, [ query ]);
+  }, [query]);
 
   const [queryResult, setQueryResult] = useState("");
   async function onSubmitQuery() {
