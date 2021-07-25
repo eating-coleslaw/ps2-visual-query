@@ -4,14 +4,12 @@ import {
   InputLabel,
   FormControl,
   Select,
-  TextField,
   Grid,
   IconButton,
-  InputAdornment,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import SaveIcon from "@material-ui/icons/Save";
 import DeleteIcon from "@material-ui/icons/Delete";
+import TextFormWithSave from "../shared/TextFormWithSave";
 
 const useStyles = makeStyles((theme) => ({
   fieldGridItem: {
@@ -35,17 +33,10 @@ export default function ConditionArgumentForm({
 }) {
   const classes = useStyles();
 
-  const [field, setField] = useState(conditionData.field);
-  const [value, setValue] = useState(conditionData.value);
-
   const [operators, setOperators] = useState([]);
   useEffect(() => {
     setOperators(QueryEnums.Operators);
   }, []);
-
-  function isValidInput(value) {
-    return value !== "";
-  }
 
   function handleOperatorChange(event) {
     const value = event.target.value;
@@ -53,14 +44,12 @@ export default function ConditionArgumentForm({
     onDataChange(conditionData.id, "operator", operator);
   }
 
-  function onSubmitField(event) {
-    event.preventDefault();
-    onDataChange(conditionData.id, "field", field);
+  function onSubmitField(newValue) {
+    onDataChange(conditionData.id, "field", newValue);
   }
 
-  function onSubmitValue(event) {
-    event.preventDefault();
-    onDataChange(conditionData.id, "value", value);
+  function onSubmitValue(newValue) {
+    onDataChange(conditionData.id, "value", newValue);
   }
 
   function handleDeleteCondition() {
@@ -70,38 +59,14 @@ export default function ConditionArgumentForm({
   return (
     <React.Fragment>
       <Grid item xs={12} md={4}>
-        <form noValidate autoComplete="off" onSubmit={onSubmitField}>
-          <TextField
-            id="condition-field"
-            label="Field"
-            margin="dense"
-            variant="outlined"
-            name="condition-field"
-            size="small"
-            onChange={(e) => setField(e.target.value)}
-            value={field}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    type="submit"
-                    variant="outlined"
-                    color="primary"
-                    disabled={
-                      !isValidInput(field) || field === conditionData.field
-                      // !isValidInput(field) || field === conditionData.getField()
-                    }
-                    aria-label="Update the condition's field"
-                    className={classes.button}
-                  >
-                    <SaveIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </form>
+        <TextFormWithSave
+          label="Field"
+          initValue={conditionData.field}
+          onChange={onSubmitField}
+          ariaLabel="Update the condition's field"
+        />
       </Grid>
+
       <Grid item xs={3} md={3} className={classes.operatorGrid}>
         <FormControl variant="outlined">
           <InputLabel htmlFor="operator-select">Operator</InputLabel>
@@ -110,57 +75,61 @@ export default function ConditionArgumentForm({
             margin="dense"
             label="Operator"
             value={conditionData.operator.name}
-            // value={conditionData.getOperator().name}
             onChange={handleOperatorChange}
             inputProps={{
               name: "operator",
               id: "operator-select",
             }}
           >
-            <option key="equals" value="equals" title="Equals">{"="}</option>
-            <option key="notEquals" value="notEquals" title="Not Equals">{"≠"}</option>
-            <option key="isLessThan" value="isLessThan" title="Is Less Than">{"<"}</option>
-            <option key="isLessThanOrEquals" value="isLessThanOrEquals" title="Is Less Than Or Equals">{"≤"}</option>
-            <option key="isGreaterThan" value="isGreaterThan" title="Is Greater Than">{">"}</option>
-            <option key="isGreaterThanOrEquals" value="isGreaterThanOrEquals" title="Is Greater Than Or Equals">{"≥"}</option>
-            <option key="startsWith" value="startsWith">Starts With</option>
-            <option key="contains" value="contains">Contains</option>
+            <option key="equals" value="equals" title="Equals">
+              {"="}
+            </option>
+            <option key="notEquals" value="notEquals" title="Not Equals">
+              {"≠"}
+            </option>
+            <option key="isLessThan" value="isLessThan" title="Is Less Than">
+              {"<"}
+            </option>
+            <option
+              key="isLessThanOrEquals"
+              value="isLessThanOrEquals"
+              title="Is Less Than Or Equals"
+            >
+              {"≤"}
+            </option>
+            <option
+              key="isGreaterThan"
+              value="isGreaterThan"
+              title="Is Greater Than"
+            >
+              {">"}
+            </option>
+            <option
+              key="isGreaterThanOrEquals"
+              value="isGreaterThanOrEquals"
+              title="Is Greater Than Or Equals"
+            >
+              {"≥"}
+            </option>
+            <option key="startsWith" value="startsWith">
+              Starts With
+            </option>
+            <option key="contains" value="contains">
+              Contains
+            </option>
           </Select>
         </FormControl>
       </Grid>
+
       <Grid item xs={8} md={4}>
-        <form noValidate autoComplete="off" onSubmit={onSubmitValue}>
-          <TextField
-            id="condition-value"
-            label="Value"
-            margin="dense"
-            variant="outlined"
-            name="condition-value"
-            size="small"
-            onChange={(e) => setValue(e.target.value)}
-            value={value}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    type="submit"
-                    variant="outlined"
-                    color="primary"
-                    disabled={
-                      !isValidInput(value) || value === conditionData.value
-                      // !isValidInput(value) || value === conditionData.getValue()
-                    }
-                    aria-label="Update the condition's filter value"
-                    className={classes.button}
-                  >
-                    <SaveIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </form>
+        <TextFormWithSave
+          label="Value"
+          initValue={conditionData.value}
+          onChange={onSubmitValue}
+          ariaLabel="Update the condition's value"
+        />
       </Grid>
+
       <Grid item xs={1} md={1}>
         <IconButton
           aria-label="Delete this query condition"

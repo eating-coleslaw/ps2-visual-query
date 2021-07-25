@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button } from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
-import DeleteIcon from '@material-ui/icons/Delete';
+import DeleteIcon from "@material-ui/icons/Delete";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -50,7 +50,7 @@ function ServiceKeyForm({ serviceId, onServiceKeyChange, onDeleteStoredKey }) {
       >
         Save
       </Button>
-      
+
       <Button
         type="button"
         variant="outlined"

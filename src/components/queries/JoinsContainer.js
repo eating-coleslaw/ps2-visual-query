@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function JoinsContainer({
   joinsData,
-  // onJoinDataChange,
   onAddJoin,
   onDeleteJoin,
   onInfoChange,
@@ -33,10 +32,6 @@ export default function JoinsContainer({
     const newJoin = QueryJoin();
     onAddJoin(newJoin);
   }
-  
-  // function handleDataChange(updatedJoin) {
-  //   onJoinDataChange(updatedJoin);
-  // }
 
   function handleDeleteJoin(id) {
     onDeleteJoin(id);
@@ -54,8 +49,22 @@ export default function JoinsContainer({
     onRemoveArrayItem(targetId, arrayName, item, ancestry);
   }
 
-  function handleChangeArrayItemWithId(targetId, arrayName, itemId, propertyName, value, ancestry) {
-    onChangeArrayItemWithId(targetId, arrayName, itemId, propertyName, value, ancestry);
+  function handleChangeArrayItemWithId(
+    targetId,
+    arrayName,
+    itemId,
+    propertyName,
+    value,
+    ancestry
+  ) {
+    onChangeArrayItemWithId(
+      targetId,
+      arrayName,
+      itemId,
+      propertyName,
+      value,
+      ancestry
+    );
   }
 
   function handleRemoveArrayItemWithId(targetId, arrayName, itemId, ancestry) {
@@ -85,11 +94,6 @@ export default function JoinsContainer({
               onRemoveArrayItem={handleRemoveArrayItem}
               onChangeArrayItemWithId={handleChangeArrayItemWithId}
               onRemoveArrayItemWithId={handleRemoveArrayItemWithId}
-              // key={join.id}
-              // joinData={join}
-              // depth={0}
-              // onChange={handleDataChange}
-              // onDelete={handleDeleteJoin}
             />
           );
         })}

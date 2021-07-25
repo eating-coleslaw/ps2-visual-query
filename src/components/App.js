@@ -113,10 +113,10 @@ const useStyles = makeStyles((theme) => ({
 export default function App() {
   const classes = useStyles();
 
-  const [namespace, setNamespace] = useState("ps2:v2")
+  const [namespace, setNamespace] = useState("ps2:v2");
   useEffect(() => {
     dbgcensus.SetGlobalNamespace("ps2:v2");
-  }, [ namespace ]);
+  }, [namespace]);
 
   const [storeKey, setStoreKey] = useState(
     localStorage.getItem("DaybreakGamesKey")
@@ -131,22 +131,9 @@ export default function App() {
 
   const [loading, setLoading] = useState(false);
 
-  const [query, setQuery] = useState(QueryConfig(storeKey ?? "example", "character", namespace));
-  // const [query, setQuery] = useState({
-  //   serviceKey: storeKey || "example",
-  //   namespace: "ps2:v2",
-  //   collection: "character",
-  //   language: "All",
-  //   conditions: [],
-  //   limit: 10,
-  //   start: null,
-  //   filterType: "show",
-  //   filterFields: [],
-  //   resolves: [],
-  //   joins: [],
-  //   trees: [],
-  //   sort: [],
-  // });
+  const [query, setQuery] = useState(
+    QueryConfig(storeKey ?? "example", "character", namespace)
+  );
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
@@ -168,9 +155,7 @@ export default function App() {
     [prefersDarkMode]
   );
 
-  function onServiceKeyChange(key) {  
-    // setQuery({ ...query, ...{ serviceKey: key } });
-
+  function onServiceKeyChange(key) {
     setQuery((prevQuery) => {
       return { ...prevQuery, ...{ serviceKey: key } };
     });
@@ -179,9 +164,7 @@ export default function App() {
     localStorage.setItem("DaybreakGamesKey", key);
   }
 
-  function onDeleteStoredServiceKey() {  
-    // setQuery({ ...query, ...{ serviceKey: "example" } });
-
+  function onDeleteStoredServiceKey() {
     setQuery((prevQuery) => {
       return { ...prevQuery, ...{ serviceKey: "example" } };
     });
@@ -191,8 +174,6 @@ export default function App() {
   }
 
   function onCollectionChange(value) {
-    // setQuery({ ...query, ...{ collection: value } });
-
     setQuery((prevQuery) => {
       return { ...prevQuery, ...{ collection: value } };
     });
@@ -200,7 +181,6 @@ export default function App() {
 
   function onLimitChange(value) {
     const newLimit = value === 0 ? null : value;
-    // setQuery({ ...query, ...{ limit: newLimit } });
 
     setQuery((prevQuery) => {
       return { ...prevQuery, ...{ limit: newLimit } };
@@ -208,23 +188,15 @@ export default function App() {
   }
 
   function onLanguageChange(value) {
-    const newValue = (value === "All") ? "" : value.toLowerCase();
-    
+    const newValue = value === "All" ? "" : value.toLowerCase();
+
     setQuery((prevQuery) => {
       return { ...prevQuery, ...{ language: newValue } };
     });
-
-    // if (value === "All") {
-    //   setQuery({ ...query, ...{ language: "" } });
-    // } else {
-    //   setQuery({ ...query, ...{ language: value.toLowerCase() } });
-    // }
   }
 
   function onFilterTypeChange(event) {
     const value = event.target.value.toLowerCase();
-    
-    // setQuery({ ...query, ...{ filterType: value } });
 
     setQuery((prevQuery) => {
       return { ...prevQuery, ...{ filterType: value } };
@@ -232,22 +204,13 @@ export default function App() {
   }
 
   function onAddSimpleArrayValue(arrayPropertyName, value) {
-    // const array = [...query[arrayPropertyName]];
-
-    // if (value !== "" && !array.includes(value)) {
-    //   let updatedFields = array;
-    //   updatedFields.push(value);
-    //   setQuery({ ...query, ...{ [arrayPropertyName]: updatedFields } });
-    // }
-
     setQuery((prevQuery) => {
       const array = [...prevQuery[arrayPropertyName]];
 
       if (value !== "" && !array.includes(value)) {
         let updatedFields = array;
         updatedFields.push(value);
-        // setQuery({ ...query, ...{ [arrayPropertyName]: updatedFields } });
-        
+
         return { ...prevQuery, ...{ [arrayPropertyName]: updatedFields } };
       } else {
         return prevQuery;
@@ -256,16 +219,6 @@ export default function App() {
   }
 
   function onRemoveSimpleArrayValue(arrayPropertyName, value) {
-    // const array = [...query[arrayPropertyName]];
-    // const index = array.indexOf(value);
-
-    // if (index !== -1) {
-    //   let updatedFields = array;
-    //   updatedFields.splice(index, 1);
-
-    //   // setQuery({ ...query, ...{ [arrayPropertyName]: updatedFields } });
-    // }
-
     setQuery((prevQuery) => {
       const array = [...prevQuery[arrayPropertyName]];
 
@@ -274,59 +227,36 @@ export default function App() {
       if (index !== -1) {
         let updatedFields = array;
         updatedFields.splice(index, 1);
-        
+
         return { ...prevQuery, ...{ [arrayPropertyName]: updatedFields } };
       }
     });
   }
 
   function onConditionDataChange(id, propertyName, propertyValue) {
-    // const updatedConditions = query.conditions.map((condition) => {
-    //   if (condition.id === id) {
-        
-    //     return { ...condition, ...{ [propertyName]: propertyValue } }
-    //     // condition[propertyName] = propertyValue;
-    //   }
-
-    //   return condition;
-    // });
-
     setQuery((prevQuery) => {
       const updatedConditions = prevQuery.conditions.map((condition) => {
         if (condition.id === id) {
-          
-          return { ...condition, ...{ [propertyName]: propertyValue } }
-          // condition[propertyName] = propertyValue;
+          return { ...condition, ...{ [propertyName]: propertyValue } };
         }
-  
+
         return condition;
       });
-      
+
       return { ...prevQuery, ...{ conditions: updatedConditions } };
     });
-
-    // setQuery({ ...query, ...{ conditions: updatedConditions } });
   }
 
   function onAddNewCondition() {
     const newCondition = QueryCondition();
-    // const updatedConditions = [...query.conditions, newCondition];
-    // const updatedConditions = [...query.getConditions(), newCondition];
 
     setQuery((prevQuery) => {
       const updatedConditions = [...prevQuery.conditions, newCondition];
       return { ...prevQuery, ...{ conditions: updatedConditions } };
     });
-
-    // setQuery({ ...query, ...{ conditions: updatedConditions } });
   }
 
   function onDeleteCondition(id) {
-    // const updatedConditions = query.getConditions().filter((condition) => {
-    // const updatedConditions = query.conditions.filter((condition) => {
-    //   return condition.id !== id;
-    // });
-
     setQuery((prevQuery) => {
       const updatedConditions = prevQuery.conditions.filter((condition) => {
         return condition.id !== id;
@@ -334,70 +264,11 @@ export default function App() {
 
       return { ...prevQuery, ...{ conditions: updatedConditions } };
     });
-
-    // setQuery({ ...query, ...{ conditions: updatedConditions } });
   }
-
-  function onJoinDataChange(updatedJoin) {
-    // console.log('Updating join: ', updatedJoin.collection);
-    
-    // const updatedJoins = query.joins.map((join) => {
-    //   if (join.id === updatedJoin.id) {
-    //     return { ...join, ...updatedJoin };
-    //   }
-
-    //   return join;
-    // });
-
-    setQuery((prevQuery) => {
-      const updatedJoins = prevQuery.joins.map((join) => {
-        if (join.id === updatedJoin.id) {
-          return { ...join, ...updatedJoin };
-        }
-  
-        return join;
-      });
-
-      return { ...prevQuery, ...{ joins: updatedJoins } };
-    });
-
-    // setQuery({ ...query, ...{ joins: updatedJoins } });
-  }
-
-  function onAddNewJoin(newJoin) {
-    if (!!newJoin.parentId) {
-      return;
-    }
-
-    // const updatedJoins = [...query.joins, newJoin];
-    // setQuery({ ...query, ...{ joins: updatedJoins } });
-
-    setQuery((prevQuery) => {
-      const updatedJoins = [...prevQuery.joins, newJoin];
-      return { ...prevQuery, ...{ joins: updatedJoins } };
-    });
-  }
-
-  function onDeleteJoin(id) {
-    setQuery((prevQuery) => {
-      const updatedJoins = prevQuery.joins.filter((join) => {
-        return join.id !== id;
-      });
-  
-      setQuery({ ...prevQuery, ...{ joins: updatedJoins } });
-    });
-    
-    // const updatedJoins = query.joins.filter((join) => {
-    //   return join.id !== id;
-    // });
-
-    // setQuery({ ...query, ...{ joins: updatedJoins } });
-  }
-
 
   function handleAddJoin(join) {
     setQuery((prevQuery) => {
-      let updatedJoins = [ ...prevQuery.joins, join ];
+      let updatedJoins = [...prevQuery.joins, join];
       return { ...prevQuery, ...{ joins: updatedJoins } };
     });
   }
@@ -411,170 +282,153 @@ export default function App() {
 
   function handleChangeJoinInfo(targetId, propertyName, value, ancestry) {
     setQuery((prevQuery) => {
-      
-      const startJoinId = ancestry[0];
-      const childAncestry = [ ...ancestry];
-      childAncestry.splice(0, 1);
-
-      const updatedJoins = prevQuery.joins.map((join) => {
-        if (join.id === startJoinId) {
-          const updatedJoin = updateJoinAncestorInfo(join, targetId, propertyName, value, childAncestry);
-          // console.log(updatedJoin);
-          return updatedJoin;
-          // return updateJoinAncestorInfo(join, targetId, propertyName, value, childAncestry);
-        }
-        return join;
-      });
-      
+      const updatedJoins = updateJoinAncestry(
+        prevQuery.joins,
+        targetId,
+        propertyName,
+        value,
+        ancestry,
+        (join) => changeJoinPropertyValue(join, propertyName, value)
+      );
       return { ...prevQuery, ...{ joins: updatedJoins } };
     });
-  }
-
-  function updateJoinAncestorInfo(join, targetId, propertyName, value, ancestry) {
-    console.log(">>> join ancestry");
-    console.log(join.id, "Ancestry:", ancestry);
-
-    // If this is the target join, update the property's value
-    if (join.id === targetId) {
-      // console.log(join);
-      console.log('Changing', propertyName, 'to', value);
-      return { ...join, ...{ [propertyName]: value } };
-    }
-
-    // If this is not the target join, dig down into children
-    const nextChildId = ancestry[0];
-    const childAncestry = [ ...ancestry];
-      childAncestry.splice(0, 1);
-
-    // const nextChild = join.joins.find((j) => j.id === nextChildId);
-    const updatedJoins = join.joins.map((j) => {
-      if (j.id === nextChildId) {
-        const updatedJoin = updateJoinAncestorInfo(j, targetId, propertyName, value, childAncestry);
-        // console.log(updatedJoin);
-        return updatedJoin;
-        // return updateJoinAncestorInfo(j, targetId, propertyName, value, childAncestry);
-      }
-
-      return j;
-    });
-
-    join = { ...join, ...{ joins: updatedJoins } };
-    return join;
   }
 
   function handleAddJoinArrayItem(targetId, arrayName, item, ancestry) {
-    console.log("vvvvvvvvvvvvvvvADD ITEMvvvvvvvvvvvvvvvv");
-    console.log("Target:", targetId, ancestry);
-
     setQuery((prevQuery) => {
-      
-      const startJoinId = ancestry[0];
-      const childAncestry = [ ...ancestry ];
-      childAncestry.splice(0, 1);
-
-      const updatedJoins = prevQuery.joins.map((join) => {
-        if (join.id === startJoinId) {
-          const updatedJoin = updateJoinAncestor(join, targetId, arrayName, item, childAncestry, (targetJoin) => addArrayItemToJoin(targetJoin, arrayName, item));
-          return updatedJoin;
-          // return updateJoinAncestor(join, targetId, arrayName, item, childAncestry, (targetJoin) => addArrayItemToJoin(targetJoin, arrayName, item));
-        }
-        return join;
-      });
-      
+      const updatedJoins = updateJoinAncestry(
+        prevQuery.joins,
+        targetId,
+        arrayName,
+        item,
+        ancestry,
+        (targetJoin) => addArrayItemToJoin(targetJoin, arrayName, item)
+      );
       return { ...prevQuery, ...{ joins: updatedJoins } };
     });
-
-    console.log("^^^^^^^^^^^^^^ADD ITEM^^^^^^^^^^^^^^^^^^^^");
   }
 
   function handleRemoveJoinArrayItem(targetId, arrayName, item, ancestry) {
-    console.log("vvvvvvvvvvvvvvvREMOVE ITEMvvvvvvvvvvvvvvvv");
-    console.log("Target:", targetId, ancestry);
-
     setQuery((prevQuery) => {
-      
-      const startJoinId = ancestry[0];
-      const childAncestry = ancestry.splice(0, 1);
-
-      const updatedJoins = prevQuery.joins.map((join) => {
-        if (join.id === startJoinId) {
-          return updateJoinAncestor(join, targetId, arrayName, item, childAncestry, (targetJoin) => removeArrayItemFromJoin(targetJoin, arrayName, item));
-        }
-        return join;
-      });
-      
-      return { ...prevQuery, ...{ joins: updatedJoins } };
-    });
-
-    console.log("^^^^^^^^^^^^^^REMOVE ITEM^^^^^^^^^^^^^^^^^^^^");
-  }
-
-  function handleChangeJoinArrayItemWithId(targetId, arrayName, itemId, propertyName, value, ancestry) {
-    console.log("Changing",arrayName, propertyName, "to", value,".");
-    console.log(ancestry);
-    
-    setQuery((prevQuery) => {
-      
-      const startJoinId = ancestry[0];
-      const childAncestry = [ ...ancestry];
-      childAncestry.splice(0, 1);
-
-      const updatedJoins = prevQuery.joins.map((join) => {
-        if (join.id === startJoinId) {
-          const updatedJoin = updateJoinAncestor(join, targetId, propertyName, value, childAncestry, (targetJoin) => updateArrayItemWithIdInJoin(targetJoin, arrayName, itemId, propertyName, value));
-          return updatedJoin;
-          // return updateJoinAncestor(join, targetId, propertyName, value, childAncestry, (targetJoin) => updateArrayItemWithIdInJoin(targetJoin, arrayName, itemId, propertyName, value));
-          // return updateJoinAncestor(join, targetId, arrayName, itemId, propertyName, childAncestry, (targetJoin) => updateArrayItemWithIdInJoin(targetJoin, arrayName, itemId, propertyName, value));
-          // return updateJoinAncestor(join, targetId, arrayName, itemId, propertyName, childAncestry, updateArrayItemWithIdInJoin);
-        }
-        return join;
-      });
-      
+      const updatedJoins = updateJoinAncestry(
+        prevQuery.joins,
+        targetId,
+        arrayName,
+        item,
+        ancestry,
+        (targetJoin) => removeArrayItemFromJoin(targetJoin, arrayName, item)
+      );
       return { ...prevQuery, ...{ joins: updatedJoins } };
     });
   }
 
-  function handleRemoveJoinArrayItemWithId(targetId, arrayName, itemId, ancestry) {
+  function handleChangeJoinArrayItemWithId(
+    targetId,
+    arrayName,
+    itemId,
+    propertyName,
+    value,
+    ancestry
+  ) {
     setQuery((prevQuery) => {
-      
-      const startJoinId = ancestry[0];
-      const childAncestry = [ ...ancestry];
-      childAncestry.splice(0, 1);
-
-      const updatedJoins = prevQuery.joins.map((join) => {
-        if (join.id === startJoinId) {
-          const updatedJoin = updateJoinAncestor(join, targetId, arrayName, itemId, childAncestry, (targetJoin) => removeArrayItemWithIdFromJoin(targetJoin, arrayName, itemId));
-          return updatedJoin;
-          // return updateJoinAncestor(join, targetId, arrayName, itemId, childAncestry, (targetJoin) => removeArrayItemWithIdFromJoin(targetJoin, arrayName, itemId));
-        }
-        return join;
-      });
-      
+      const updatedJoins = updateJoinAncestry(
+        prevQuery.joins,
+        targetId,
+        propertyName,
+        value,
+        ancestry,
+        (targetJoin) =>
+          updateArrayItemWithIdInJoin(
+            targetJoin,
+            arrayName,
+            itemId,
+            propertyName,
+            value
+          )
+      );
       return { ...prevQuery, ...{ joins: updatedJoins } };
     });
   }
 
-  function updateJoinAncestor(join, targetId, propertyName, value, ancestry, updateFunction) {
-    console.log(join.id === targetId);
+  function handleRemoveJoinArrayItemWithId(
+    targetId,
+    arrayName,
+    itemId,
+    ancestry
+  ) {
+    setQuery((prevQuery) => {
+      const updatedJoins = updateJoinAncestry(
+        prevQuery.joins,
+        targetId,
+        arrayName,
+        itemId,
+        ancestry,
+        (targetJoin) =>
+          removeArrayItemWithIdFromJoin(targetJoin, arrayName, itemId)
+      );
+      return { ...prevQuery, ...{ joins: updatedJoins } };
+    });
+  }
 
+  function updateJoinAncestry(
+    joins,
+    targetId,
+    propertyName,
+    value,
+    ancestry,
+    updateFunction
+  ) {
+    const startJoinId = ancestry[0];
+    const childAncestry = [...ancestry];
+    childAncestry.splice(0, 1);
+
+    const updatedJoins = joins.map((join) => {
+      if (join.id === startJoinId) {
+        const updatedJoin = updateJoinAncestor(
+          join,
+          targetId,
+          propertyName,
+          value,
+          childAncestry,
+          updateFunction
+        );
+        return updatedJoin;
+      }
+      return join;
+    });
+
+    return updatedJoins;
+  }
+
+  function updateJoinAncestor(
+    join,
+    targetId,
+    propertyName,
+    value,
+    ancestry,
+    updateFunction
+  ) {
     // If this is the target join, update the property's value
     if (join.id === targetId) {
-      console.log("Result:", updateFunction(join))
-      // return updateFunction(join); //, propertyName, value); //{ ...join, ...{ [propertyName]: value } };
-      return updateFunction(join); //, propertyName, value); //{ ...join, ...{ [propertyName]: value } };
+      return updateFunction(join);
     }
 
     // If this is not the target join, dig down into children
     const nextChildId = ancestry[0];
-    const childAncestry = [ ...ancestry];
-      childAncestry.splice(0, 1);
+    const childAncestry = [...ancestry];
+    childAncestry.splice(0, 1);
 
-    // const nextChild = join.joins.find((j) => j.id === nextChildId);
     const updatedJoins = join.joins.map((j) => {
       if (j.id === nextChildId) {
-        const updatedJoin = updateJoinAncestor(j, targetId, propertyName, value, childAncestry, updateFunction);
+        const updatedJoin = updateJoinAncestor(
+          j,
+          targetId,
+          propertyName,
+          value,
+          childAncestry,
+          updateFunction
+        );
         return updatedJoin;
-        // return updateJoinAncestorInfo(j, targetId, propertyName, value, childAncestry);
       }
 
       return j;
@@ -584,30 +438,33 @@ export default function App() {
     return join;
   }
 
+  function changeJoinPropertyValue(join, propertyName, value) {
+    return { ...join, ...{ [propertyName]: value } };
+  }
+
   function addArrayItemToJoin(join, arrayName, item) {
-    console.log("Adding", item, "to", arrayName);
-    const updatedArray = [ ...join[arrayName], item ];
+    const updatedArray = [...join[arrayName], item];
     return { ...join, ...{ [arrayName]: updatedArray } };
   }
 
   function removeArrayItemFromJoin(join, arrayName, item) {
-    console.log("Removing", item, "from", arrayName);
     const updatedArray = join[arrayName].filter((i) => i !== item);
     return { ...join, ...{ [arrayName]: updatedArray } };
   }
 
-  function updateArrayItemWithIdInJoin(join, arrayName, itemId, propertyName, value) {
-    console.log("Entered updateFunction");
-    console.log(join, arrayName, itemId, propertyName, value);
-    
+  function updateArrayItemWithIdInJoin(
+    join,
+    arrayName,
+    itemId,
+    propertyName,
+    value
+  ) {
     const updatedArray = join[arrayName].map((item) => {
       if (item.id === itemId) {
         return { ...item, ...{ [propertyName]: value } };
       }
       return item;
     });
-
-    console.log(join[arrayName].find((item) => item.id === itemId));
 
     return { ...join, ...{ [arrayName]: updatedArray } };
   }
@@ -617,14 +474,7 @@ export default function App() {
     return { ...join, ...{ [arrayName]: updatedArray } };
   }
 
-
-  
-
-  
-
-
   const [queryUrl, setQueryUrl] = useState("");
-  // const updateQueryUrl = () => {
   useEffect(() => {
     function convertToCensusQuery() {
       let censusQuery = new CensusQuery(
@@ -664,9 +514,7 @@ export default function App() {
           const value = condition.value;
 
           if (condition.isValid(field, operator, value)) {
-            censusQuery
-              .where(field)
-              [operator.name](value);
+            censusQuery.where(field)[operator.name](value);
           }
         });
       }
@@ -681,8 +529,6 @@ export default function App() {
     function addQueryJoins(censusQuery, joinsArray, censusJoin = null) {
       if (joinsArray.length > 0) {
         joinsArray.forEach((join) => {
-          // console.log(">>> Join: ", join);
-          
           if (!!join.collection) {
             let serviceJoin =
               censusJoin !== null
@@ -713,11 +559,9 @@ export default function App() {
                 const field = term.field;
                 const operator = term.operator;
                 const value = term.value;
-          
+
                 if (term.isValid(field, operator, value)) {
-                  serviceJoin
-                    .where(field)
-                    [operator.name](value);
+                  serviceJoin.where(field)[operator.name](value);
                 }
               });
             }
@@ -733,7 +577,6 @@ export default function App() {
     }
 
     try {
-      // console.log(">>> GENERATING NEW QUERY URL <<<");
       const censusQuery = convertToCensusQuery();
       let url = censusQuery.toUrl();
       url = url.replace("http://", "https://");
@@ -742,8 +585,6 @@ export default function App() {
       console.log("Error getting query URL: ", error);
     }
   }, [query]);
-
-  // setQueryUrl(updateQueryUrl());
 
   const [queryResult, setQueryResult] = useState("");
   async function onSubmitQuery() {
@@ -762,8 +603,6 @@ export default function App() {
       }
     }
   }
-
-  // console.log('Query Joins:', query.joins);
 
   return (
     <ThemeProvider theme={theme}>
@@ -1005,10 +844,6 @@ export default function App() {
                 >
                   <JoinsContainer
                     joinsData={query.joins}
-                    // depth={0}
-                    // onJoinDataChange={onJoinDataChange}
-                    // onAddNewJoin={onAddNewJoin}
-                    // onDeleteJoin={onDeleteJoin}
                     onAddJoin={handleAddJoin}
                     onDeleteJoin={handleDeleteJoin}
                     onInfoChange={handleChangeJoinInfo}

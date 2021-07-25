@@ -1,6 +1,6 @@
-import React from 'react';
-import Slider from '@material-ui/core/Slider';
-import InputLabel from '@material-ui/core/InputLabel';
+import React from "react";
+import Slider from "@material-ui/core/Slider";
+import InputLabel from "@material-ui/core/InputLabel";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -44,7 +44,7 @@ const getScaledValue = (x) => {
   } else {
     return (x - 30) * 1000;
   }
-}
+};
 
 const getUnscaledValue = (x) => {
   if (x === 0) {
@@ -52,30 +52,32 @@ const getUnscaledValue = (x) => {
   } else if (x <= 10) {
     return x;
   } else if (x <= 100) {
-    return (x / 10)  + 10;
+    return x / 10 + 10;
   } else if (x <= 1000) {
-    return (x / 100) + 20;
+    return x / 100 + 20;
   } else {
-    return (x / 1000) + 30;
+    return x / 1000 + 30;
   }
-}
+};
 
-export default function LimitSlider({ value,  onChange, label }) {
+export default function LimitSlider({ value, onChange, label }) {
   const classes = useStyles();
-  
+
   const sliderValue = getUnscaledValue(value);
 
   const handleSliderChange = (event, newValue) => {
     onChange(getScaledValue(newValue));
-  }
+  };
 
   return (
     <React.Fragment>
-      <InputLabel id="limit-input-slider-label" htmlFor="limit-slider">Limit</InputLabel>
+      <InputLabel id="limit-input-slider-label" htmlFor="limit-slider">
+        Limit
+      </InputLabel>
       <Slider
         className={classes.root}
         id="limit-slider"
-        value={typeof sliderValue === 'number' ? sliderValue : 0}
+        value={typeof sliderValue === "number" ? sliderValue : 0}
         min={0}
         step={1}
         max={40}
@@ -88,5 +90,5 @@ export default function LimitSlider({ value,  onChange, label }) {
         marks={marks}
       />
     </React.Fragment>
-  )
+  );
 }

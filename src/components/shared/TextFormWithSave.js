@@ -22,9 +22,9 @@ export default function TextFormWithSave({
   label,
   initValue,
   onChange,
-  placeholder = null,
+  placeholder = "",
   variant = "outlined",
-  ariaLabel ="",
+  ariaLabel = "",
 }) {
   const classes = useStyles();
 
@@ -48,7 +48,7 @@ export default function TextFormWithSave({
         variant={variant}
         name={`${label}-field`}
         size="small"
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(event) => setValue(event.target.value)}
         value={value}
         placeholder={placeholder}
         InputProps={{
