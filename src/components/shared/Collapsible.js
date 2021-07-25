@@ -49,14 +49,14 @@ const useStyles = makeStyles((theme) => ({
     transform: "rotateZ(180deg)",
   },
   content: {
-    height: 0,
+    // height: 0,
     width: "100%",
     display: "none",
-    transition: "all 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+    // transition: "all 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
   },
   contentOpen: {
     width: "100%",
-    transition: "all 100ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+    // transition: "all 100ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
   },
 }));
 
@@ -145,7 +145,7 @@ export default function Collapsible({
 
       <div
         id={`collapsible-content-${id}`}
-        style={{ height: `${contentHeight}px` }}
+        // style={{ height: `${contentHeight}px` }}
         className={extended ? classes.contentOpen : classes.content}
       >
         {children}
