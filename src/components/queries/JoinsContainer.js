@@ -18,24 +18,48 @@ const useStyles = makeStyles((theme) => ({
 
 export default function JoinsContainer({
   joinsData,
-  onJoinDataChange,
-  onAddNewJoin,
+  // onJoinDataChange,
+  onAddJoin,
   onDeleteJoin,
+  onInfoChange,
+  onAddArrayItem,
+  onRemoveArrayItem,
+  onChangeArrayItemWithId,
+  onRemoveArrayItemWithId,
 }) {
   const classes = useStyles();
 
-  function handleAddNewJoin() {
+  function handleAddJoin() {
     const newJoin = QueryJoin();
-
-    onAddNewJoin(newJoin);
+    onAddJoin(newJoin);
   }
   
-  function handleDataChange(updatedJoin) {
-    onJoinDataChange(updatedJoin);
-  }
+  // function handleDataChange(updatedJoin) {
+  //   onJoinDataChange(updatedJoin);
+  // }
 
   function handleDeleteJoin(id) {
     onDeleteJoin(id);
+  }
+
+  function handleChangeInfo(targetId, propertyName, value, ancestry) {
+    onInfoChange(targetId, propertyName, value, ancestry);
+  }
+
+  function handleAddArrayItem(targetId, arrayName, item, ancestry) {
+    onAddArrayItem(targetId, arrayName, item, ancestry);
+  }
+
+  function handleRemoveArrayItem(targetId, arrayName, item, ancestry) {
+    onRemoveArrayItem(targetId, arrayName, item, ancestry);
+  }
+
+  function handleChangeArrayItemWithId(targetId, arrayName, itemId, propertyName, value, ancestry) {
+    onChangeArrayItemWithId(targetId, arrayName, itemId, propertyName, value, ancestry);
+  }
+
+  function handleRemoveArrayItemWithId(targetId, arrayName, itemId, ancestry) {
+    onRemoveArrayItemWithId(targetId, arrayName, itemId, ancestry);
   }
 
   return (
@@ -55,8 +79,17 @@ export default function JoinsContainer({
               key={join.id}
               joinData={join}
               depth={0}
-              onChange={handleDataChange}
               onDelete={handleDeleteJoin}
+              onInfoChange={handleChangeInfo}
+              onAddArrayItem={handleAddArrayItem}
+              onRemoveArrayItem={handleRemoveArrayItem}
+              onChangeArrayItemWithId={handleChangeArrayItemWithId}
+              onRemoveArrayItemWithId={handleRemoveArrayItemWithId}
+              // key={join.id}
+              // joinData={join}
+              // depth={0}
+              // onChange={handleDataChange}
+              // onDelete={handleDeleteJoin}
             />
           );
         })}
@@ -67,7 +100,7 @@ export default function JoinsContainer({
           color="primary"
           startIcon={<AddIcon fontSize="small" />}
           size="small"
-          onClick={handleAddNewJoin}
+          onClick={handleAddJoin}
           className={classes.textButton}
         >
           New Join
