@@ -31,6 +31,8 @@ import JoinsContainer from "./queries/JoinsContainer";
 import QueryCondition from "../planetside/QueryCondition";
 import Collapsible from "./shared/Collapsible";
 
+import HideAppBar from "./HideAppBar";
+
 import QueryConfig from "../planetside/QueryConfig";
 
 import userPreferenceStore from "../persistence/userPreferencesStore";
@@ -43,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   container: {
-    "margin-top": theme.spacing(3),
+    "margin-top": theme.spacing(2),
   },
   gridContainer: {
     padding: theme.spacing(2),
@@ -113,9 +115,7 @@ export default function App() {
     dbgcensus.SetGlobalNamespace("ps2:v2");
   }, [namespace]);
 
-  const [storeKey, setStoreKey] = useState(
-    userPreferenceStore.getServiceId()
-  );
+  const [storeKey, setStoreKey] = useState(userPreferenceStore.getServiceId());
   useEffect(() => {
     const storedKey = userPreferenceStore.getServiceId();
     if (storedKey !== null) {
@@ -131,24 +131,46 @@ export default function App() {
   );
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+  const storedColorTheme = userPreferenceStore.getColorTheme();
+
+  const [colorTheme, setColorTheme] = useState(
+    !!storedColorTheme ? storedColorTheme : prefersDarkMode ? "dark" : "light"
+  );
+
+  useEffect(() => {
+    const newTheme = !!storedColorTheme
+      ? storedColorTheme
+      : prefersDarkMode
+      ? "dark"
+      : "light";
+    setColorTheme(newTheme);
+  }, [storedColorTheme, prefersDarkMode]);
+
+  const useDarkMode = colorTheme === "dark";
+  console.log(colorTheme);
 
   const theme = React.useMemo(
     () =>
       createTheme({
         palette: {
-          type: prefersDarkMode ? "dark" : "light",
-          primary: prefersDarkMode ? { main: "#E7ADFB" } : pink, //24E8D8 cyan : pink, //"#E34F8C" : pink, //amber : pink,
+          type: useDarkMode ? "dark" : "light",
+          primary: useDarkMode ? { main: "#E7ADFB" } : pink, //24E8D8 cyan : pink, //"#E34F8C" : pink, //amber : pink,
           secondary: orange, //amber,
           background: {
-            paper: prefersDarkMode ? "#27273A" : "#fff",
-            default: prefersDarkMode ? "#0F1320" : "#fafafa",
+            paper: useDarkMode ? "#27273A" : "#fff",
+            default: useDarkMode ? "#0F1320" : "#fafafa",
           },
           text: {},
         },
         contrastThreshold: 5,
       }),
-    [prefersDarkMode]
+    [useDarkMode]
   );
+
+  function handleColorThemeChange(theme) {
+    userPreferenceStore.saveColorTheme(theme);
+    setColorTheme(theme);
+  }
 
   function onServiceKeyChange(key) {
     setQuery((prevQuery) => {
@@ -602,6 +624,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <HideAppBar theme={colorTheme} onChangeTheme={handleColorThemeChange} />
       <Container maxWidth="lg" className={classes.container}>
         <Grid container alignItems="flex-start">
           <Grid container item xs={12} sm={6} className={classes.gridContainer}>
