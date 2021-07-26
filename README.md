@@ -92,3 +92,19 @@ The repo is configured to deploy my own GitHub Pages. To deploy a fork to your o
 4. Wait for your site to be published and available to visit. This shouldn't take very long.
 5. Whenever you want to publish changes to the site, simply execute the command `npm run deploy` again.
 
+### Contributing
+
+Feel free to submit pull requests for fixes or new features. Below is a list of query modifiers that the app currently doesn't support.
+
+#### Missing Query Features
+
+- `c:sort`
+- `c:has`
+- `c:case`
+- `c:limitPerDB`
+- `c:start`
+- `c:includeNul`
+- `c:tree`
+- `c:timing`
+- `c:exactMatchFirst`
+- `c:distinct`
