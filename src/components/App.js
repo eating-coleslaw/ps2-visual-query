@@ -23,22 +23,17 @@ import ServiceKeyForm from "./queries/ServiceKeyForm";
 import CollectionSelector from "./queries/CollectionSelector";
 import LimitSlider from "./queries/LimitSlider";
 import LanguageSelector from "./queries/LanguageSelector";
-
 import FieldsEntryForm from "./queries/FieldsEntryForm";
 import ConditionArgumentForm from "./queries/ConditionArgumentForm";
 import QueryResults from "./queries/QueryResults";
 import QueryUrlContainer from "./queries/QueryUrlContainer";
-
 import JoinsContainer from "./queries/JoinsContainer";
-// import JoinForm from "./queries/JoinForm";
-
 import QueryCondition from "../planetside/QueryCondition";
-
 import Collapsible from "./shared/Collapsible";
 
-import { v4 as uuidv4 } from "uuid";
-
 import QueryConfig from "../planetside/QueryConfig";
+
+import userPreferenceStore from "../persistence/userPreferencesStore";
 
 const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
@@ -119,10 +114,10 @@ export default function App() {
   }, [namespace]);
 
   const [storeKey, setStoreKey] = useState(
-    localStorage.getItem("DaybreakGamesKey")
+    userPreferenceStore.getServiceId()
   );
   useEffect(() => {
-    const storedKey = localStorage.getItem("DaybreakGamesKey");
+    const storedKey = userPreferenceStore.getServiceId();
     if (storedKey !== null) {
       dbgcensus.SetGlobalServiceKey(storedKey);
       setStoreKey(storedKey);
@@ -161,7 +156,7 @@ export default function App() {
     });
 
     dbgcensus.SetGlobalServiceKey(key);
-    localStorage.setItem("DaybreakGamesKey", key);
+    userPreferenceStore.saveServiceId(key);
   }
 
   function onDeleteStoredServiceKey() {
@@ -170,7 +165,7 @@ export default function App() {
     });
 
     dbgcensus.SetGlobalServiceKey("example");
-    localStorage.removeItem("DaybreakGamesKey");
+    userPreferenceStore.removeServiceId();
   }
 
   function onCollectionChange(value) {
