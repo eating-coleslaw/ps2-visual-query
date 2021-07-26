@@ -147,25 +147,24 @@ export default function App() {
   }, [storedColorTheme, prefersDarkMode]);
 
   const useDarkMode = colorTheme === "dark";
-  console.log(colorTheme);
 
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        palette: {
-          type: useDarkMode ? "dark" : "light",
-          primary: useDarkMode ? { main: "#E7ADFB" } : pink, //24E8D8 cyan : pink, //"#E34F8C" : pink, //amber : pink,
-          secondary: orange, //amber,
-          background: {
-            paper: useDarkMode ? "#27273A" : "#fff",
-            default: useDarkMode ? "#0F1320" : "#fafafa",
-          },
-          text: {},
+  const theme = React.useMemo(() => {
+    const theme = createTheme({
+      palette: {
+        type: useDarkMode ? "dark" : "light",
+        primary: useDarkMode ? { main: "#E7ADFB" } : pink, //24E8D8 cyan : pink, //"#E34F8C" : pink, //amber : pink,
+        secondary: orange, //amber,
+        background: {
+          paper: useDarkMode ? "#27273A" : "#fff",
+          default: useDarkMode ? "#0F1320" : "#fafafa",
         },
-        contrastThreshold: 5,
-      }),
-    [useDarkMode]
-  );
+        text: {},
+      },
+      contrastThreshold: 5,
+    });
+
+    return theme;
+  }, [useDarkMode]);
 
   function handleColorThemeChange(theme) {
     userPreferenceStore.saveColorTheme(theme);

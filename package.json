@@ -13,10 +13,8 @@
     "dbgcensus": "^1.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-json-view": "^1.21.3",
     "react-scripts": "4.0.3",
-    "uuid": "^8.3.2",
-    "web-vitals": "^1.1.2"
+    "uuid": "^8.3.2"
   },
   "scripts": {
     "predeploy": "npm run build",
