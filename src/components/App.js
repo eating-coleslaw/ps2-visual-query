@@ -30,10 +30,9 @@ import QueryUrlContainer from "./queries/QueryUrlContainer";
 import JoinsContainer from "./queries/JoinsContainer";
 import QueryCondition from "../planetside/QueryCondition";
 import Collapsible from "./shared/Collapsible";
-
 import HideAppBar from "./HideAppBar";
-
 import QueryConfig from "../planetside/QueryConfig";
+import TreeForm from "./queries/TreeForm";
 
 import userPreferenceStore from "../persistence/userPreferencesStore";
 
@@ -490,6 +489,14 @@ export default function App() {
     return { ...join, ...{ [arrayName]: updatedArray } };
   }
 
+  function handleChangeQueryTreeProperty(propertyName, value) {
+    setQuery((prevQuery) => {
+      let updatedTree = { ...prevQuery.tree, ...{ [propertyName]: value } };
+
+      return { ...prevQuery, ...{ tree: updatedTree } };
+    });
+  }
+
   const [queryUrl, setQueryUrl] = useState("");
   useEffect(() => {
     function convertToCensusQuery() {
@@ -592,10 +599,32 @@ export default function App() {
       return censusQuery;
     }
 
+    // The dbgcensus package doesn't process trees correctly, so we do it manually
+    function getTreeViewUrlString() {
+      const treeField = query.tree.treeField || query.tree.startField;
+
+      if (!!treeField) {
+        let treeViewString = `&c:tree=field:${treeField}`;
+
+        treeViewString = `${treeViewString}^isList:${query.tree.isList}`;
+
+        if (!!query.tree.groupPrefix) {
+          treeViewString = `${treeViewString}^prefix:${query.tree.groupPrefix}`;
+        }
+
+        if (!!query.tree.startField) {
+          treeViewString = `${treeViewString}^start:${query.tree.startField}`;
+        }
+
+        return treeViewString;
+      }
+    }
+
     try {
       const censusQuery = convertToCensusQuery();
       let url = censusQuery.toUrl();
       url = url.replace("http://", "https://");
+      url = url + getTreeViewUrlString();
       setQueryUrl(url);
     } catch (error) {
       console.log("Error getting query URL: ", error);
@@ -868,6 +897,18 @@ export default function App() {
                     onRemoveArrayItem={handleRemoveJoinArrayItem}
                     onChangeArrayItemWithId={handleChangeJoinArrayItemWithId}
                     onRemoveArrayItemWithId={handleRemoveJoinArrayItemWithId}
+                  />
+                </Collapsible>
+
+                <Collapsible
+                  id="tree-form"
+                  headerLevel={2}
+                  headerText="Tree View"
+                  defaultExtended={true}
+                >
+                  <TreeForm
+                    tree={query.tree}
+                    onChange={handleChangeQueryTreeProperty}
                   />
                 </Collapsible>
               </Paper>

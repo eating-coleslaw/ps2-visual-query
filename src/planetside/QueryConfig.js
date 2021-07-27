@@ -1,3 +1,5 @@
+import QueryTree from "./QueryTree";
+
 const QueryConfig = (
   serviceId = "example",
   defaultCollection = "character"
@@ -13,7 +15,7 @@ const QueryConfig = (
     filterFields: [],
     resolves: [],
     joins: [],
-    trees: [],
+    tree: QueryTree(),
     start: null,
     sortFields: [],
     sortDirection: -1,
