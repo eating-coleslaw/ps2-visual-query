@@ -46,12 +46,13 @@ export default function TreeForm({ tree, onChange }) {
           />
         </Grid>
 
-        <Grid item sm={12} md={6}></Grid>
-        <TextFormWithSave
-          label="Start Field"
-          initValue={tree.startField}
-          onChange={handleChangeStartField}
-        />
+        <Grid item sm={12} md={6}>
+          <TextFormWithSave
+            label="Start Field"
+            initValue={tree.startField}
+            onChange={handleChangeStartField}
+          />
+        </Grid>
       </Grid>
 
       <Grid
@@ -60,7 +61,7 @@ export default function TreeForm({ tree, onChange }) {
         alignItems="center"
         className={classes.gridRow}
       >
-        <Grid item xs={6} sm={3}>
+        <Grid item xs={12} sm={6} md={4}>
           <BooleanSelector
             label="Is List"
             initValue={tree.isList}
@@ -68,7 +69,7 @@ export default function TreeForm({ tree, onChange }) {
           />
         </Grid>
 
-        <Grid item xs={6} sm={9}>
+        <Grid item xs={12} sm={6} md={8}>
           <TextFormWithSave
             label="Group Prefix"
             initValue={tree.groupPrefix}
