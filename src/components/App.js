@@ -624,7 +624,13 @@ export default function App() {
       const censusQuery = convertToCensusQuery();
       let url = censusQuery.toUrl();
       url = url.replace("http://", "https://");
-      url = url + getTreeViewUrlString();
+
+      let treeViewString = getTreeViewUrlString();
+
+      if (!!treeViewString) {
+        url = url + treeViewString;
+      }
+
       setQueryUrl(url);
     } catch (error) {
       console.log("Error getting query URL: ", error);
