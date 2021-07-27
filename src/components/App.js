@@ -702,6 +702,16 @@ export default function App() {
                   >
                     official documentation
                   </a>{" "}
+                  or{" "}
+                  <a
+                    href="https://github.com/leonhard-s/auraxium/wiki/Census-API-Primer"
+                    aria-label="Leonhard-s's Census API Primer wiki"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: "#40afee" }}
+                  >
+                    leonhard-s's API primer
+                  </a>{" "}
                   for more information on using the API.
                 </p>
 
@@ -806,14 +816,15 @@ export default function App() {
                     xs={12}
                     justifyContent="flex-start"
                     alignItems="center"
-                    spacing={0}
+                    spacing={1}
                     className={classes.gridRow}
                   >
                     <Grid
                       item
                       xs={12}
                       sm={6}
-                      md={3}
+                      md={4}
+                      lg={3}
                       className={classes.inlineSelectItem}
                     >
                       <FormControl variant="outlined">
@@ -841,6 +852,7 @@ export default function App() {
                         </Select>
                       </FormControl>
                     </Grid>
+
                     <FieldsEntryForm
                       label="Add Field"
                       fields={query.filterFields}
