@@ -46,12 +46,12 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
   const classes = useStyles();
 
   function copyToClipboardExact() {
-    navigator.clipboard.writeText(queryUrl);
+    navigator.clipboard.writeText(unescape(queryUrl));
   }
 
   function copyToClipboardAnonymous() {
     const anonymousUrl = anonymizeQueryUrl(queryUrl);
-    navigator.clipboard.writeText(anonymousUrl);
+    navigator.clipboard.writeText(unescape(anonymousUrl));
   }
 
   function anonymizeQueryUrl(url) {
