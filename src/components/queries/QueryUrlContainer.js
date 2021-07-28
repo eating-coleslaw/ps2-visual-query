@@ -41,6 +41,33 @@ const useStyles = makeStyles((theme) => ({
   buttonWide: {
     whiteSpace: "nowrap",
   },
+  syntax: {
+    fontSize: "1rem",
+  },
+  questionMark: {
+    color: theme.palette.secondary.main,
+  },
+  ampersand: {
+    color: theme.palette.secondary.main,
+  },
+  queryDelimiter: {
+    color: theme.palette.secondary.main,
+  },
+  equals: {
+    color: "#E752A1",
+  },
+  equalsModifier: {
+    color: "#E752A1",
+  },
+  colon: {
+    color: "#E752A1",
+  },
+  parentheses: {
+    color: "#50DFFE",
+  },
+  comma: {
+    color: "#97EE91",
+  },
 }));
 
 export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
@@ -67,6 +94,8 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
 
   let queryUrlPieces = [];
 
+  const operatorCharacters = ["[", "]", "*", "!", "<", ">", "^"];
+
   // let splitAtQueryArray = unescapedUrl.split("?c:");
 
   let splitAtQueryArray = unescapedUrl.split("?");
@@ -76,7 +105,8 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
   queryUrlPieces.push(<span key={preQueryString}>{preQueryString}</span>);
   
   if (splitAtQueryArray.length > 1) {
-    queryUrlPieces.push(<span key="?" style={{ color: secondaryColor }}>?</span>);
+    // queryUrlPieces.push(<span key="?" style={{ color: secondaryColor }}>?</span>);
+    queryUrlPieces.push(<span key="?" className={ classes.syntax + " " + classes.questionMark }>?</span>);
 
     let queryString = splitAtQueryArray[1];
 
@@ -96,7 +126,8 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
 
     splitAtMod.forEach((modItem) => {
       if (splitAtMod.indexOf(modItem) !== 0 && !!modItem) {
-        queryUrlPieces.push(<span key={uuidv1()} style={{ color: secondaryColor }}>c:</span>);
+        queryUrlPieces.push(<span key={uuidv1()} className={ classes.queryDelimiter }>c:</span>);
+        // queryUrlPieces.push(<span key={uuidv1()} style={{ color: secondaryColor }}>c:</span>);
       }      
       
       let splitAtAmpersand = modItem.split("&");
@@ -108,26 +139,36 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
 
       splitAtAmpersand.forEach((amperItem) => {
         if (splitAtAmpersand.indexOf(amperItem) !== 0) {
-          queryUrlPieces.push(<span key={uuidv1()}  style={{ color: secondaryColor }}>&</span>);
+          // queryUrlPieces.push(<span key={uuidv1()}  style={{ color: secondaryColor }}>&</span>);
+          queryUrlPieces.push(<span key={uuidv1()} className={ classes.syntax + " " + classes.ampersand }>&</span>);
         }
 
         let splitAtEquals = amperItem.split("=");
 
         splitAtEquals.forEach((equalsItem) => {
           if (splitAtEquals.indexOf(equalsItem) !== 0) {
+            queryUrlPieces.push(<span key={uuidv1()} className={ classes.syntax + " " + classes.equals }>=</span>);
+            // queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#E752A1", fontWeight: 500, fontSize: "1rem" }}>=</span>);
             // queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#97EE91", fontWeight: 500 }}>=</span>);
-            queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#E752A1", fontWeight: 500 }}>=</span>);
             // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>=</span>)
             // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>=</span>)
             // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>=</span>)
+          }
+
+          const firstChar = equalsItem.charAt(0);
+          if (operatorCharacters.includes(firstChar)) {
+            queryUrlPieces.push(<span key={uuidv1()} className={ classes.syntax + " " + classes.equalsModifier }>{firstChar}</span>);
+            // queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#E752A1", fontWeight: 500 }}>{firstChar}</span>);
+            equalsItem = equalsItem.substring(1);
           }
           
           let splitAtColon = equalsItem.split(":");
           
           splitAtColon.forEach((colonItem) => {
             if (splitAtColon.indexOf(colonItem) !== 0) {
+              queryUrlPieces.push(<span key={uuidv1()} className={ classes.syntax + " " + classes.colon }>:</span>)
+              // queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
               // queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#97EE91", fontWeight: 500 }}>:</span>)
-              queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
               // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
               // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>:</span>)
               // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>:</span>)
@@ -137,7 +178,8 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
 
             splitAtOpenParen.forEach((openParenItem) => {
               if (splitAtOpenParen.indexOf(openParenItem) !== 0) {
-                queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#50DFFE", fontWeight: 500 }}>(</span>)
+                queryUrlPieces.push(<span key={uuidv1()} className={ classes.syntax + " " + classes.parentheses }>(</span>)
+                // queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#50DFFE", fontWeight: 500 }}>(</span>)
                 // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
                 // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>:</span>)
                 // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>:</span>)
@@ -147,7 +189,8 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
 
               splitAtCloseParen.forEach((closeParenItem) => {
                 if (splitAtCloseParen.indexOf(closeParenItem) !== 0) {
-                  queryUrlPieces.push(<span key={uuidv1()}   style={{ color: "#50DFFE", fontWeight: 500 }}>)</span>)
+                  queryUrlPieces.push(<span key={uuidv1()} className={ classes.syntax + " " + classes.parentheses }>)</span>)
+                  // queryUrlPieces.push(<span key={uuidv1()}   style={{ color: "#50DFFE", fontWeight: 500 }}>)</span>)
                   // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
                   // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>:</span>)
                   // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>:</span>)
@@ -157,15 +200,36 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
 
                 splitAtUpperComman.forEach((upperCommaItem) => {
                   if (splitAtUpperComman.indexOf(upperCommaItem) !== 0) {
-                    queryUrlPieces.push(<span key={uuidv1()}   style={{ color: "#97EE91", fontWeight: 500 }}>^</span>)
+                    queryUrlPieces.push(<span key={uuidv1()}  className={ classes.syntax + " " + classes.comma }>^</span>)
+                    // queryUrlPieces.push(<span key={uuidv1()}   style={{ color: "#97EE91", fontWeight: 500 }}>^</span>)
                     // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
                     // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>:</span>)
                     // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>:</span>)
                   }
   
-                  if (!!upperCommaItem) {
-                    queryUrlPieces.push(<span key={uuidv1()}>{upperCommaItem}</span>);
-                  }
+                  // if (!!upperCommaItem) {
+                  //   queryUrlPieces.push(<span key={uuidv1()}>{upperCommaItem}</span>);
+                  // }
+
+                  let splitAtComma = upperCommaItem.split(",");
+
+                  splitAtComma.forEach((commaItem) => {
+                    if (splitAtComma.indexOf(commaItem) !== 0) {
+                      queryUrlPieces.push(<span key={uuidv1()} className={ classes.syntax + " " + classes.comma }>,</span>)
+                      // queryUrlPieces.push(<span key={uuidv1()}   style={{ color: "#97EE91", fontWeight: 500 }}>,</span>)
+                      // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
+                      // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>:</span>)
+                      // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>:</span>)
+                    }
+    
+                    if (!!commaItem) {
+                      queryUrlPieces.push(<span key={uuidv1()}>{commaItem}</span>);
+                    }
+
+                    // if (!!upperCommaItem) {
+                    //   queryUrlPieces.push(<span key={uuidv1()}>{upperCommaItem}</span>);
+                    // }
+                  });
                 });
 
                 // if (!!closeParenItem) {
