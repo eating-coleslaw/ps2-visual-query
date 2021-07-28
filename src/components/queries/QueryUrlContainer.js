@@ -1,9 +1,10 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Paper, Button, Grid, Link } from "@material-ui/core";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import AssignmentIcon from "@material-ui/icons/Assignment";
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
+import { v1 as uuidv1 } from 'uuid';
 
 const useStyles = makeStyles((theme) => ({
   header1: {
@@ -44,6 +45,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
   const classes = useStyles();
+  const theme = useTheme();
+  const secondaryColor = theme.palette.secondary.main;
+  const primaryColor = theme.palette.primary.main;
 
   function copyToClipboardExact() {
     navigator.clipboard.writeText(unescape(queryUrl));
@@ -59,10 +63,177 @@ export default function QueryUrlContainer({ queryUrl, isLoading, onRunQuery }) {
     return queryUrl.replace(regex, "/s:example/");
   }
 
+  const unescapedUrl = unescape(queryUrl);
+
+  let queryUrlPieces = [];
+
+  // let splitAtQueryArray = unescapedUrl.split("?c:");
+
+  let splitAtQueryArray = unescapedUrl.split("?");
+
+  const preQueryString = splitAtQueryArray[0];
+
+  queryUrlPieces.push(<span key={preQueryString}>{preQueryString}</span>);
+  
+  if (splitAtQueryArray.length > 1) {
+    queryUrlPieces.push(<span key="?" style={{ color: secondaryColor }}>?</span>);
+
+    let queryString = splitAtQueryArray[1];
+
+    let splitAtMod = queryString.split("c:");
+
+    let splitAtAmpersand = splitAtMod.map((piece) => {
+      return piece.split("&");
+    });
+    
+    // let splitAtEquals = splitAtAmpersand.map((piece) => {
+    //   return piece.split("=");
+    // });
+
+    console.log(splitAtMod);
+    console.log(splitAtAmpersand);
+    // console.log(splitAtEquals);
+
+    splitAtMod.forEach((modItem) => {
+      if (splitAtMod.indexOf(modItem) !== 0 && !!modItem) {
+        queryUrlPieces.push(<span key={uuidv1()} style={{ color: secondaryColor }}>c:</span>);
+      }      
+      
+      let splitAtAmpersand = modItem.split("&");
+      
+      // modItem.forEach((amperItem) => {
+      //   if (modItem.indexOf(amperItem) !== 0) {
+      //     queryUrlPieces.push(<span style={{ color: syntaxColor }}>&</span>);
+      //   }
+
+      splitAtAmpersand.forEach((amperItem) => {
+        if (splitAtAmpersand.indexOf(amperItem) !== 0) {
+          queryUrlPieces.push(<span key={uuidv1()}  style={{ color: secondaryColor }}>&</span>);
+        }
+
+        let splitAtEquals = amperItem.split("=");
+
+        splitAtEquals.forEach((equalsItem) => {
+          if (splitAtEquals.indexOf(equalsItem) !== 0) {
+            // queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#97EE91", fontWeight: 500 }}>=</span>);
+            queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#E752A1", fontWeight: 500 }}>=</span>);
+            // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>=</span>)
+            // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>=</span>)
+            // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>=</span>)
+          }
+          
+          let splitAtColon = equalsItem.split(":");
+          
+          splitAtColon.forEach((colonItem) => {
+            if (splitAtColon.indexOf(colonItem) !== 0) {
+              // queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#97EE91", fontWeight: 500 }}>:</span>)
+              queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
+              // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
+              // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>:</span>)
+              // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>:</span>)
+            }
+
+            let splitAtOpenParen = colonItem.split("(");
+
+            splitAtOpenParen.forEach((openParenItem) => {
+              if (splitAtOpenParen.indexOf(openParenItem) !== 0) {
+                queryUrlPieces.push(<span key={uuidv1()} style={{ color: "#50DFFE", fontWeight: 500 }}>(</span>)
+                // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
+                // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>:</span>)
+                // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>:</span>)
+              }
+
+              let splitAtCloseParen = openParenItem.split(")");
+
+              splitAtCloseParen.forEach((closeParenItem) => {
+                if (splitAtCloseParen.indexOf(closeParenItem) !== 0) {
+                  queryUrlPieces.push(<span key={uuidv1()}   style={{ color: "#50DFFE", fontWeight: 500 }}>)</span>)
+                  // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
+                  // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>:</span>)
+                  // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>:</span>)
+                }
+
+                let splitAtUpperComman = closeParenItem.split("^");
+
+                splitAtUpperComman.forEach((upperCommaItem) => {
+                  if (splitAtUpperComman.indexOf(upperCommaItem) !== 0) {
+                    queryUrlPieces.push(<span key={uuidv1()}   style={{ color: "#97EE91", fontWeight: 500 }}>^</span>)
+                    // queryUrlPieces.push(<span style={{ color: "#E752A1", fontWeight: 500 }}>:</span>)
+                    // queryUrlPieces.push(<span style={{ color: "#E7ADFB", fontWeight: 500 }}>:</span>)
+                    // queryUrlPieces.push(<span style={{ color: secondaryColor, fontWeight: 500 }}>:</span>)
+                  }
+  
+                  if (!!upperCommaItem) {
+                    queryUrlPieces.push(<span key={uuidv1()}>{upperCommaItem}</span>);
+                  }
+                });
+
+                // if (!!closeParenItem) {
+                //   queryUrlPieces.push(<span key={uuidv1()}>{closeParenItem}</span>);
+                // }
+              });
+            });
+          });
+        });
+
+        // queryUrlPieces.push(<span>{amperItem}</span>);
+      });
+    });
+  }
+ 
+  // if (splitAtQueryArray.length === 1) {
+  //   splitAtQueryArray = unescapedUrl.split("?");
+  //   queryUrlPieces.push()
+  // }
+
+  // const preQueryString = splitAtQueryArray[0];
+
+  // queryUrlPieces = [ preQueryString ];
+
+
+
+  // const queryString = splitAtQueryArray[1];
+
+  // let splitQueryArray = [];
+  // if (!!queryString){
+  //   queryUrlPieces.push(<span style={{ color: theme.palette.secondary.main }}>?c:</span>);
+
+  //   // splitQueryArray = queryString.split("&c:");
+  //   splitQueryArray = queryString.split("&");
+  // }
+
+  // // const splitUrlArray = queryUrl.split("&c:");
+  // // console.log(splitUrlArray);
+
+  // const queryElementsArray = splitQueryArray.map((piece) => {
+  //   if (splitQueryArray.indexOf(piece) > 0) {
+  //     return (
+  //         <React.Fragment>
+  //           <span style={{ color: theme.palette.secondary.main }}>&</span><span>{piece}</span>
+  //           {/* <span style={{ color: theme.palette.secondary.main }}>&c:</span><span>{piece}</span> */}
+  //       </React.Fragment>
+  //     );
+  //   } else {
+  //       return (
+  //         <span>{piece}</span>
+  //       );
+  //     }
+  // });
+  
+  // if (queryElementsArray.length > 0) {
+  //   queryUrlPieces = [ ...queryUrlPieces, ...queryElementsArray ];
+  // }
+
+  
+  console.log(unescape(queryUrl));
+
   return (
     <Paper className={classes.paper}>
       <h1 className={classes.header1}>Query URL</h1>
-      <div className={classes.urlBox}>{unescape(queryUrl)}</div>
+      <div className={classes.urlBox}>
+        {queryUrlPieces}
+        {/* {unescape(queryUrl)} */}
+      </div>
       <Grid
         container
         justifyContent="flex-start"
