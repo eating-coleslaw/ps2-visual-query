@@ -30,10 +30,6 @@ export default function TextFormWithSave({
 
   const [value, setValue] = useState(initValue);
 
-  function isValidInput(value) {
-    return value !== "";
-  }
-
   function onSubmit(event) {
     event.preventDefault();
     onChange(value);
@@ -58,7 +54,7 @@ export default function TextFormWithSave({
                 type="submit"
                 variant="outlined"
                 color="primary"
-                disabled={!isValidInput(value) || value === initValue}
+                disabled={value === initValue}
                 aria-label={ariaLabel}
                 className={classes.button}
               >
