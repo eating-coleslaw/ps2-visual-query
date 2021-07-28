@@ -16,6 +16,7 @@ The app supports the majority of the `ps2:v2` namespace query features:
 - Show/Hide fields
 - Resolves
 - Joins, including nested joins
+- Tree views
 
 Other app features include:
 
@@ -104,7 +105,6 @@ Feel free to submit pull requests for fixes or new features. Below is a list of 
 - `c:limitPerDB`
 - `c:start`
 - `c:includeNul`
-- `c:tree`
 - `c:timing`
 - `c:exactMatchFirst`
 - `c:distinct`
