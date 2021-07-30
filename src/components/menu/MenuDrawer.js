@@ -37,6 +37,7 @@ const useStyles = makeStyles((theme) => ({
     left: 0,
     right: "auto",
     borderRadius: 0,
+    width: 300,
     transform: "translateX(-300px)",
     transition: "transform 250ms cubic-bezier(.18,.89,.33,1) 0ms",
   },
