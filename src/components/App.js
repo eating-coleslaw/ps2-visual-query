@@ -35,6 +35,8 @@ import QueryConfig from "../planetside/QueryConfig";
 import TreeForm from "./queries/TreeForm";
 
 import userPreferenceStore from "../persistence/userPreferencesStore";
+import { add as saveQuery, isSupported } from "../persistence/queryStore";
+// import queryStore from "../persistence/queryStore";
 
 const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
@@ -115,18 +117,21 @@ export default function App() {
   }, [namespace]);
 
   const [storeKey, setStoreKey] = useState(userPreferenceStore.getServiceId());
+  const [serviceKey, setServiceKey] = useState("example");
   useEffect(() => {
     const storedKey = userPreferenceStore.getServiceId();
     if (storedKey !== null) {
       dbgcensus.SetGlobalServiceKey(storedKey);
       setStoreKey(storedKey);
+      setServiceKey(storedKey);
     }
-  }, [setStoreKey]);
+  }, []);
 
   const [loading, setLoading] = useState(false);
 
   const [query, setQuery] = useState(
-    QueryConfig(storeKey ?? "example", "character", namespace)
+    // QueryConfig(storeKey ?? "example", "character", namespace)
+    QueryConfig("character", namespace)
   );
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -170,13 +175,33 @@ export default function App() {
     setColorTheme(theme);
   }
 
+  async function handleSaveQuery() {
+    const currentQuery = { ...query };
+    
+    // console.log("Saving query: ", currentQuery);
+    console.log("Saving query...");
+
+    // console.log("Is IndexDB supported?", isSupported());
+
+    try {
+      console.log(saveQuery);
+      const result = await saveQuery(currentQuery);
+      console.log("Result:", result);
+      // console.log(queryStore.add);
+      // await queryStore.add(currentQuery);
+    } catch (error) {
+      console.warn("Error saving query:", error);
+    }
+  }
+  
   function onServiceKeyChange(key) {
-    setQuery((prevQuery) => {
-      return { ...prevQuery, ...{ serviceKey: key } };
-    });
+    // setQuery((prevQuery) => {
+    //   return { ...prevQuery, ...{ serviceKey: key } };
+    // });
 
     dbgcensus.SetGlobalServiceKey(key);
-    userPreferenceStore.saveServiceId(key);
+    userPreferenceStore.saveServiceId(key); // TODO: make sure this doesn't cause problems with the store key effect above
+    setServiceKey(key);
   }
 
   function onDeleteStoredServiceKey() {
@@ -502,8 +527,9 @@ export default function App() {
     function convertToCensusQuery() {
       let censusQuery = new CensusQuery(
         query.collection,
-        query.namespace,
-        query.serviceKey
+        query.namespace//,
+        // serviceKey
+        // query.serviceKey
       );
 
       if (!!query.language && query.language !== "All") {
@@ -721,6 +747,12 @@ export default function App() {
                   for more information on using the API.
                 </p>
 
+                <Grid container className={classes.gridRow}>
+                  <Grid item xs={12}>
+                    <Button onClick={handleSaveQuery}>Save</Button>
+                  </Grid>
+                </Grid>
+
                 <Collapsible
                   id="collection"
                   headerLevel={2}
@@ -929,6 +961,7 @@ export default function App() {
                     onChange={handleChangeQueryTreeProperty}
                   />
                 </Collapsible>
+
               </Paper>
             </Grid>
           </Grid>
