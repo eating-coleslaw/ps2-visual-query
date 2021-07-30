@@ -35,7 +35,7 @@ import QueryConfig from "../planetside/QueryConfig";
 import TreeForm from "./queries/TreeForm";
 
 import userPreferenceStore from "../persistence/userPreferencesStore";
-import { upsert as upsertQuery, add as saveQuery, isSupported } from "../persistence/queryStore";
+import { upsert as upsertQuery, add as saveQuery, isSupported, getLastModified } from "../persistence/queryStore";
 // import queryStore from "../persistence/queryStore";
 
 const CensusQuery = require("dbgcensus").Query;
@@ -188,7 +188,6 @@ export default function App() {
     try {
       // const result = await saveQuery(currentQuery);
       const result = await upsertQuery(currentQuery);
-      // console.log("Result:", result);
       
       if (!!result) {
         setQuery((prevQuery) => {
@@ -207,13 +206,15 @@ export default function App() {
     console.log("Saving query copy...");
     
     try {
-      const { id, ...currentQuery } = { ...query };
+      // const { id, ...currentQuery } = { ...query };
+      const currentQuery = { ...query };
 
-      if (!!copyName) {
+      if (!copyName) {
         copyName = `${currentQuery.name} (copy)`;  
       }
 
       currentQuery.id = null;
+      currentQuery.name = copyName;
       
       const result = await saveQuery(currentQuery);
       
@@ -230,6 +231,20 @@ export default function App() {
     }
   }
   
+  async function getRecentlyModified() {
+    console.log("Getting recent queries...");
+
+    try {
+      const result = await getLastModified(5);
+      console.log(result);
+      console.log(result.map((query) => {
+        return new Date(query.dateLastModified).toUTCString();
+      }));
+    } catch (error) {
+      console.warn("Error getting recently modified queries:", getRecentlyModified);
+    }
+  }
+
   function onServiceKeyChange(key) {
     // setQuery((prevQuery) => {
     //   return { ...prevQuery, ...{ serviceKey: key } };
@@ -769,6 +784,10 @@ export default function App() {
                     <Grid item container sm={12} md={6} justifyContent="flex-end" style={{ textAlign: "right" }}>
                       <Grid item sm={6} md={6}>
                         <Button onClick={handleSaveQuery} style={{ color: theme.palette.primary.main }}>Save</Button>
+                      </Grid>
+                      
+                      <Grid item sm={6} md={6}>
+                        <Button onClick={getRecentlyModified} style={{ color: theme.palette.primary.main }}>Recent</Button>
                       </Grid>
 
                       { !!query.id && 

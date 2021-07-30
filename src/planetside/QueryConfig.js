@@ -1,5 +1,4 @@
 import QueryTree from "./QueryTree";
-import { v4 as uuidv4 } from 'uuid';
 
 const QueryConfig = (
   // serviceId = "example",
@@ -7,8 +6,7 @@ const QueryConfig = (
   defaultNamespace = "ps2:v2",
 ) => {
   return {
-    // serviceKey: serviceId,
-    namespace: defaultNamespace, //"ps2:v2",
+    namespace: defaultNamespace,
     collection: defaultCollection,
     language: "All",
     limit: 0,
@@ -22,7 +20,7 @@ const QueryConfig = (
     sortFields: [],
     sortDirection: -1,
     // Persistence Properties
-    id: null, //uuidv4(),
+    id: null,
     name: "",
     dateCreated: null,
     dateLastModified: null,
