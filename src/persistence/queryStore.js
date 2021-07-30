@@ -125,7 +125,7 @@ export async function getLastModified(take = 5, start = 0) {
   const count = results.length;
 
   const startIndex = count > take ? count - take : 0;
-  const endIndex = count - 1;
+  const endIndex = count;
 
   return results.slice(startIndex, endIndex).sort((a, b) => {
     return b.dateLastModified - a.dateLastModified;
