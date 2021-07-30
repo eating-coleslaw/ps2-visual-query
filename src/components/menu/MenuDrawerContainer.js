@@ -10,7 +10,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { isSupported, getLastModified } from "../../persistence/queryStore";
 import MenuIcon from "@material-ui/icons/Menu";
-import { IconButton } from "@material-ui/core";
+import { IconButton, ListSubheader } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
 
 const useStyles = makeStyles((theme) => ({
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MenuDrawerContainer(props) {
+export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
   const classes = useStyles();
   const theme = useTheme();
 
@@ -60,6 +60,8 @@ export default function MenuDrawerContainer(props) {
   const [recentQueryItems, setRecentQueryItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
+    console.log("using effect. Open:", isOpen, "Loading:", isLoading);
+    
     async function getRecentlyModified() {
       console.log("Getting recent queries...");
   
@@ -71,6 +73,11 @@ export default function MenuDrawerContainer(props) {
       }
     }
 
+    function handleLoadQuery(id) {
+      onLoadQuery(id);
+      setIsOpen(false);
+    }
+
     if (isOpen && !isLoading) {
       setIsLoading(true);
 
@@ -80,20 +87,31 @@ export default function MenuDrawerContainer(props) {
         if (!!recentQueries && recentQueries.length > 0) {
           
           const listItems = recentQueries.map((query) => {
+            console.log(query.name);
+            const name = query.name; 
             return (
-              <ListItem button key={query.id}>
-                <ListItemText primary={query.name} secondary={new Date(query.dateLastModified).toUTCString()} />
+              <ListItem button key={query.id} onClick={() => handleLoadQuery(query.id)}>
+                <ListItemText primary={`${query.name}`} secondary={new Date(query.dateLastModified).toUTCString()} />
+                {/* <ListItemText primary={<span>{query.name}</span>} secondary={new Date(query.dateLastModified).toUTCString()} /> */}
               </ListItem>
             )
           }); 
           
+          console.log(listItems);
+
           setRecentQueryItems(listItems);
         }
+
+        setIsLoading(false);
       });
 
-      setIsLoading(true);
+      setIsLoading(false);
     }
-  }, [isOpen, isLoading]);
+
+    return () => {
+      setIsLoading(false);
+    }
+  }, [isOpen, isLoading, onLoadQuery]);
 
   
 
@@ -117,9 +135,16 @@ export default function MenuDrawerContainer(props) {
         </Grid>
 
       <MenuDrawer open={isOpen} onClose={() => toggleDrawer(false)}>
-        <List style={{ width: "auto" }}>
+        <Divider />
+        <List style={{ width: "auto" }}
+          subheader={
+            <ListSubheader component="div" id="recent-queries-subheader">
+              Recent Queries
+            </ListSubheader>
+          }>
           {recentQueryItems}
         </List>
+        <Divider />
       </MenuDrawer>
 
       {/* <Drawer anchor="left" open={isOpen} onClose={() => toggleDrawer(false)} style={{ transition: "none" }}>

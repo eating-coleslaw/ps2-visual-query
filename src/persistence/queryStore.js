@@ -66,10 +66,15 @@ export async function add(query) {
     query.dateLastModified = nowUTC;
     query.dateLastOpened = nowUTC;
 
+    const item = JSON.parse(JSON.stringify(query));
+
+    console.log("Serialized Item: ", item);
+
     const db = await dbPromise;
     const tx = db.transaction(queryStoreName, "readwrite");
     const store = tx.objectStore(queryStoreName);
-    const result = await store.add(query);
+    // const result = await store.add(query);
+    const result = await store.add(item);
     await tx.done;
     return result;
   } catch (error) {
@@ -77,11 +82,27 @@ export async function add(query) {
   }
 }
 
+const getCircularReplacer = () => {
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) {
+        console.log("Seen:", value);
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
+};
+
 export async function update(query) {
   try {
     if (query.id === null) {
       throw new Error(`Cannot update query with a null ID`);
     }
+
+    console.log("Updating query:", query);
 
     const nowUTC = Date.now();
 
@@ -89,9 +110,30 @@ export async function update(query) {
     query.dateLastOpened = nowUTC;
 
     const db = await dbPromise;
+
+    console.log("DB:", db);
+
     const tx = db.transaction(queryStoreName, "readwrite");
+    
+    console.log("TX:", tx);
+    
     const store = tx.objectStore(queryStoreName);
-    const result = await store.put(query);
+    
+    console.log("Store:", store);
+    
+    const stringified = JSON.stringify(query); //, getCircularReplacer());
+
+    console.log("Stringified:", stringified);
+
+    const item = JSON.parse(stringified);
+
+    // const item = JSON.parse(JSON.stringify(query));
+
+    console.log("Serialized Item: ", item);
+
+    const result = await store.put(item);
+    // const result = await store.put(query);
+    // const result = await store.put(query, query.id);
     await tx.done;
     return result;
   } catch (error) {

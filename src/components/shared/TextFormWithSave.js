@@ -25,6 +25,7 @@ export default function TextFormWithSave({
   placeholder = "",
   variant = "outlined",
   ariaLabel = "",
+  allowBlank = true,
 }) {
   const classes = useStyles();
 
@@ -33,6 +34,14 @@ export default function TextFormWithSave({
   function onSubmit(event) {
     event.preventDefault();
     onChange(value);
+  }
+
+  function isValid() {
+    if (value === "") {
+      return allowBlank && (value !== initValue);
+    } else {
+      return value !== initValue;
+    }
   }
 
   return (
@@ -54,7 +63,8 @@ export default function TextFormWithSave({
                 type="submit"
                 variant="outlined"
                 color="primary"
-                disabled={value === initValue}
+                // disabled={value === initValue}
+                disabled={!isValid()}
                 aria-label={ariaLabel}
                 className={classes.button}
               >

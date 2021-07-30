@@ -70,7 +70,7 @@ export default function HideAppBar({ onMenuClicked, ...props }) {
                   </IconButton>
                 </Grid>
               )} */}
-              <MenuDrawerContainer /> {/*{...props}/>*/}
+              <MenuDrawerContainer {...props} /> {/*{...props}/>*/}
 
               <Grid item xs={10}>
                 <Typography variant="h6">PS2 Query Editor</Typography>

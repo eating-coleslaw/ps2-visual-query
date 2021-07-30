@@ -35,7 +35,14 @@ import QueryConfig from "../planetside/QueryConfig";
 import TreeForm from "./queries/TreeForm";
 
 import userPreferenceStore from "../persistence/userPreferencesStore";
-import { upsert as upsertQuery, add as saveQuery, isSupported, getLastModified } from "../persistence/queryStore";
+import {
+  upsert as upsertQuery,
+  add as saveQuery,
+  isSupported,
+  getLastModified,
+  get as getQuery,
+} from "../persistence/queryStore";
+import TextFormWithSave from "./shared/TextFormWithSave";
 // import queryStore from "../persistence/queryStore";
 
 const CensusQuery = require("dbgcensus").Query;
@@ -175,28 +182,70 @@ export default function App() {
     setColorTheme(theme);
   }
 
+  const [loadedQueryId, setLoadedQueryId] = useState();
+
   const [isStoreSupported, setIsStoreSupported] = useState(false);
   useEffect(() => {
     setIsStoreSupported(isSupported());
   }, []);
 
-  async function handleSaveQuery() {
+  async function handleSaveNewQuery(queryName) {
+    if (!queryName) {
+      console.warn("Invalid query name");
+      return;
+    }
+
+    // setQuery((prevQuery) => {
+    //   return { ...prevQuery, ...{ name: queryName } };
+    // });
+
+    await handleSaveQuery(queryName);
+  }
+
+  async function handleSaveQuery(queryName) {
+    // setQuery((prevQuery) => {
+    //   return { ...prevQuery, ...{name: queryName } };
+    // });
+
     const currentQuery = { ...query };
-    
-    console.log("Saving query...");
+
+    if (!!queryName) {
+      console.log(queryName);
+      currentQuery.name = queryName;
+    }
+
+    console.log("Saving query...", currentQuery);
 
     try {
       // const result = await saveQuery(currentQuery);
       const result = await upsertQuery(currentQuery);
-      
-      if (!!result) {
-        setQuery((prevQuery) => {
-          // return { ...prevQuery, ...{ id: result } };
-          return { ...prevQuery, ...currentQuery };
-        });
-      } else {
-        console.warn("Error saving query:", result);
-      }
+
+      console.log("Result:", result);
+
+      const queryId = currentQuery.id;
+
+      console.log("Query ID:", queryId);
+
+      await handleLoadQuery(queryId);
+      // const loadedQuery = await handleLoadQuery(queryId);
+
+      // if (!!loadedQuery) {
+      //   // setQuery((prevQuery) => {
+      //   //   return { ...prevQuery, ...loadedQuery };
+      //   // })
+      //   // setQuery(loadedQuery);
+
+      // // if (!!result) {
+      // //   setQuery((prevQuery) => {
+      // //     // return { ...prevQuery, ...{ id: result } };
+      // //     return { ...prevQuery, ...currentQuery };
+      // //   });
+
+      //   // setLoadedQueryId(currentQuery.id);
+      //   // setLoadedQueryId(queryId);
+      // } else {
+      //   console.warn("Error saving query:", result);
+      // }
     } catch (error) {
       console.warn("Error saving query:", error);
     }
@@ -204,25 +253,27 @@ export default function App() {
 
   async function handleSaveQueryCopy(copyName = "") {
     console.log("Saving query copy...");
-    
+
     try {
       // const { id, ...currentQuery } = { ...query };
       const currentQuery = { ...query };
 
       if (!copyName) {
-        copyName = `${currentQuery.name} (copy)`;  
+        copyName = `${currentQuery.name} (copy)`;
       }
 
       currentQuery.id = null;
       currentQuery.name = copyName;
-      
-      const result = await saveQuery(currentQuery);
-      
+
+      const result = await upsertQuery(currentQuery);
+
       if (!!result) {
         setQuery((prevQuery) => {
           // return { ...prevQuery, ...{ id: result } };
           return { ...prevQuery, ...currentQuery };
         });
+
+        setLoadedQueryId(currentQuery.id);
       } else {
         console.warn("Error saving query:", result);
       }
@@ -230,20 +281,39 @@ export default function App() {
       console.warn("Error saving query:", error);
     }
   }
-  
-  async function getRecentlyModified() {
-    console.log("Getting recent queries...");
 
+  async function handleLoadQuery(id) {
     try {
-      const result = await getLastModified(5);
-      console.log(result);
-      console.log(result.map((query) => {
-        return new Date(query.dateLastModified).toUTCString();
-      }));
+      const loadedQuery = await getQuery(id);
+      if (!!loadedQuery) {
+        console.log(loadedQuery);
+
+        setQuery(loadedQuery);
+
+        setLoadedQueryId(id);
+      } 
     } catch (error) {
-      console.warn("Error getting recently modified queries:", getRecentlyModified);
+      console.warn(`Error loading query ${id}:`, error);
     }
   }
+
+  function handleNewQuery() {
+    setQuery(QueryConfig());
+  }
+
+  // async function getRecentlyModified() {
+  //   console.log("Getting recent queries...");
+
+  //   try {
+  //     const result = await getLastModified(5);
+  //     console.log(result);
+  //     console.log(result.map((query) => {
+  //       return new Date(query.dateLastModified).toUTCString();
+  //     }));
+  //   } catch (error) {
+  //     console.warn("Error getting recently modified queries:", getRecentlyModified);
+  //   }
+  // }
 
   function onServiceKeyChange(key) {
     // setQuery((prevQuery) => {
@@ -575,10 +645,12 @@ export default function App() {
 
   const [queryUrl, setQueryUrl] = useState("");
   useEffect(() => {
+    console.log("Query Changed effect");
+    
     function convertToCensusQuery() {
       let censusQuery = new CensusQuery(
         query.collection,
-        query.namespace//,
+        query.namespace //,
         // serviceKey
         // query.serviceKey
       );
@@ -613,7 +685,8 @@ export default function App() {
           const operator = condition.operator;
           const value = condition.value;
 
-          if (condition.isValid(field, operator, value)) {
+          // if (condition.isValid(field, operator, value)) {
+          if (!!field && !!operator && !!value) {
             censusQuery.where(field)[operator.name](value);
           }
         });
@@ -660,7 +733,8 @@ export default function App() {
                 const operator = term.operator;
                 const value = term.value;
 
-                if (term.isValid(field, operator, value)) {
+                // if (term.isValid(field, operator, value)) {
+                if (!!field && !!operator && !!value) {
                   serviceJoin.where(field)[operator.name](value);
                 }
               });
@@ -712,7 +786,7 @@ export default function App() {
     } catch (error) {
       console.log("Error getting query URL: ", error);
     }
-  }, [query]);
+  }, [query, loadedQueryId]);
 
   const [queryResult, setQueryResult] = useState("");
   async function onSubmitQuery() {
@@ -735,7 +809,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <HideAppBar theme={colorTheme} onChangeTheme={handleColorThemeChange} />
+      <HideAppBar theme={colorTheme} onChangeTheme={handleColorThemeChange} onLoadQuery={handleLoadQuery}/>
       <Container maxWidth="lg" className={classes.container}>
         <Grid container alignItems="flex-start">
           <Grid container item xs={12} sm={6} className={classes.gridContainer}>
@@ -773,30 +847,82 @@ export default function App() {
 
             <Grid item xs={12} className={classes.gridContainerItem}>
               <Paper className={classes.paper}>
-                <Grid container className={classes.gridRow} alignItems="center" spacing={1}>
-                  <Grid item container sm={12} md={6} justifyContent="flex-start">
+                <Grid
+                  container
+                  className={classes.gridRow}
+                  alignItems="center"
+                  spacing={1}
+                >
+                  <Grid
+                    item
+                    container
+                    sm={12}
+                    md={4}
+                    justifyContent="flex-start"
+                  >
                     <h1 className={classes.header1}>Query Creator</h1>
                     {/* <Grid item sm={12} md={6} style={{ textAlign: "left" }}>
                     </Grid> */}
                   </Grid>
-                  
-                  { isStoreSupported &&
-                    <Grid item container sm={12} md={6} justifyContent="flex-end" style={{ textAlign: "right" }}>
-                      <Grid item sm={6} md={6}>
-                        <Button onClick={handleSaveQuery} style={{ color: theme.palette.primary.main }}>Save</Button>
-                      </Grid>
-                      
-                      <Grid item sm={6} md={6}>
-                        <Button onClick={getRecentlyModified} style={{ color: theme.palette.primary.main }}>Recent</Button>
-                      </Grid>
 
-                      { !!query.id && 
-                        <Grid item sm={6} md={6}>
-                          <Button onClick={handleSaveQueryCopy} style={{  color: theme.palette.primary.main }}>Save Copy</Button>
+                  {isStoreSupported && (
+                    <Grid
+                      item
+                      container
+                      sm={12}
+                      md={8}
+                      justifyContent="flex-end"
+                      style={{ textAlign: "right" }}
+                    >
+                      {!query.id && (
+                        <Grid item sm={12} md={12}>
+                          {/* <Button onClick={handleSaveQuery} style={{ color: theme.palette.primary.main }}>Save</Button> */}
+                          <TextFormWithSave
+                            initValue={query.name}
+                            placeholder="Query Name"
+                            label="Save Query"
+                            onChange={handleSaveNewQuery}
+                            allowBlank={false}
+                          />
                         </Grid>
-                      }
+                      )}
+
+                      {/* <Grid item sm={6} md={6}>
+                        <Button onClick={getRecentlyModified} style={{ color: theme.palette.primary.main }}>Recent</Button>
+                      </Grid> */}
+
+                      {!!query.id && (
+                        <React.Fragment>
+                          <Grid item sm={4} md={4}>
+                            <Button
+                              onClick={handleNewQuery}
+                              style={{ color: theme.palette.primary.main }}
+                            >
+                              New
+                            </Button>
+                          </Grid>
+
+                          <Grid item sm={4} md={4}>
+                            <Button
+                              onClick={() => handleSaveQuery("")}
+                              style={{ color: theme.palette.primary.main }}
+                            >
+                              Save
+                            </Button>
+                          </Grid>
+
+                          <Grid item sm={4} md={4}>
+                            <Button
+                              onClick={handleSaveQueryCopy}
+                              style={{ color: theme.palette.primary.main }}
+                            >
+                              Save Copy
+                            </Button>
+                          </Grid>
+                        </React.Fragment>
+                      )}
                     </Grid>
-                  }
+                  )}
                 </Grid>
                 {/* <h1 className={classes.header1}>Query Creator</h1> */}
                 <p className={classes.itemParagraph}>
@@ -1031,7 +1157,6 @@ export default function App() {
                     onChange={handleChangeQueryTreeProperty}
                   />
                 </Collapsible>
-
               </Paper>
             </Grid>
           </Grid>
