@@ -1,28 +1,18 @@
 import { openDB } from "idb";
+import { v4 as uuidv4 } from 'uuid';
 
 const appDbName = "ps2QueryDb";
 const queryStoreName = "queries";
 
 const dbPromise = openDB(appDbName, 1, {
-  upgrade(db, oldVersion, newVersion) {
-    // console.log(oldVersion);
-    
+  upgrade(db, oldVersion) {
     if (!isSupported()) {
       return;
     }
 
-    // const queryStore = db.createObjectStore(queryStoreName, {
-    //   keyPath: "id",
-    //   autoIncrement: true,
-    // });
-
-    // queryStore.createIndex("favorites", "isFavorite", {
-    //   unique: false,
-    // });
-
     switch (oldVersion) {
       case 0:
-        console.log(`Upgrading query database to version ${newVersion}...`);
+        // console.log(`Upgrading query database to version ${newVersion}...`);
 
         const queryStore = db.createObjectStore(queryStoreName, {
           keyPath: "id",
@@ -48,134 +38,100 @@ export function isSupported() {
   return true;
 }
 
+export async function upsert(query) {
+  try {
+    if (query.id === null) {
+      return await add(query);
+    } else {
+      return await update(query);
+    }
+  } catch (error) {
+    throw new Error("Error upsert query");
+  }
+}
+
 export async function add(query) {
+  try {
+    console.log("Enter add");
+
+    console.log("ID:", query.id);
+    
+    if (query.id !== null) {
+      console.log("PK Erroring...");
+      throw new Error(`Query ${query.id} violates primary key contraint`);
+    }
+    
+    query.id = uuidv4();
+
+    const nowUTC = new Date().getUTCDate();
+
+    query.dateCreated = nowUTC;
+    query.dateLastModified = nowUTC;
+    query.dateLastOpened = nowUTC;
+    
+    console.log("Updated query");
+
+    
+    const db = await dbPromise;
+
+    console.log("DB:", db);
+
+    const tx = db.transaction(queryStoreName, "readwrite");
+    const store = tx.objectStore(queryStoreName);
+
+    console.log("Store:", store);
+
+    const result = await store.add(query);
+    
+    console.log("Add Result:", result);
+    
+    await tx.done;
+    return result;
+  } catch (error) {
+    console.warn("Error adding query to database:", error);
+  }
+}
+
+export async function update(query) {
+  try {  
+    if (query.id === null) {
+      throw new Error(`Cannot update query with a null ID`);
+    }
+    
+    const nowUTC = new Date().getUTCDate();
+
+    query.dateLastModified = nowUTC;
+    query.dateLastOpened = nowUTC;
+    
+    const db = await dbPromise;
+    const tx = db.transaction(queryStoreName, "readwrite");
+    const store = tx.objectStore(queryStoreName);
+    const result = await store.put(query);
+    await tx.done;
+    return result;
+  } catch (error) {
+    console.warn("Error adding query to database:", error);
+  }
+} 
+
+export async function get(id) {
   const db = await dbPromise;
   const tx = db.transaction(queryStoreName, "readwrite");
   const store = tx.objectStore(queryStoreName);
-  const result = await store.add(query);
+  const query = await store.get(id);
   await tx.done;
-  return result;
+  return query;
 }
 
+export async function getFavorites() {
+  // const db = await dbPromise;
+  // const tx = db.transaction(queryStoreName, "readwrite");
+  // const store = tx.objectStore(queryStoreName);
+  // const query = await store.get(id);
+  // await tx.done;
+  // return query;
 
-// const queryStore = (async () => {
-//   const appDbName = "ps2QueryDb";
-//   const queryStoreName = "queries";
-
-//   if (!checkIsSupported()) {
-//     return;
-//   }
-
-//   let db = null;
-  
-//   // let db = await openDB(appDbName, 1, {
-//   //   upgrade(db, oldVersion) {
-//   //     console.log(oldVersion);
-      
-//   //     switch (oldVersion) {
-//   //       case 0:
-//   //         const queryStore = db.createObjectStore(queryStoreName, {
-//   //           keyPath: "id",
-//   //           autoIncrement: false, //true,
-//   //         });
-//   //         queryStore.createIndex("favorites", "isFavorite", {
-//   //           unique: false,
-//   //         });
-//   //         break;
-
-//   //       default:
-//   //         break;
-//   //     }
-//   //   },
-//   // });
-
-//   (async function () {
-//     //check for support
-//     if (!checkIsSupported()) {
-//       return;
-//     }
-
-//     db = await openDB(appDbName, 1, {
-//       upgrade(db, oldVersion) {
-//         console.log(oldVersion);
-        
-//         switch (oldVersion) {
-//           case 0:
-//             const queryStore = db.createObjectStore(queryStoreName, {
-//               keyPath: "id",
-//               autoIncrement: false, //true,
-//             });
-
-//             queryStore.createIndex("favorites", "isFavorite", {
-//               unique: false,
-//             });
-//             break;
-
-//           default:
-//             break;
-//         }
-//       },
-//     });
-//   })();
-
-//   //check whether indexedDB is supported by the browser
-//   function checkIsSupported() {
-//     if (!("indexedDB" in window)) {
-//       console.log("This browser doesn't support IndexedDB");
-//       return false;
-//     }
-
-//     return true;
-//   }
-
-//   async function add(query) {
-//     console.log("Still saving query...");
-
-//     if (!checkIsSupported()) {
-//       return;
-//     }
-    
-//     // if (query.id !== null) {
-//     //   console.log("Can't add pre-existing query to the database");
-//     //   return;
-//     // }
-
-//     // const tx = db.transaction(queryStoreName, "readwrite");
-//     // const store = tx.objectStore(queryStoreName);
-
-//     const created = (new Date()).getUTCDate();
-//     const modified = created;
-//     const opened = created;
-
-//     let item = { ...query, ...{ dateCreated: created, dateLastModified: modified, dateLastOpened: opened } };
-
-//     // await tx.store.add(item);
-
-//     // await tx.done;
-
-//     // const success = tx.complete;
-
-//     console.log(item);
-
-//     const success = await db.add(queryStoreName, item, item.id);
-
-//     if (success) {
-//       console.log(item);
-//       return item;
-//     } else {
-//       console.log("Failed to save query to the database");
-//       return;
-//     }
-//   }
-
-//   function getUtcDate() {
-//     return new Date().getUtcDate();
-//   } 
-
-//   return {
-//     checkIsSupported: checkIsSupported,
-//     add: add,
-//   };
-// })();
-
-// export default queryStore;
+  const db = await dbPromise;
+  const results = await db.getAllFromIndex(queryStoreName, "favorites", true);
+  return results;
+}

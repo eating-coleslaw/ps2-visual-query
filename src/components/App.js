@@ -35,7 +35,7 @@ import QueryConfig from "../planetside/QueryConfig";
 import TreeForm from "./queries/TreeForm";
 
 import userPreferenceStore from "../persistence/userPreferencesStore";
-import { add as saveQuery, isSupported } from "../persistence/queryStore";
+import { upsert as upsertQuery, add as saveQuery, isSupported } from "../persistence/queryStore";
 // import queryStore from "../persistence/queryStore";
 
 const CensusQuery = require("dbgcensus").Query;
@@ -175,20 +175,56 @@ export default function App() {
     setColorTheme(theme);
   }
 
+  const [isStoreSupported, setIsStoreSupported] = useState(false);
+  useEffect(() => {
+    setIsStoreSupported(isSupported());
+  }, []);
+
   async function handleSaveQuery() {
     const currentQuery = { ...query };
     
-    // console.log("Saving query: ", currentQuery);
     console.log("Saving query...");
 
-    // console.log("Is IndexDB supported?", isSupported());
-
     try {
-      console.log(saveQuery);
+      // const result = await saveQuery(currentQuery);
+      const result = await upsertQuery(currentQuery);
+      // console.log("Result:", result);
+      
+      if (!!result) {
+        setQuery((prevQuery) => {
+          // return { ...prevQuery, ...{ id: result } };
+          return { ...prevQuery, ...currentQuery };
+        });
+      } else {
+        console.warn("Error saving query:", result);
+      }
+    } catch (error) {
+      console.warn("Error saving query:", error);
+    }
+  }
+
+  async function handleSaveQueryCopy(copyName = "") {
+    console.log("Saving query copy...");
+    
+    try {
+      const { id, ...currentQuery } = { ...query };
+
+      if (!!copyName) {
+        copyName = `${currentQuery.name} (copy)`;  
+      }
+
+      currentQuery.id = null;
+      
       const result = await saveQuery(currentQuery);
-      console.log("Result:", result);
-      // console.log(queryStore.add);
-      // await queryStore.add(currentQuery);
+      
+      if (!!result) {
+        setQuery((prevQuery) => {
+          // return { ...prevQuery, ...{ id: result } };
+          return { ...prevQuery, ...currentQuery };
+        });
+      } else {
+        console.warn("Error saving query:", result);
+      }
     } catch (error) {
       console.warn("Error saving query:", error);
     }
@@ -722,7 +758,28 @@ export default function App() {
 
             <Grid item xs={12} className={classes.gridContainerItem}>
               <Paper className={classes.paper}>
-                <h1 className={classes.header1}>Query Creator</h1>
+                <Grid container className={classes.gridRow} alignItems="center" spacing={1}>
+                  <Grid item container sm={12} md={6} justifyContent="flex-start">
+                    <h1 className={classes.header1}>Query Creator</h1>
+                    {/* <Grid item sm={12} md={6} style={{ textAlign: "left" }}>
+                    </Grid> */}
+                  </Grid>
+                  
+                  { isStoreSupported &&
+                    <Grid item container sm={12} md={6} justifyContent="flex-end" style={{ textAlign: "right" }}>
+                      <Grid item sm={6} md={6}>
+                        <Button onClick={handleSaveQuery} style={{ color: theme.palette.primary.main }}>Save</Button>
+                      </Grid>
+
+                      { !!query.id && 
+                        <Grid item sm={6} md={6}>
+                          <Button onClick={handleSaveQueryCopy} style={{  color: theme.palette.primary.main }}>Save Copy</Button>
+                        </Grid>
+                      }
+                    </Grid>
+                  }
+                </Grid>
+                {/* <h1 className={classes.header1}>Query Creator</h1> */}
                 <p className={classes.itemParagraph}>
                   Refer to the{" "}
                   <a
@@ -746,12 +803,6 @@ export default function App() {
                   </a>{" "}
                   for more information on using the API.
                 </p>
-
-                <Grid container className={classes.gridRow}>
-                  <Grid item xs={12}>
-                    <Button onClick={handleSaveQuery}>Save</Button>
-                  </Grid>
-                </Grid>
 
                 <Collapsible
                   id="collection"

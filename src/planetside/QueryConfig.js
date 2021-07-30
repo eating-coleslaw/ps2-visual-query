@@ -22,7 +22,7 @@ const QueryConfig = (
     sortFields: [],
     sortDirection: -1,
     // Persistence Properties
-    id: uuidv4(),
+    id: null, //uuidv4(),
     name: "",
     dateCreated: null,
     dateLastModified: null,
