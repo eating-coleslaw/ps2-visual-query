@@ -1,5 +1,5 @@
 import { openDB } from "idb";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 const appDbName = "ps2QueryDb";
 const queryStoreName = "queries";
@@ -16,7 +16,7 @@ const dbPromise = openDB(appDbName, 2, {
           keyPath: "id",
           autoIncrement: false,
         });
-        
+
         queryStore.createIndex("isFavorite", "isFavorite", {
           unique: false,
         });
@@ -32,10 +32,10 @@ const dbPromise = openDB(appDbName, 2, {
 });
 
 export function isSupported() {
-  if (!('indexedDB' in window)) {
-    console.log('This browser doesn\'t support IndexedDB');
+  if (!("indexedDB" in window)) {
+    console.log("This browser doesn't support IndexedDB");
     return false;
-  } 
+  }
 
   return true;
 }
@@ -57,7 +57,7 @@ export async function add(query) {
     if (query.id !== null) {
       throw new Error(`Query ${query.id} violates primary key contraint`);
     }
-    
+
     query.id = uuidv4();
 
     const nowUTC = Date.now();
@@ -65,7 +65,7 @@ export async function add(query) {
     query.dateCreated = nowUTC;
     query.dateLastModified = nowUTC;
     query.dateLastOpened = nowUTC;
-    
+
     const db = await dbPromise;
     const tx = db.transaction(queryStoreName, "readwrite");
     const store = tx.objectStore(queryStoreName);
@@ -78,16 +78,16 @@ export async function add(query) {
 }
 
 export async function update(query) {
-  try {  
+  try {
     if (query.id === null) {
       throw new Error(`Cannot update query with a null ID`);
     }
-    
+
     const nowUTC = Date.now();
 
     query.dateLastModified = nowUTC;
     query.dateLastOpened = nowUTC;
-    
+
     const db = await dbPromise;
     const tx = db.transaction(queryStoreName, "readwrite");
     const store = tx.objectStore(queryStoreName);
@@ -97,7 +97,7 @@ export async function update(query) {
   } catch (error) {
     console.warn("Error adding query to database:", error);
   }
-} 
+}
 
 export async function get(id) {
   const db = await dbPromise;
@@ -124,8 +124,8 @@ export async function getLastModified(take = 5, start = 0) {
 
   const count = results.length;
 
-  const startIndex = (count > take) ? (count - take) : 0;
-  const endIndex = (count - 1);
+  const startIndex = count > take ? count - take : 0;
+  const endIndex = count - 1;
 
   return results.slice(startIndex, endIndex).sort((a, b) => {
     return b.dateLastModified - a.dateLastModified;
