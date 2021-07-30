@@ -1,0 +1,18 @@
+.menu-drawer-transition {
+  transform: translateX(0) !important;
+  transition: transform 250ms cubic-bezier(.18,.89,.33,1);
+}
+
+@keyframes slid-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-300px);
+  }
+  1% {
+    opacity: 1;
+    transform: translateX(-300px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
