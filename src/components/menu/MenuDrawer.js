@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import Paper from '@material-ui/core/Paper';
+import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
-import '../../styles/MenuDrawer.css';
+import "../../styles/MenuDrawer.css";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MenuDrawer({ open, children, onClose, ...props}) {
+export default function MenuDrawer({ open, children, onClose, ...props }) {
   const classes = useStyles();
 
   useEffect(() => {
@@ -54,30 +54,30 @@ export default function MenuDrawer({ open, children, onClose, ...props}) {
       if (event.target !== event.currentTarget) {
         return;
       }
-  
+
       if (onClose) {
         menuPaper.classList.toggle("menu-drawer-transition");
-        onClose('backdropClick');
+        onClose("backdropClick");
       }
     }
-  
+
     function handleKeyDown(event) {
-      if (event.key !== 'Escape') {
+      if (event.key !== "Escape") {
         return;
       }
-  
+
       // Swallow the event, in case someone is listening for the escape key on the body.
       event.stopPropagation();
-  
+
       if (onClose) {
         menuPaper.classList.toggle("menu-drawer-transition");
-        onClose('escapeKeyDown');
+        onClose("escapeKeyDown");
       }
     }
 
     if (open) {
       menuPaper.classList.toggle("menu-drawer-transition");
-      
+
       backdrop.addEventListener("click", handleBackdropClick);
       document.addEventListener("keydown", handleKeyDown);
     }
@@ -87,8 +87,8 @@ export default function MenuDrawer({ open, children, onClose, ...props}) {
 
       backdrop?.removeEventListener("click", handleBackdropClick);
       document.removeEventListener("keydown", handleKeyDown);
-    }
-  }, [ open, onClose ]);
+    };
+  }, [open, onClose]);
 
   if (!open) {
     return null;
@@ -97,7 +97,11 @@ export default function MenuDrawer({ open, children, onClose, ...props}) {
   return (
     <div className={classes.root}>
       <div id="menu-drawer-backdrop" className={classes.backdrop}></div>
-      <Paper id="menu-drawer-paper" className={classes.paper} style={{ transform: "translateX(-300px)"  }}>
+      <Paper
+        id="menu-drawer-paper"
+        className={classes.paper}
+        style={{ transform: "translateX(-300px)" }}
+      >
         {children}
       </Paper>
     </div>

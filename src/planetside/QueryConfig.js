@@ -1,7 +1,6 @@
 import QueryTree from "./QueryTree";
 
 const QueryConfig = (
-  // serviceId = "example",
   defaultCollection = "character",
   defaultNamespace = "ps2:v2"
 ) => {

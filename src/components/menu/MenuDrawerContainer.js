@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
-import Drawer from '@material-ui/core/Drawer';
-import Button from '@material-ui/core/Button';
-import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
+import List from "@material-ui/core/List";
+import Divider from "@material-ui/core/Divider";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { isSupported, getLastModified } from "../../persistence/queryStore";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -50,7 +47,6 @@ export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
     }
 
     toggleDrawer(true);
-    // onMenuClicked();
   }
 
   function toggleDrawer(state) {
@@ -61,15 +57,18 @@ export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     console.log("using effect. Open:", isOpen, "Loading:", isLoading);
-    
+
     async function getRecentlyModified() {
       console.log("Getting recent queries...");
-  
+
       try {
         return await getLastModified(5);
       } catch (error) {
-        console.warn("Error getting recently modified queries:", getRecentlyModified);
-        return
+        console.warn(
+          "Error getting recently modified queries:",
+          getRecentlyModified
+        );
+        return;
       }
     }
 
@@ -83,20 +82,23 @@ export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
 
       getRecentlyModified().then((recentQueries) => {
         console.log("Recent Queries:", recentQueries);
-        
+
         if (!!recentQueries && recentQueries.length > 0) {
-          
           const listItems = recentQueries.map((query) => {
-            console.log(query.name);
-            const name = query.name; 
             return (
-              <ListItem button key={query.id} onClick={() => handleLoadQuery(query.id)}>
-                <ListItemText primary={`${query.name}`} secondary={new Date(query.dateLastModified).toUTCString()} />
-                {/* <ListItemText primary={<span>{query.name}</span>} secondary={new Date(query.dateLastModified).toUTCString()} /> */}
+              <ListItem
+                button
+                key={query.id}
+                onClick={() => handleLoadQuery(query.id)}
+              >
+                <ListItemText
+                  primary={`${query.name}`}
+                  secondary={new Date(query.dateLastModified).toUTCString()}
+                />
               </ListItem>
-            )
-          }); 
-          
+            );
+          });
+
           console.log(listItems);
 
           setRecentQueryItems(listItems);
@@ -110,10 +112,8 @@ export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
 
     return () => {
       setIsLoading(false);
-    }
+    };
   }, [isOpen, isLoading, onLoadQuery]);
-
-  
 
   if (!isStoreSupported) {
     return null;
@@ -121,37 +121,33 @@ export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
 
   return (
     <React.Fragment>
-        <Grid item xs={1} className={classes.menuButtonContainer}>
-          <IconButton
-            type="submit"
-            variant="outlined"
-            color="primary"
-            aria-label="Menu"
-            className={classes.button}
-            onClick={handleMenuClicked}
-          >
-            <MenuIcon style={{ color: color }} />
-          </IconButton>
-        </Grid>
+      <Grid item xs={1} className={classes.menuButtonContainer}>
+        <IconButton
+          type="submit"
+          variant="outlined"
+          color="primary"
+          aria-label="Menu"
+          className={classes.button}
+          onClick={handleMenuClicked}
+        >
+          <MenuIcon style={{ color: color }} />
+        </IconButton>
+      </Grid>
 
       <MenuDrawer open={isOpen} onClose={() => toggleDrawer(false)}>
         <Divider />
-        <List style={{ width: "auto" }}
+        <List
+          style={{ width: "auto" }}
           subheader={
             <ListSubheader component="div" id="recent-queries-subheader">
               Recent Queries
             </ListSubheader>
-          }>
+          }
+        >
           {recentQueryItems}
         </List>
         <Divider />
       </MenuDrawer>
-
-      {/* <Drawer anchor="left" open={isOpen} onClose={() => toggleDrawer(false)} style={{ transition: "none" }}>
-        <List style={{ width: "auto" }}>
-          {recentQueryItems}
-        </List>
-      </Drawer> */}
     </React.Fragment>
   );
 }
