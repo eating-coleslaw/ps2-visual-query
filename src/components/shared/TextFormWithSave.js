@@ -25,7 +25,7 @@ export default function TextFormWithSave({
   placeholder = "",
   variant = "outlined",
   ariaLabel = "",
-  allowBlank = true,
+  allowBlank = true, // TODO: replace this with validation function
 }) {
   const classes = useStyles();
 
