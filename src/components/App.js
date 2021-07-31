@@ -43,6 +43,8 @@ import {
   get as getQuery,
 } from "../persistence/queryStore";
 import TextFormWithSave from "./shared/TextFormWithSave";
+import QueryMenu from "./queries/queryOptions/QueryMenu";
+import QueryOptionsContainer from "./queries/queryOptions/QueryOptionsContainer";
 // import queryStore from "../persistence/queryStore";
 
 const CensusQuery = require("dbgcensus").Query;
@@ -866,7 +868,31 @@ export default function App() {
                   </Grid>
 
                   {isStoreSupported && (
-                    <Grid
+                    <QueryOptionsContainer
+                      query={query}
+                      onSaveNew={handleSaveNewQuery}
+                      onSave={handleSaveQuery}
+                      onSaveAs={() => console.log("Save As...")}
+                      onNewQuery={handleNewQuery}
+                      onDelete={() => console.log("Delete Query")}
+                      onRename={() => console.log("Rename Query")}
+                    />
+                  )}
+
+                  {/* {isStoreSupported && (
+                    <QueryMenu
+                      query={query}
+                      onSaveNew={handleSaveNewQuery}
+                      onClickSave={handleSaveQuery}
+                      onClickSaveAs={() => console.log("Save As...")}
+                      onClickNewQuery={handleNewQuery}
+                      onClickOpenCopy={() => console.log("Open Copy")}
+                      onClickDelete={() => console.log("Delete Query")}
+                      onClickRename={() => console.log("Rename Query")}
+                    />
+                  )} */}
+
+                    {/* <Grid
                       item
                       container
                       sm={12}
@@ -876,7 +902,6 @@ export default function App() {
                     >
                       {!query.id && (
                         <Grid item sm={12} md={12}>
-                          {/* <Button onClick={handleSaveQuery} style={{ color: theme.palette.primary.main }}>Save</Button> */}
                           <TextFormWithSave
                             initValue={query.name}
                             placeholder="Query Name"
@@ -886,10 +911,6 @@ export default function App() {
                           />
                         </Grid>
                       )}
-
-                      {/* <Grid item sm={6} md={6}>
-                        <Button onClick={getRecentlyModified} style={{ color: theme.palette.primary.main }}>Recent</Button>
-                      </Grid> */}
 
                       {!!query.id && (
                         <React.Fragment>
@@ -921,9 +942,10 @@ export default function App() {
                           </Grid>
                         </React.Fragment>
                       )}
-                    </Grid>
-                  )}
+                    </Grid> */}
+                  {/* )} */}
                 </Grid>
+
                 {/* <h1 className={classes.header1}>Query Creator</h1> */}
                 <p className={classes.itemParagraph}>
                   Refer to the{" "}
