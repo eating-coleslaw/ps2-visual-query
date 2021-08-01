@@ -52,8 +52,9 @@ export default function QueryOptionsContainer({
 
   const handleDeleteSubmit = () => {
     handleCloseDialog();
-    onDelete();
+    onDelete(query.id);
   };
+  
   const handleRenameSubmit = (queryName) => {
     handleCloseDialog();
     onRename(queryName);

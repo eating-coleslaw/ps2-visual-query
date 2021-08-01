@@ -36,11 +36,12 @@ import TreeForm from "./queries/TreeForm";
 
 import userPreferenceStore from "../persistence/userPreferencesStore";
 import {
-  upsert as upsertQuery,
-  add as saveQuery,
+  upsertQuery,
+  // addQuery as saveQuery,
   isSupported,
-  getLastModified,
-  get as getQuery,
+  // getLastModified,
+  getQuery,
+  deleteQuery,
 } from "../persistence/queryStore";
 import TextFormWithSave from "./shared/TextFormWithSave";
 import QueryMenu from "./queries/queryOptions/QueryMenu";
@@ -253,11 +254,10 @@ export default function App() {
     }
   }
 
-  async function handleSaveQueryCopy(copyName = "") {
+  async function handleSaveQueryAs(copyName = "") {
     console.log("Saving query copy...");
 
     try {
-      // const { id, ...currentQuery } = { ...query };
       const currentQuery = { ...query };
 
       if (!copyName) {
@@ -271,7 +271,6 @@ export default function App() {
 
       if (!!result) {
         setQuery((prevQuery) => {
-          // return { ...prevQuery, ...{ id: result } };
           return { ...prevQuery, ...currentQuery };
         });
 
@@ -299,29 +298,27 @@ export default function App() {
     }
   }
 
+  async function handleRenameQuery(queryName) {
+    await handleSaveQuery(queryName);
+  }
+
+  async function handleDeleteQuery(id) {
+    try {
+      const result = await deleteQuery(id);
+      
+      if (!!result) {
+        handleNewQuery();
+      }      
+    } catch (error) {
+      console.warn(`Error deleting query ${id}:`, error);
+    }
+  }
+
   function handleNewQuery() {
     setQuery(QueryConfig());
   }
 
-  // async function getRecentlyModified() {
-  //   console.log("Getting recent queries...");
-
-  //   try {
-  //     const result = await getLastModified(5);
-  //     console.log(result);
-  //     console.log(result.map((query) => {
-  //       return new Date(query.dateLastModified).toUTCString();
-  //     }));
-  //   } catch (error) {
-  //     console.warn("Error getting recently modified queries:", getRecentlyModified);
-  //   }
-  // }
-
   function onServiceKeyChange(key) {
-    // setQuery((prevQuery) => {
-    //   return { ...prevQuery, ...{ serviceKey: key } };
-    // });
-
     dbgcensus.SetGlobalServiceKey(key);
     userPreferenceStore.saveServiceId(key); // TODO: make sure this doesn't cause problems with the store key effect above
     setServiceKey(key);
@@ -872,10 +869,10 @@ export default function App() {
                       query={query}
                       onSaveNew={handleSaveNewQuery}
                       onSave={handleSaveQuery}
-                      onSaveAs={() => console.log("Save As...")}
+                      onSaveAs={handleSaveQueryAs}
                       onNewQuery={handleNewQuery}
-                      onDelete={() => console.log("Delete Query")}
-                      onRename={() => console.log("Rename Query")}
+                      onDelete={handleDeleteQuery}
+                      onRename={handleRenameQuery}
                     />
                   )}
 

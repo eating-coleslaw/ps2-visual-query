@@ -40,19 +40,19 @@ export function isSupported() {
   return true;
 }
 
-export async function upsert(query) {
+export async function upsertQuery(query) {
   try {
     if (query.id === null) {
-      return await add(query);
+      return await addQuery(query);
     } else {
-      return await update(query);
+      return await updateQuery(query);
     }
   } catch (error) {
     throw new Error("Error upsert query");
   }
 }
 
-export async function add(query) {
+export async function addQuery(query) {
   try {
     if (query.id !== null) {
       throw new Error(`Query ${query.id} violates primary key contraint`);
@@ -82,21 +82,7 @@ export async function add(query) {
   }
 }
 
-const getCircularReplacer = () => {
-  const seen = new WeakSet();
-  return (key, value) => {
-    if (typeof value === "object" && value !== null) {
-      if (seen.has(value)) {
-        console.log("Seen:", value);
-        return;
-      }
-      seen.add(value);
-    }
-    return value;
-  };
-};
-
-export async function update(query) {
+export async function updateQuery(query) {
   try {
     if (query.id === null) {
       throw new Error(`Cannot update query with a null ID`);
@@ -141,13 +127,22 @@ export async function update(query) {
   }
 }
 
-export async function get(id) {
+export async function getQuery(id) {
   const db = await dbPromise;
   const tx = db.transaction(queryStoreName, "readwrite");
   const store = tx.objectStore(queryStoreName);
   const query = await store.get(id);
   await tx.done;
   return query;
+}
+
+export async function deleteQuery(id) {
+  const db = await dbPromise;
+  const tx = db.transaction(queryStoreName, "readwrite");
+  const store = tx.objectStore(queryStoreName);
+  const result = await store.delete(id);
+  await tx.done;
+  return result;
 }
 
 export async function getFavorites() {

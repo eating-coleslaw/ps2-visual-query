@@ -3,7 +3,7 @@ import ConfirmationDialog from "../../shared/ConfirmationDialog";
 
 export default function DeleteDialog({ open, onClose, onSubmit }) {
   const contentText =
-    "Are you sure you want to delete this query. This action is permanent and cannot be undone.";
+    "Are you sure you want to delete this query? This action is permanent and cannot be undone.";
 
   return (
     <ConfirmationDialog
