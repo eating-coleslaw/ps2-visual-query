@@ -63,9 +63,11 @@ export default function QueryMenu({
     <Grid
       item
       container
-      sm={12}
-      md={8}
+      xs={5}
+      sm={5}
+      md={5}
       justifyContent="flex-end"
+      alignItems="center"
       style={{ textAlign: "right" }}
     >
       {isNewQuery && (
@@ -80,40 +82,45 @@ export default function QueryMenu({
       )}
       {!isNewQuery && (
         <React.Fragment>
-          <Button
-            onClick={() => onClickSave("")}
-            style={{ color: theme.palette.primary.main }}
-          >
-            Save
-          </Button>
-          <IconButton
-            aria-label="More query options"
-            aria-controls="query-options-menu"
-            aria-haspopup={true}
-            onClick={handleIconClick}
-          >
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            id="query-options-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={open}
-            onClose={handleCloseMenu}
-          >
-            <MenuItem key="SaveAs" onClick={handleClickSaveAs}>
-              Save As...
-            </MenuItem>
-            <MenuItem key="New" onClick={handleClickNewQuery}>
-              New
-            </MenuItem>
-            <MenuItem key="Rename" onClick={handleClickRename}>
-              Rename
-            </MenuItem>
-            <MenuItem key="Delete" onClick={handleClickDelete}>
-              Delete
-            </MenuItem>
-          </Menu>
+          <Grid item>
+            <Button
+              onClick={() => onClickSave("")}
+              style={{ color: theme.palette.primary.main }}
+            >
+              Save
+            </Button>
+          </Grid>
+          
+          <Grid item>
+            <IconButton
+              aria-label="More query options"
+              aria-controls="query-options-menu"
+              aria-haspopup={true}
+              onClick={handleIconClick}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              id="query-options-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={open}
+              onClose={handleCloseMenu}
+            >
+              <MenuItem key="SaveAs" onClick={handleClickSaveAs}>
+                Save As...
+              </MenuItem>
+              <MenuItem key="New" onClick={handleClickNewQuery}>
+                New
+              </MenuItem>
+              <MenuItem key="Rename" onClick={handleClickRename}>
+                Rename
+              </MenuItem>
+              <MenuItem key="Delete" onClick={handleClickDelete}>
+                Delete
+              </MenuItem>
+            </Menu>
+          </Grid>
         </React.Fragment>
       )}
     </Grid>

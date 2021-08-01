@@ -16,7 +16,7 @@ import {
   Select,
 } from "@material-ui/core";
 import "../styles/App.css";
-import { pink, amber, orange, blue, cyan } from "@material-ui/core/colors";
+import { pink } from "@material-ui/core/colors";
 import AddIcon from "@material-ui/icons/Add";
 
 import ServiceKeyForm from "./queries/ServiceKeyForm";
@@ -42,6 +42,7 @@ import {
   deleteQuery,
 } from "../persistence/queryStore";
 import QueryOptionsContainer from "./queries/queryOptions/QueryOptionsContainer";
+import QueryCreatorHeader from "./queries/QueryCreatorHeader";
 
 const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
@@ -132,10 +133,7 @@ export default function App() {
 
   const [loading, setLoading] = useState(false);
 
-  const [query, setQuery] = useState(
-    // QueryConfig(storeKey ?? "example", "character", namespace)
-    QueryConfig("character", namespace)
-  );
+  const [query, setQuery] = useState(QueryConfig("character", namespace));
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const storedColorTheme = userPreferenceStore.getColorTheme();
@@ -159,8 +157,8 @@ export default function App() {
     const theme = createTheme({
       palette: {
         type: useDarkMode ? "dark" : "light",
-        primary: useDarkMode ? { main: "#E7ADFB" } : pink, //24E8D8 cyan : pink, //"#E34F8C" : pink, //amber : pink,
-        secondary: orange, //amber,
+        primary: useDarkMode ? { main: "#E7ADFB" } : pink,
+        secondary: useDarkMode ? { main: "#F8C275" } : { main: "#5700FE" },
         background: {
           paper: useDarkMode ? "#27273A" : "#fff",
           default: useDarkMode ? "#0F1320" : "#fafafa",
@@ -602,12 +600,7 @@ export default function App() {
     console.log("Query Changed effect");
 
     function convertToCensusQuery() {
-      let censusQuery = new CensusQuery(
-        query.collection,
-        query.namespace //,
-        // serviceKey
-        // query.serviceKey
-      );
+      let censusQuery = new CensusQuery(query.collection, query.namespace);
 
       if (!!query.language && query.language !== "All") {
         censusQuery.setLanguage(query.language.toLowerCase());
@@ -770,7 +763,14 @@ export default function App() {
       />
       <Container maxWidth="lg" className={classes.container}>
         <Grid container alignItems="flex-start">
-          <Grid container item xs={12} sm={12} md={6} className={classes.gridContainer}>
+          <Grid
+            container
+            item
+            xs={12}
+            sm={6}
+            md={6}
+            className={classes.gridContainer}
+          >
             <Grid item xs={12} className={classes.gridContainerItem}>
               <Paper className={classes.paper}>
                 <Collapsible
@@ -808,18 +808,11 @@ export default function App() {
                 <Grid
                   container
                   className={classes.gridRow}
-                  alignItems="center"
+                  alignItems="flex-start"
                   spacing={1}
+                  style={{ marginBottom: 12 }}
                 >
-                  <Grid
-                    item
-                    container
-                    sm={12}
-                    md={4}
-                    justifyContent="flex-start"
-                  >
-                    <h1 className={classes.header1}>Query Creator</h1>
-                  </Grid>
+                  <QueryCreatorHeader queryName={query.name} />
 
                   {isStoreSupported && (
                     <QueryOptionsContainer
@@ -1070,7 +1063,14 @@ export default function App() {
             </Grid>
           </Grid>
 
-          <Grid container item xs={12} sm={12} md={6} className={classes.gridContainer}>
+          <Grid
+            container
+            item
+            xs={12}
+            sm={6}
+            md={6}
+            className={classes.gridContainer}
+          >
             <Grid item xs={12} className={classes.gridContainerItem}>
               <QueryUrlContainer
                 queryUrl={queryUrl}
