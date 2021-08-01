@@ -770,7 +770,7 @@ export default function App() {
       />
       <Container maxWidth="lg" className={classes.container}>
         <Grid container alignItems="flex-start">
-          <Grid container item xs={12} sm={6} className={classes.gridContainer}>
+          <Grid container item xs={12} sm={12} md={6} className={classes.gridContainer}>
             <Grid item xs={12} className={classes.gridContainerItem}>
               <Paper className={classes.paper}>
                 <Collapsible
@@ -1070,7 +1070,7 @@ export default function App() {
             </Grid>
           </Grid>
 
-          <Grid container item xs={12} sm={6} className={classes.gridContainer}>
+          <Grid container item xs={12} sm={12} md={6} className={classes.gridContainer}>
             <Grid item xs={12} className={classes.gridContainerItem}>
               <QueryUrlContainer
                 queryUrl={queryUrl}
