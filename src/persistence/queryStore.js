@@ -88,38 +88,17 @@ export async function updateQuery(query) {
       throw new Error(`Cannot update query with a null ID`);
     }
 
-    console.log("Updating query:", query);
-
     const nowUTC = Date.now();
-
     query.dateLastModified = nowUTC;
     query.dateLastOpened = nowUTC;
 
     const db = await dbPromise;
-
-    console.log("DB:", db);
-
     const tx = db.transaction(queryStoreName, "readwrite");
-    
-    console.log("TX:", tx);
-    
     const store = tx.objectStore(queryStoreName);
-    
-    console.log("Store:", store);
-    
-    const stringified = JSON.stringify(query); //, getCircularReplacer());
 
-    console.log("Stringified:", stringified);
-
-    const item = JSON.parse(stringified);
-
-    // const item = JSON.parse(JSON.stringify(query));
-
-    console.log("Serialized Item: ", item);
-
+    const item = JSON.parse(JSON.stringify(query));
     const result = await store.put(item);
-    // const result = await store.put(query);
-    // const result = await store.put(query, query.id);
+
     await tx.done;
     return result;
   } catch (error) {

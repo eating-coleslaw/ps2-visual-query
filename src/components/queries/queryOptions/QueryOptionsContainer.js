@@ -54,7 +54,7 @@ export default function QueryOptionsContainer({
     handleCloseDialog();
     onDelete(query.id);
   };
-  
+
   const handleRenameSubmit = (queryName) => {
     handleCloseDialog();
     onRename(queryName);
