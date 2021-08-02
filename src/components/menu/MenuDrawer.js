@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    height: "100vh",
   },
   paper: {
     top: 0,
@@ -40,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
     width: 300,
     transform: "translateX(-300px)",
     transition: "transform 250ms cubic-bezier(.18,.89,.33,1) 0ms",
+    padding: theme.spacing(2),
   },
 }));
 
@@ -78,12 +80,17 @@ export default function MenuDrawer({ open, children, onClose, ...props }) {
     if (open) {
       menuPaper.classList.toggle("menu-drawer-transition");
 
+      // Prevent background scrolling when menu is open
+      document.body.style.overflowY = "hidden";
+
       backdrop.addEventListener("click", handleBackdropClick);
       document.addEventListener("keydown", handleKeyDown);
     }
 
     return () => {
       menuPaper?.classList.toggle("menu-drawer-transition");
+
+      document.body.style.overflowY = "";
 
       backdrop?.removeEventListener("click", handleBackdropClick);
       document.removeEventListener("keydown", handleKeyDown);

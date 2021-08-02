@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 const appDbName = "ps2QueryDb";
 const queryStoreName = "queries";
 
-const dbPromise = openDB(appDbName, 2, {
+const dbPromise = openDB(appDbName, 1, {
   upgrade(db, oldVersion) {
     if (!isSupported()) {
       return;
@@ -22,6 +22,8 @@ const dbPromise = openDB(appDbName, 2, {
         });
 
         queryStore.createIndex("dateLastModified", "dateLastModified");
+
+        queryStore.createIndex("name", "name");
 
         break;
 
@@ -73,7 +75,6 @@ export async function addQuery(query) {
     const db = await dbPromise;
     const tx = db.transaction(queryStoreName, "readwrite");
     const store = tx.objectStore(queryStoreName);
-    // const result = await store.add(query);
     const result = await store.add(item);
     await tx.done;
     return result;
@@ -124,9 +125,29 @@ export async function deleteQuery(id) {
   return result;
 }
 
+export async function getAllQueries() {
+  const db = await dbPromise;
+  const tx = db.transaction(queryStoreName, "readwrite");
+  const store = tx.objectStore(queryStoreName);
+  const queries = await store.getAll();
+  await tx.done;
+  return queries;
+}
+
 export async function getFavorites() {
   const db = await dbPromise;
   const results = await db.getAllFromIndex(queryStoreName, "favorites", true);
+  return results;
+}
+
+export async function getAllSortedByName() {
+  const db = await dbPromise;
+  const results = await db.getAllFromIndex(queryStoreName, "name");
+
+  if (!results) {
+    return null;
+  }
+
   return results;
 }
 
@@ -134,8 +155,12 @@ export async function getLastModified(take = 5, start = 0) {
   const db = await dbPromise;
   const results = await db.getAllFromIndex(queryStoreName, "dateLastModified");
 
-  if (!results || results.length === 0) {
+  if (!results) {
     return null;
+  }
+
+  if (results.length === 0) {
+    return [];
   }
 
   const count = results.length;

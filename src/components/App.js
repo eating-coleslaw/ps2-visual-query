@@ -30,7 +30,7 @@ import QueryUrlContainer from "./queries/QueryUrlContainer";
 import JoinsContainer from "./queries/JoinsContainer";
 import QueryCondition from "../planetside/QueryCondition";
 import Collapsible from "./shared/Collapsible";
-import HideAppBar from "./HideAppBar";
+import StaticAppBar from "./StaticAppBar";
 import QueryConfig from "../planetside/QueryConfig";
 import TreeForm from "./queries/TreeForm";
 
@@ -756,7 +756,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <HideAppBar
+      <StaticAppBar
         theme={colorTheme}
         onChangeTheme={handleColorThemeChange}
         onLoadQuery={handleLoadQuery}

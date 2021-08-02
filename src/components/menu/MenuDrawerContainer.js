@@ -9,8 +9,14 @@ import { isSupported, getLastModified } from "../../persistence/queryStore";
 import MenuIcon from "@material-ui/icons/Menu";
 import { IconButton, ListSubheader } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
+import QuerySelector from "./QuerySelector";
 
 const useStyles = makeStyles((theme) => ({
+  header1: {
+    margin: 0,
+    fontSize: "1.4em",
+    fontWeight: 500,
+  },
   menuButtonContainer: {
     maxWidth: 20,
     marginRight: theme.spacing(2),
@@ -18,6 +24,30 @@ const useStyles = makeStyles((theme) => ({
   button: {
     margin: 0,
     padding: 0,
+  },
+  divider: {
+    margin: "8px 0",
+  },
+  list: {
+    width: "100%",
+  },
+  recentListItem: {
+    padding: "0 0 0 8px",
+  },
+  subHeader: {
+    color: theme.palette.secondary.main,
+    lineHeight: 2,
+    padding: "8px 0 0 0",
+    fontSize: "0.875rem",
+    boxSizing: "border-box",
+    fontWeight: 500,
+    margin: "0 0 4px 0",
+  },
+  listSubheader: {
+    color: theme.palette.secondary.main,
+    lineHeight: 2,
+    padding: "8px 0 0 0",
+    marginTop: theme.spacing(1),
   },
 }));
 
@@ -56,11 +86,7 @@ export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
   const [recentQueryItems, setRecentQueryItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
-    console.log("using effect. Open:", isOpen, "Loading:", isLoading);
-
     async function getRecentlyModified() {
-      console.log("Getting recent queries...");
-
       try {
         return await getLastModified(5);
       } catch (error) {
@@ -81,25 +107,26 @@ export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
       setIsLoading(true);
 
       getRecentlyModified().then((recentQueries) => {
-        console.log("Recent Queries:", recentQueries);
-
         if (!!recentQueries && recentQueries.length > 0) {
           const listItems = recentQueries.map((query) => {
+            const timestamp = new Date(query.dateLastModified).toLocaleString();
+            const subText = `Modified: ${timestamp}`;
+
             return (
               <ListItem
                 button
                 key={query.id}
                 onClick={() => handleLoadQuery(query.id)}
+                className={classes.recentListItem}
               >
                 <ListItemText
-                  primary={`${query.name}`}
-                  secondary={new Date(query.dateLastModified).toUTCString()}
+                  primary={query.name}
+                  primaryTypographyProps={{ variant: "body2" }}
+                  secondary={subText}
                 />
               </ListItem>
             );
           });
-
-          console.log(listItems);
 
           setRecentQueryItems(listItems);
         }
@@ -113,7 +140,12 @@ export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
     return () => {
       setIsLoading(false);
     };
-  }, [isOpen, isLoading, onLoadQuery]);
+  }, [isOpen, isLoading, onLoadQuery, classes.recentListItem]);
+
+  function handleSelectQuery(id) {
+    onLoadQuery(id);
+    setIsOpen(false);
+  }
 
   if (!isStoreSupported) {
     return null;
@@ -135,11 +167,21 @@ export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
       </Grid>
 
       <MenuDrawer open={isOpen} onClose={() => toggleDrawer(false)}>
-        <Divider />
+        <h1 className={classes.header1}>PS2 Query Editor</h1>
+
+        <Divider className={classes.divider} />
+
+        <h2 className={classes.subHeader}>Open a Query</h2>
+        <QuerySelector onSelectQuery={handleSelectQuery} />
+
         <List
-          style={{ width: "auto" }}
+          className={classes.list}
           subheader={
-            <ListSubheader component="div" id="recent-queries-subheader">
+            <ListSubheader
+              component="div"
+              id="recent-queries-subheader"
+              className={classes.listSubheader}
+            >
               Recent Queries
             </ListSubheader>
           }
