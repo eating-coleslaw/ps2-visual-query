@@ -597,8 +597,6 @@ export default function App() {
 
   const [queryUrl, setQueryUrl] = useState("");
   useEffect(() => {
-    console.log("Query Changed effect");
-
     function convertToCensusQuery() {
       let censusQuery = new CensusQuery(query.collection, query.namespace);
 

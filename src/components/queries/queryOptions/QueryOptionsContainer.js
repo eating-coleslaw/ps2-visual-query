@@ -60,8 +60,6 @@ export default function QueryOptionsContainer({
     onRename(queryName);
   };
 
-  console.log("Dialog:", openDialog);
-
   return (
     <React.Fragment>
       <QueryMenu
