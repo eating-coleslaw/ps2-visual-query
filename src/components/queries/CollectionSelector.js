@@ -40,6 +40,7 @@ export default function CollectionSelector({ collection, onChange }) {
       value={collection}
       autoSelect
       required
+      disableClearable
       onChange={(event, newValue) => handleChange(newValue)}
       ListboxProps={{ className: `${classes.listbox}` }}
       renderInput={(params) => (
