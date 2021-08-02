@@ -257,11 +257,8 @@ export default function App() {
 
   async function handleDeleteQuery(id) {
     try {
-      const result = await deleteQuery(id);
-
-      if (!!result) {
-        handleNewQuery();
-      }
+      await deleteQuery(id);
+      handleNewQuery();
     } catch (error) {
       console.warn(`Error deleting query ${id}:`, error);
     }
