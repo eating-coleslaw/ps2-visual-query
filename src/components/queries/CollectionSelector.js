@@ -8,6 +8,15 @@ const useStyles = makeStyles((theme) => ({
   selectControl: {
     minWidth: 250,
   },
+  listbox: {
+    margin: 0,
+    padding: "8px 0",
+    overflow: "auto",
+    listStyle: "none",
+    maxHeight: "40vh",
+    border: "1px solid #414152",
+    boxSizing: "border-box",
+  },
 }));
 
 export default function CollectionSelector({ collection, onChange }) {
@@ -32,6 +41,7 @@ export default function CollectionSelector({ collection, onChange }) {
       autoSelect
       required
       onChange={(event, newValue) => handleChange(newValue)}
+      ListboxProps={{ className: `${classes.listbox}` }}
       renderInput={(params) => (
         <TextField
           {...params}
