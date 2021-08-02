@@ -20,6 +20,7 @@ The app supports the majority of the `ps2:v2` namespace query features:
 
 Other app features include:
 
+- Save queries to the browser's local IndexedDB storage
 - Toggleable light & dark themes
 - Run the query and view the response in-app
 - Save your Service ID to the browser
