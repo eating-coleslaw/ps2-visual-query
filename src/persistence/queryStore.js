@@ -70,8 +70,6 @@ export async function addQuery(query) {
 
     const item = JSON.parse(JSON.stringify(query));
 
-    console.log("Serialized Item: ", item);
-
     const db = await dbPromise;
     const tx = db.transaction(queryStoreName, "readwrite");
     const store = tx.objectStore(queryStoreName);
