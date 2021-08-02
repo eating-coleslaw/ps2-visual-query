@@ -16,7 +16,7 @@ export default function LanguageSelector({ language, onChange }) {
   const [optionItems, setOptionItems] = useState([]);
   useEffect(() => {
     const allItem = (
-      <option ket="All" aria-label="All" value="All">
+      <option key="All" aria-label="All" value="All">
         All
       </option>
     );
