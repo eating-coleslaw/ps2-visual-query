@@ -7,7 +7,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import CollectionSelector from "./CollectionSelector";
 import FieldsEntryForm from "./FieldsEntryForm";
 import ConditionArgumentForm from "./ConditionArgumentForm";
-import BinarySelector from "../BinarySelector";
+import BinarySelector from "../shared/BinarySelector";
 import BooleanSelector from "../shared/BooleanSelector";
 import Collapsible from "../shared/Collapsible";
 import QueryJoin from "../../planetside/QueryJoin";
