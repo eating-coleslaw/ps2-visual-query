@@ -88,7 +88,7 @@ export default function MenuDrawerContainer({ onLoadQuery, ...props }) {
   useEffect(() => {
     async function getRecentlyModified() {
       try {
-        return await getLastModified(5);
+        return await getLastModified(10);
       } catch (error) {
         console.warn(
           "Error getting recently modified queries:",
