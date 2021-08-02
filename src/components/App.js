@@ -301,10 +301,8 @@ export default function App() {
   }
 
   function onLanguageChange(value) {
-    const newValue = value === "All" ? "" : value.toLowerCase();
-
     setQuery((prevQuery) => {
-      return { ...prevQuery, ...{ language: newValue } };
+      return { ...prevQuery, ...{ language: value } };
     });
   }
 
@@ -881,7 +879,7 @@ export default function App() {
                       style={{ marginTop: 4 }}
                     >
                       <LanguageSelector
-                        value={query.language}
+                        language={query.language}
                         onChange={onLanguageChange}
                       />
                     </Grid>

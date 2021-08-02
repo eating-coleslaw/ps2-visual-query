@@ -12,20 +12,26 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LanguageSelector({ language, onChange }) {
   const classes = useStyles();
-  const [languages, setLanguages] = useState([]);
 
+  const [optionItems, setOptionItems] = useState([]);
   useEffect(() => {
-    setLanguages(QueryEnums.Languages);
+    const allItem = (
+      <option ket="All" aria-label="All" value="All">
+        All
+      </option>
+    );
+
+    const languageItems = QueryEnums.Languages.map((lang) => (
+      <option key={lang} value={lang} aria-label={lang}>
+        {lang}
+      </option>
+    ));
+
+    setOptionItems([allItem, ...languageItems]);
   }, []);
 
-  const languageItems = languages.map((lang) => (
-    <option key={lang} value={lang} aria-label={lang}>
-      {lang}
-    </option>
-  ));
-
-  function handleChange(e) {
-    const value = e.target.value;
+  function handleChange(event) {
+    const value = event.target.value;
     onChange(value);
   }
 
@@ -44,10 +50,7 @@ export default function LanguageSelector({ language, onChange }) {
           id: "language-select",
         }}
       >
-        <option aria-label="All" value="All">
-          All
-        </option>
-        {languageItems}
+        {optionItems}
       </Select>
     </FormControl>
   );
