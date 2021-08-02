@@ -45,13 +45,13 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "1rem",
   },
   questionMark: {
-    color: theme.palette.secondary.main,
+    color: "#F8C275",
   },
   ampersand: {
-    color: theme.palette.secondary.main,
+    color: "#F8C275",
   },
   queryDelimiter: {
-    color: theme.palette.secondary.main,
+    color: "#F8C275",
   },
   equals: {
     color: "#E752A1",
