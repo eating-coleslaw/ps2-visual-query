@@ -24,6 +24,7 @@ export default function SaveWithDialog({
   function handleSubmit() {
     if (isValidName) {
       onSubmit(queryName);
+      setQueryName("");
     }
   }
 
