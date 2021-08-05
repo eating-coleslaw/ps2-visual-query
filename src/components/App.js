@@ -268,6 +268,10 @@ export default function App() {
     setQuery(QueryConfig());
   }
 
+  function handleImportQuery(queryModel) {
+    setQuery(queryModel);
+  }
+
   function onServiceKeyChange(key) {
     dbgcensus.SetGlobalServiceKey(key);
     userPreferenceStore.saveServiceId(key); // TODO: make sure this doesn't cause problems with the store key effect above
@@ -807,17 +811,19 @@ export default function App() {
                 >
                   <QueryCreatorHeader queryName={query.name} />
 
-                  {isStoreSupported && (
+                  {/* {isStoreSupported && ( */}
                     <QueryOptionsContainer
                       query={query}
+                      isSavingEnabled={isStoreSupported}
                       onSaveNew={handleSaveNewQuery}
                       onSave={handleSaveQuery}
                       onSaveAs={handleSaveQueryAs}
                       onNewQuery={handleNewQuery}
                       onDelete={handleDeleteQuery}
                       onRename={handleRenameQuery}
+                      onImport={handleImportQuery}
                     />
-                  )}
+                  {/* )} */}
                 </Grid>
 
                 <p className={classes.itemParagraph}>

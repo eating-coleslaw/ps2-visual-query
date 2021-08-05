@@ -9,12 +9,14 @@ import { useTheme } from "@material-ui/core";
 
 export default function QueryMenu({
   query,
+  isSavingEnabled,
   onClickSaveNew,
   onClickSave,
   onClickSaveAs,
   onClickNewQuery,
   onClickDelete,
   onClickRename,
+  onClickImport,
 }) {
   const theme = useTheme();
 
@@ -59,6 +61,11 @@ export default function QueryMenu({
     onClickRename();
   }
 
+  function handleClickImport() {
+    handleCloseMenu();
+    onClickImport();
+  }
+
   return (
     <Grid
       item
@@ -70,7 +77,7 @@ export default function QueryMenu({
       alignItems="center"
       style={{ textAlign: "right" }}
     >
-      {isNewQuery && (
+      {isNewQuery && isSavingEnabled && (
         <React.Fragment>
           <Button
             onClick={handleClickSaveNew}
@@ -80,8 +87,8 @@ export default function QueryMenu({
           </Button>
         </React.Fragment>
       )}
-      {!isNewQuery && (
         <React.Fragment>
+        {!isNewQuery && isSavingEnabled && (
           <Grid item>
             <Button
               onClick={() => onClickSave("")}
@@ -89,7 +96,7 @@ export default function QueryMenu({
             >
               Save
             </Button>
-          </Grid>
+          </Grid>)}
           
           <Grid item>
             <IconButton
@@ -100,6 +107,7 @@ export default function QueryMenu({
             >
               <MoreVertIcon />
             </IconButton>
+            
             <Menu
               id="query-options-menu"
               anchorEl={anchorEl}
@@ -107,22 +115,31 @@ export default function QueryMenu({
               open={open}
               onClose={handleCloseMenu}
             >
+              {isSavingEnabled && !isNewQuery &&
               <MenuItem key="SaveAs" onClick={handleClickSaveAs}>
                 Save As...
-              </MenuItem>
+              </MenuItem>}
+              
               <MenuItem key="New" onClick={handleClickNewQuery}>
                 New
               </MenuItem>
+              
+              {isSavingEnabled && !isNewQuery &&
               <MenuItem key="Rename" onClick={handleClickRename}>
                 Rename
-              </MenuItem>
+              </MenuItem>}
+              
+              {isSavingEnabled && !isNewQuery &&
               <MenuItem key="Delete" onClick={handleClickDelete}>
                 Delete
+              </MenuItem>}
+              
+              <MenuItem key="Import" onClick={handleClickImport}>
+                Import
               </MenuItem>
             </Menu>
           </Grid>
         </React.Fragment>
-      )}
     </Grid>
   );
 }

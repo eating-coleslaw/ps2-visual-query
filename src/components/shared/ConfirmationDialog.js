@@ -15,7 +15,7 @@ export default function ConfirmationDialog({
   onConfirm,
 }) {
   return (
-    <Dialog open={open} onClose={onCancel} maxWidth="md">
+    <Dialog open={open} onClose={onCancel} maxWidth="sm" fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{text}</DialogContentText>

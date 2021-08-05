@@ -5,15 +5,18 @@ import NewQueryDialog from "./NewQueryDialog";
 import RenameDialog from "./RenameDialog";
 import SaveAsDialog from "./SaveAsDialog";
 import SaveNewDialog from "./SaveNewDialog";
+import ImportUrlDialog from "./ImportUrlDialog";
 
 export default function QueryOptionsContainer({
   query,
+  isSavingEnabled,
   onSaveNew,
   onSave,
   onSaveAs,
   onNewQuery,
   onDelete,
   onRename,
+  onImport,
 }) {
   const [openDialog, setOpenDialog] = useState("");
 
@@ -34,6 +37,7 @@ export default function QueryOptionsContainer({
   const handleOpenNew = () => tryOpenDialog("OpenNew");
   const handleDelete = () => tryOpenDialog("Delete");
   const handleRename = () => tryOpenDialog("Rename");
+  const handleImport = () => tryOpenDialog("Import");
 
   const handleSaveNewSubmit = (queryName) => {
     handleCloseDialog();
@@ -60,16 +64,23 @@ export default function QueryOptionsContainer({
     onRename(queryName);
   };
 
+  const handleImportSubmit = (queryModel) => {
+    handleCloseDialog();
+    onImport(queryModel);
+  }
+
   return (
     <React.Fragment>
       <QueryMenu
         query={query}
+        isSavingEnabled={isSavingEnabled}
         onClickSaveNew={handleSaveNew}
         onClickSave={handleSave}
         onClickSaveAs={handleSaveAs}
         onClickNewQuery={handleOpenNew}
         onClickDelete={handleDelete}
         onClickRename={handleRename}
+        onClickImport={handleImport}
       />
       <SaveNewDialog
         open={openDialog === "SaveNew"}
@@ -95,6 +106,11 @@ export default function QueryOptionsContainer({
         open={openDialog === "Rename"}
         onClose={handleCloseDialog}
         onSubmit={handleRenameSubmit}
+      />
+      <ImportUrlDialog
+        open={openDialog === "Import"}
+        onClose={handleCloseDialog}
+        onSubmit={handleImportSubmit}
       />
     </React.Fragment>
   );

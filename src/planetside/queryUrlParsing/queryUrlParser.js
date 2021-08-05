@@ -73,7 +73,7 @@ export function test() {
 
 export default function parseQueryUrl(url) {
   if (!url) {
-    return new Error("Query URL is required");
+    throw new Error("Query URL is required");
     // return null;
   }
   
