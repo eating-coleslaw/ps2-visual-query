@@ -1,8 +1,11 @@
-import QueryConfig from './QueryConfig';
-import QueryCondition from './QueryCondition';
-import QueryJoin from './QueryJoin';
-import QueryTree from './QueryTree';
-import QueryEnums from './QueryEnums';
+import QueryConfig from '../QueryConfig';
+import QueryCondition from '../QueryCondition';
+import QueryJoin from '../QueryJoin';
+import QueryTree from '../QueryTree';
+import QueryEnums from '../QueryEnums';
+import joinStringDelimiterData from './joinStringDelimiterData';
+import joinSiblingDelimiterData from './joinSiblingDelimiterData';
+
 
 const HOST = "http://census.daybreakgames.com";
 const NAMESPACE = "ps2:v2";
@@ -54,12 +57,14 @@ const SEARCH_MODIFIERS = [
 ];
 
 export function test() {
+  console.log("=============== Test 1 ===============");
   const testUrl = "https://census.daybreakgames.com/s:example/get/ps2:v2/character/?name.first=Chirtle&name.first_lower=*chir&c:hide=times,certs,daily_ribbon&c:resolve=outfit_member&c:join=characters_item^list:true^outer:false^hide:character_id^terms:item_type_id=26^inject_at:Items(item^list:true^outer:false^hide:item_id^inject_at:Details(item_type^list:true^outer:false^inject_at:Type)characters_weapon_stat_by_faction^list:true^outer:true^inject_at:Stats)&c:lang=en&c:tree=field:Items^isList:false^start:item_id&c:limit=10";
-
+  
   const queryModel = parseQueryUrl(testUrl);
-
+  
   console.log("Test 1:", queryModel);
-
+  
+  console.log("=============== Join Test ===============");
   const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^inject_at:Details)";
 
   const joinTestQueryModel = parseQueryUrl(joinTestUrl);
@@ -464,7 +469,7 @@ function parseJoinParameter(queryModel, valueString) {
   let closeParenthesesIndices = [];
   let commaIndices = [];
 
-  let parentSplitIndices = [];
+  let parentSplitIndices = [0];
 
 
   // allParenthesesPairs[i] corresponds to the subjoins for the join at parentJoins[i]
@@ -480,7 +485,6 @@ function parseJoinParameter(queryModel, valueString) {
   for (let i = 0; i < valueString.length; i++) {
     let char = valueString.charAt(i);
 
-    
     if (char === "(") {
       currentParenthesesPairs[parenthesesDepth] = {
         open: i,
@@ -508,6 +512,8 @@ function parseJoinParameter(queryModel, valueString) {
         const parentJoin = valueString.slice(prevSplitIndex + 1, i);
         parentJoins.push(parentJoin);
 
+        // parentSplitIndices[parentJoins.length] = i;
+
         prevSplitIndex = i;
       }
     } else {
@@ -515,16 +521,127 @@ function parseJoinParameter(queryModel, valueString) {
     }
   }
 
-  console.log(parentJoins);
+  if (parentJoins.length === 0) {
+    parentJoins.push(valueString);
+  }
 
+  console.log(parentJoins);
   console.log("allParenthesesPairs:", allParenthesesPairs);
 
-  console.log("openParenthesesIndices:", openParenthesesIndices);
-  console.log("closeParenthesesIndices:", closeParenthesesIndices);
-  console.log("commaIndices:", commaIndices);
+  parentJoins.forEach((joinString) => {
+    const index = parentJoins.indexOf(joinString);
+
+    let parenthesesPairs = undefined;
+    if (index < allParenthesesPairs.length) {
+      parenthesesPairs = allParenthesesPairs[index];
+    }
+
+    let baseJoinString = joinString;    
+    let subJoinString = "";
+
+    if (!!parenthesesPairs && !!parenthesesPairs[0]) {
+      let offset = 0;
+      if (index > 0) {
+        offset = parentSplitIndices[index] + 1;
+      }
+
+      const outermostPair = parenthesesPairs[0];
+      const baseJoinEnd = outermostPair.open - offset;
+      const subJoinStart = outermostPair.open + 1 - offset;
+      const subJoinEnd = outermostPair.close - offset;
+
+      baseJoinString = joinString.slice(0, baseJoinEnd);
+
+      subJoinString = joinString.slice(subJoinStart, subJoinEnd);
+    }
+
+    console.log("baseJoinString:", baseJoinString);
+    console.log("subJoinString:", subJoinString);
+
+  })
 
   return true;
 }
+
+
+
+
+function getJoinStringIndices(joinString) {
+  let delimData = joinStringDelimiterData(0, joinString);
+  
+  
+  let siblingSplitIndices = [0];
+  
+  let parentJoins = [];
+  
+  let openParenthesesIndices = [];
+  let closeParenthesesIndices = [];
+  let commaIndices = [];
+
+  let parenthesesDepth = 0;
+  let prevSplitIndex = -1;
+  
+  let allParenthesesPairs = [];
+  let currentParenthesesPairs = [];
+  
+  let currentParent = null;
+  let currentSibling = joinSiblingDelimiterData("");
+
+  let currentiblingIndex = 0;
+  delimData.siblingsData.push(currentSibling);
+
+  for (let i = 0; i < joinString.length; i++) {
+    let char = joinString.charAt(i);
+
+    if (char === "(") {
+      currentParenthesesPairs[parenthesesDepth] = {
+        open: i,
+        close: null,
+      };
+      
+      parenthesesDepth++;
+      openParenthesesIndices.push(i);
+    } else if (char === ")") {
+      parenthesesDepth--;
+      currentParenthesesPairs[parenthesesDepth].close = i;
+      
+      closeParenthesesIndices.push(i);
+      
+      if (parenthesesDepth === 0) {
+        allParenthesesPairs.push(currentParenthesesPairs);
+        currentParenthesesPairs = [];
+      }
+    } else if (char === ",") {
+      commaIndices.push(i);
+      
+      if (parenthesesDepth === 0) {
+        siblingSplitIndices.push(i);
+
+        const parentJoin = joinString.slice(prevSplitIndex + 1, i);
+        parentJoins.push(parentJoin);
+
+        // parentSplitIndices[parentJoins.length] = i;
+
+        prevSplitIndex = i;
+      }
+    } else {
+      continue;
+    }
+  }
+
+  if (parentJoins.length === 0) {
+    parentJoins.push(joinString);
+  }
+
+  console.log(parentJoins);
+  console.log("allParenthesesPairs:", allParenthesesPairs);
+}
+
+function splitSiblingJoins(joinString) {
+
+}
+
+
 
 function filterValidFields(initFields) {
   let fields = [];

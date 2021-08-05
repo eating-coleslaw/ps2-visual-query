@@ -7,7 +7,7 @@ import App from './components/App';
     TEMPORARY TESTING CALL
 =========================== */
 
-import { test } from './planetside/queryUrlParser';
+import { test } from './planetside/queryUrlParsing/queryUrlParser';
 test();
 
 /* ========================*/
