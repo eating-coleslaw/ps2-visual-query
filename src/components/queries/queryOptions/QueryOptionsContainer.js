@@ -67,7 +67,7 @@ export default function QueryOptionsContainer({
   const handleImportSubmit = (queryModel) => {
     handleCloseDialog();
     onImport(queryModel);
-  }
+  };
 
   return (
     <React.Fragment>

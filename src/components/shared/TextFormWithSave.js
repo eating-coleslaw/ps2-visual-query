@@ -38,7 +38,7 @@ export default function TextFormWithSave({
 
   function isValid() {
     if (value === "") {
-      return allowBlank && (value !== initValue);
+      return allowBlank && value !== initValue;
     } else {
       return value !== initValue;
     }
@@ -63,7 +63,6 @@ export default function TextFormWithSave({
                 type="submit"
                 variant="outlined"
                 color="primary"
-                // disabled={value === initValue}
                 disabled={!isValid()}
                 aria-label={ariaLabel}
                 className={classes.button}

@@ -3,11 +3,7 @@ import QueryCondition from '../QueryCondition';
 import QueryJoin from '../QueryJoin';
 import QueryTree from '../QueryTree';
 import QueryEnums from '../QueryEnums';
-import joinStringDelimiterData from './joinStringDelimiterData';
-import joinSiblingDelimiterData from './joinSiblingDelimiterData';
 
-
-const HOST = "http://census.daybreakgames.com";
 const NAMESPACE = "ps2:v2";
 
 const FIELD_REGEX = /^[A-z0-9]+(\.[A-z0-9]+)?$/;
@@ -20,17 +16,6 @@ const COMMANDS = [
   "lang",
   "join",
   "tree",
-  /* Unsuported */
-  // "case",
-  // "distinct",
-  // "exactMatchFirst",
-  // "has",
-  // "includeNull",
-  // "limitPerDB",
-  // "retry",
-  // "sort",
-  // "start",
-  // "timing",
 ];
 
 const UNSUPPORTED_COMMANDS = [
@@ -47,12 +32,12 @@ const UNSUPPORTED_COMMANDS = [
 ];
 
 export function test() {
-  // console.log("=============== Test 1 ===============");
-  // const testUrl = "https://census.daybreakgames.com/s:example/get/ps2:v2/character/?name.first=Chirtle&name.first_lower=*chir&c:hide=times,certs,daily_ribbon&c:resolve=outfit_member&c:join=characters_item^list:true^outer:false^hide:character_id^terms:item_type_id=26^inject_at:Items(item^list:true^outer:false^hide:item_id^inject_at:Details(item_type^list:true^outer:false^inject_at:Type)characters_weapon_stat_by_faction^list:true^outer:true^inject_at:Stats)&c:lang=en&c:tree=field:Items^isList:false^start:item_id&c:limit=10";
+  console.log("=============== Test 1 ===============");
+  const testUrl = "https://census.daybreakgames.com/s:example/get/ps2:v2/character/?name.first=Chirtle&name.first_lower=*chir&c:hide=times,certs,daily_ribbon&c:resolve=outfit_member&c:join=characters_item^list:true^outer:false^hide:character_id^terms:item_type_id=26^inject_at:Items(item^list:true^outer:false^hide:item_id^inject_at:Details(item_type^list:true^outer:false^inject_at:Type)characters_weapon_stat_by_faction^list:true^outer:true^inject_at:Stats)&c:lang=en&c:tree=field:Items^isList:false^start:item_id&c:limit=10";
   
-  // const queryModel = parseQueryUrl(testUrl);
+  const queryModel = parseQueryUrl(testUrl);
   
-  // console.log("Test 1:", queryModel);
+  console.log("Test 1:", queryModel);
   
   console.log("=============== Join Test 1 ===============");
   const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^terms:repeatable=0'objective_group_id=!10014^inject_at:Details)";
@@ -62,27 +47,24 @@ export function test() {
 
   console.log("Join Test:", joinTestQueryModel);
   
-  // console.log("=============== Join Test 2 ===============");
-  // const joinTestUrl2 = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^inject_at:Details)";
+  console.log("=============== Join Test 2 ===============");
+  const joinTestUrl2 = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^inject_at:Details)";
 
-  // const joinTestQueryModel2 = parseQueryUrl(joinTestUrl2);
+  const joinTestQueryModel2 = parseQueryUrl(joinTestUrl2);
 
-  // console.log("Join Test 2:", joinTestQueryModel2);
+  console.log("Join Test 2:", joinTestQueryModel2);
 }
 
 
 export default function parseQueryUrl(url) {
   if (!url) {
     throw new Error("Query URL is required");
-    // return null;
   }
   
   const unescapedUrl = unescape(url);
 
   const splitAtQueryPieces = unescapedUrl.split("?");
   const preQueryString = splitAtQueryPieces[0];
-
-  // console.log("preQueryString:", preQueryString);
 
   const collection = extractCollection(preQueryString);
 
@@ -95,22 +77,17 @@ export default function parseQueryUrl(url) {
 
   const queryParameters = getQueryParametersArray(splitAtQueryPieces[1]);
 
-  // console.log("Query Parameters String:", queryParameters);
-
   let seenCommands = [];
 
   queryParameters.forEach((parameter) => {
     const commandValuePair = parseQueryParameterString(parameter);
     
-    // console.log("commandValuePair:", commandValuePair, "from:", parameter);
-    
-    // TODO: check if the parameter is the search conditions
     if (commandValuePair === null && queryParameters.indexOf(parameter) === 0) {
       const conditions = parseConditionsParameter(parameter, false);
       
       queryModel.conditions = conditions;
       
-      return ;
+      return;
     }
 
     const command = commandValuePair[0];
@@ -163,12 +140,9 @@ function extractCollection(preQueryString) {
 }
 
 function getQueryParametersArray(queryString) {
-  // prepend an ampersand if 
   if (queryString.charAt(0) === "c" && queryString.charAt(1) === ":") {
     queryString = `&${queryString}`;
   }
-  
-  // return queryString.split("&c:");
   
   let splitAtMod = queryString.split("&c:");
 
@@ -192,16 +166,11 @@ function parseQueryParameterString(parameter) {
   
   const [command, value] = commandValueSplit;
 
-  // console.log("commandValueSplit:", commandValueSplit);
-
   if (commandValueSplit.length !== 2) {
     console.warn("Failed to parse query parameter:", parameter);
     return null;
   }
 
-  // const [command, value] = commandValueSplit;
-
-  // const command = commandValueSplit[0];
   if (!COMMANDS.includes(command)) {
     if (UNSUPPORTED_COMMANDS.includes(command)) {
       console.warn(`Query command ${command} is not supported yet`);
@@ -212,7 +181,6 @@ function parseQueryParameterString(parameter) {
     }
   }
 
-  // const value = commandValueSplit[1];
   if (value === "") {
     console.warn(`No value specified for ${command} command`);
     return null;
@@ -222,8 +190,6 @@ function parseQueryParameterString(parameter) {
 }
 
 function parseQueryParameter(queryModel, command, value) {
-  // console.log("Parsing query parameter:", command,"=>", value);
-  
   let success = false;
 
   switch (command) {
@@ -368,8 +334,6 @@ function parseTreeParameter(queryModel, valueString) {
     }
 
     const [key, value] = splitPair;
-    // const key = splitPair[0];
-    // const value = splitPair[1];
 
     if (!TREE_KEYS.includes(key) || seenKeys.includes(key)) {
       return;
@@ -447,7 +411,6 @@ function parseConditionsParameter(valueString, delimiter ="&", excludeRegex = fa
     const keyValuePair = conditionString.split("=");
     const key = keyValuePair[0];
     let value = keyValuePair[1];
-    // const [key, value] = conditionString.split("=");
     
     if (!value) {
       return;
@@ -501,20 +464,6 @@ function parseConditionsParameter(valueString, delimiter ="&", excludeRegex = fa
 
   join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_dataitem_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false)
   characters_item(item,item_to_weapon),outfit_member_extended(outfit)
-
-  a(b,c(d)),e(f(g),h)
-  a(b,c(d)),e(f(g),h),i
-
-  __Unnested__
-  0-1 of each:  ,   ()   ,()   (),   (,)
-  2 commas:     ,,   ,,()   ,(),   (),,
-  2 parens:     ()()   ,()()   (),()   ()(),
-  2 of each:    ,,()()   (),,()   ()(),,   (,,)()   ()(,,)
-                ,(,)()   ,(),()   ,()(,)   ,()(),
-                (,),()   (,)(,)   (,)(),   (),(,)   (),(),
-    
-  (())    (,())   ((),)   (()),   ,(())   ,(()),
-  ,(),
 */
 
 const JOIN_KEYS = [
@@ -529,37 +478,17 @@ const JOIN_KEYS = [
   "outer", // bit => boolean
 ];
 
-// function parseJoinParameter(queryModel, valueString) {
 function parseJoinParameter(valueString) {
-  // console.log("Parsing join parameter:", valueString);
-  
-  // if (valueString === "") {
-  //   console.error("Can't prase empty valueString");
-  //   throw new Error("Can't prase empty valueString");
-  //   return;
-  // }
-
-
-  let openParenthesesIndices = [];
-  let closeParenthesesIndices = [];
-  let commaIndices = [];
+  let parentJoins = [];
 
   let parentSplitIndices = [0];
 
-
-  // allParenthesesPairs[i] corresponds to the subjoins for the join at parentJoins[i]
-  // allSiblingSplitIndices[i] corresponds to the subjoins for the join at parentJoins[i]
-
-  let parentJoins = [];
-
   let parenthesesDepth = 0;
   let prevSplitIndex = -1;
+  let currentSiblingSplitIndices = [];
 
   let allParenthesesPairs = [];
   let currentParenthesesPairs = [];
-
-  let allSiblingSplitIndices = [];
-  let currentSiblingSplitIndices = [];
 
   let currentSiblingIndex = 0;
 
@@ -573,32 +502,21 @@ function parseJoinParameter(valueString) {
       };
       
       parenthesesDepth++;
-      openParenthesesIndices.push(i);
     } else if (char === ")") {
       parenthesesDepth--;
       currentParenthesesPairs[parenthesesDepth].close = i;
       
-      closeParenthesesIndices.push(i);
-      
       if (parenthesesDepth === 0) {
         allParenthesesPairs[currentSiblingIndex] = currentParenthesesPairs;
-        // allParenthesesPairs.push(currentParenthesesPairs);
 
         currentParenthesesPairs = [];
       }
     } else if (char === ",") {
-      commaIndices.push(i);
-
       currentSiblingSplitIndices.push(i);
       
       if (parenthesesDepth === 0) {
-        // parentSplitIndices.push(i);
-        
         const parentJoin = valueString.slice(prevSplitIndex + 1, i);
         parentJoins[currentSiblingIndex] = parentJoin;
-        // parentJoins.push(parentJoin);
-        
-        // parentSplitIndices[parentJoins.length] = i;
         
         currentSiblingIndex++;
         parentSplitIndices[currentSiblingIndex] = i;
@@ -617,16 +535,9 @@ function parseJoinParameter(valueString) {
     parentJoins.push(finalSibling);
   }
 
-  // console.log("commaIndices:", commaIndices);
-  // console.log("parentSplitIndices:", parentSplitIndices);
-
-  // console.log("parentJoins:", parentJoins);
-  // console.log("allParenthesesPairs:", allParenthesesPairs);
-
   const siblingJoinModels = [];
 
   parentJoins.forEach((joinString) => {
-    // console.log("----- parentString:", joinString);
     const index = parentJoins.indexOf(joinString);
 
     let parenthesesPairs = undefined;
@@ -643,9 +554,6 @@ function parseJoinParameter(valueString) {
         offset = parentSplitIndices[index] + 1;
       }
 
-      // console.log("parenthesesPairs:", parenthesesPairs);
-      // console.log("offset:", offset);
-
       const outermostPair = parenthesesPairs[0];
       const baseJoinEnd = outermostPair.open - offset;
       const subJoinStart = outermostPair.open + 1 - offset;
@@ -656,14 +564,8 @@ function parseJoinParameter(valueString) {
       subJoinString = joinString.slice(subJoinStart, subJoinEnd);
     }
 
-    // console.log("baseJoinString:", baseJoinString);
-    // console.log("subJoinString:", subJoinString);
-
-    // create a join out of baseJoinString
     const baseJoinModel = parseSimpleJoinString(baseJoinString);
-    // console.log("baseJoinModel", baseJoinModel)
 
-    // recursively call this function, passing in subJoinString for valueString
     if (subJoinString !== "") {
       const subJoinModels = parseJoinParameter(subJoinString);
   

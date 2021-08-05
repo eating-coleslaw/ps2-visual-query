@@ -7,8 +7,6 @@ const QueryCondition = (defaultOperatorName = "equals") => {
     field: "",
     value: "",
     operator: QueryOperator(defaultOperatorName),
-    // isValid: (field, operator, value) => !!field && !!operator && !!value,
-    // toString: (field, operator, value) => `${field}${operator?.value}${value}`,
   };
 };
 
