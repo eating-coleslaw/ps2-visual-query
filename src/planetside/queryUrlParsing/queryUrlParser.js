@@ -46,16 +46,6 @@ const UNSUPPORTED_COMMANDS = [
   "timing",
 ];
 
-const SEARCH_MODIFIERS = [
-  "<",
-  "[", // <=
-  ">",
-  "]", // >=
-  "^", // Starts With
-  "*", // Contains
-  "!", // NOT
-];
-
 export function test() {
   // console.log("=============== Test 1 ===============");
   // const testUrl = "https://census.daybreakgames.com/s:example/get/ps2:v2/character/?name.first=Chirtle&name.first_lower=*chir&c:hide=times,certs,daily_ribbon&c:resolve=outfit_member&c:join=characters_item^list:true^outer:false^hide:character_id^terms:item_type_id=26^inject_at:Items(item^list:true^outer:false^hide:item_id^inject_at:Details(item_type^list:true^outer:false^inject_at:Type)characters_weapon_stat_by_faction^list:true^outer:true^inject_at:Stats)&c:lang=en&c:tree=field:Items^isList:false^start:item_id&c:limit=10";
@@ -64,13 +54,20 @@ export function test() {
   
   // console.log("Test 1:", queryModel);
   
-  console.log("=============== Join Test ===============");
-  // const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^inject_at:Details)";
-  const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?c:join=a(b,c(d)),e(f),i,g(h)";
+  console.log("=============== Join Test 1 ===============");
+  const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^terms:repeatable=0'objective_group_id=!10014^inject_at:Details)";
+  // const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?c:join=a(b,c(d)),e(f),i,g(h)";
 
   const joinTestQueryModel = parseQueryUrl(joinTestUrl);
 
   console.log("Join Test:", joinTestQueryModel);
+  
+  // console.log("=============== Join Test 2 ===============");
+  // const joinTestUrl2 = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^inject_at:Details)";
+
+  // const joinTestQueryModel2 = parseQueryUrl(joinTestUrl2);
+
+  // console.log("Join Test 2:", joinTestQueryModel2);
 }
 
 
@@ -104,12 +101,16 @@ export default function parseQueryUrl(url) {
 
   queryParameters.forEach((parameter) => {
     const commandValuePair = parseQueryParameterString(parameter);
-
+    
     // console.log("commandValuePair:", commandValuePair, "from:", parameter);
-
+    
     // TODO: check if the parameter is the search conditions
-    if (commandValuePair === null) {
-      return;
+    if (commandValuePair === null && queryParameters.indexOf(parameter) === 0) {
+      const conditions = parseConditionsParameter(parameter, false);
+      
+      queryModel.conditions = conditions;
+      
+      return ;
     }
 
     const command = commandValuePair[0];
@@ -189,6 +190,8 @@ function parseQueryParameterString(parameter) {
     commandValueSplit = parameter.split("=");
   }
   
+  const [command, value] = commandValueSplit;
+
   // console.log("commandValueSplit:", commandValueSplit);
 
   if (commandValueSplit.length !== 2) {
@@ -196,7 +199,7 @@ function parseQueryParameterString(parameter) {
     return null;
   }
 
-  const [command, value] = commandValueSplit;
+  // const [command, value] = commandValueSplit;
 
   // const command = commandValueSplit[0];
   if (!COMMANDS.includes(command)) {
@@ -249,7 +252,9 @@ function parseQueryParameter(queryModel, command, value) {
       break;
     
     case "join":
-      success = parseJoinParameter(queryModel, value);
+      const joins = parseJoinParameter(value);
+      queryModel.joins = joins;
+      success = joins.length > 0;
       break;
 
     default:
@@ -413,10 +418,67 @@ function parseTreeParameter(queryModel, valueString) {
   return true;
 }
 
+/* =============
+    CONDITIONS
+================ */
 
-function parseConditionsParameter(queryModel, valueString) {
+const SEARCH_MODIFIERS = [
+  "<",
+  "[", // <=
+  ">",
+  "]", // >=
+  "^", // Starts With
+  "*", // Contains
+  "!", // NOT
+];
 
-  return true;
+const REGEX_MODIFIERS = [
+  "^", // Starts With 
+  "*", // Contains
+];
+
+
+function parseConditionsParameter(valueString, delimiter ="&", excludeRegex = false) {
+  const conditions = [];
+  
+  const splitConditions = valueString.split(delimiter);
+
+  splitConditions.forEach((conditionString) => {
+    const keyValuePair = conditionString.split("=");
+    const key = keyValuePair[0];
+    let value = keyValuePair[1];
+    // const [key, value] = conditionString.split("=");
+    
+    if (!value) {
+      return;
+    }
+
+    if (!isValidField(key)) {
+      return;
+    }
+
+    let operatorName = "equals";
+
+    const firstValueChar = value.charAt(0);
+    if (SEARCH_MODIFIERS.includes(firstValueChar)) {
+      if (excludeRegex && REGEX_MODIFIERS.includes(firstValueChar)) {
+        return;
+      }
+      
+      value = value.slice(1);
+
+      const operatorValue = `=${firstValueChar}`;
+      operatorName =  QueryEnums.Operators.find((op) => op.value === operatorValue)?.name;
+    }
+
+    const condition = QueryCondition(operatorName);
+    condition.field = key;
+    condition.value = value;
+    
+    conditions.push(condition);
+  });
+
+  return conditions;
 }
 
 
@@ -467,9 +529,17 @@ const JOIN_KEYS = [
   "outer", // bit => boolean
 ];
 
-function parseJoinParameter(queryModel, valueString) {
+// function parseJoinParameter(queryModel, valueString) {
+function parseJoinParameter(valueString) {
   // console.log("Parsing join parameter:", valueString);
   
+  // if (valueString === "") {
+  //   console.error("Can't prase empty valueString");
+  //   throw new Error("Can't prase empty valueString");
+  //   return;
+  // }
+
+
   let openParenthesesIndices = [];
   let closeParenthesesIndices = [];
   let commaIndices = [];
@@ -547,14 +617,16 @@ function parseJoinParameter(queryModel, valueString) {
     parentJoins.push(finalSibling);
   }
 
-  console.log("commaIndices:", commaIndices);
-  console.log("parentSplitIndices:", parentSplitIndices);
+  // console.log("commaIndices:", commaIndices);
+  // console.log("parentSplitIndices:", parentSplitIndices);
 
-  console.log("parentJoins:", parentJoins);
-  console.log("allParenthesesPairs:", allParenthesesPairs);
+  // console.log("parentJoins:", parentJoins);
+  // console.log("allParenthesesPairs:", allParenthesesPairs);
+
+  const siblingJoinModels = [];
 
   parentJoins.forEach((joinString) => {
-    console.log("----- parentString:", joinString);
+    // console.log("----- parentString:", joinString);
     const index = parentJoins.indexOf(joinString);
 
     let parenthesesPairs = undefined;
@@ -571,8 +643,8 @@ function parseJoinParameter(queryModel, valueString) {
         offset = parentSplitIndices[index] + 1;
       }
 
-      console.log("parenthesesPairs:", parenthesesPairs);
-      console.log("offset:", offset);
+      // console.log("parenthesesPairs:", parenthesesPairs);
+      // console.log("offset:", offset);
 
       const outermostPair = parenthesesPairs[0];
       const baseJoinEnd = outermostPair.open - offset;
@@ -584,15 +656,26 @@ function parseJoinParameter(queryModel, valueString) {
       subJoinString = joinString.slice(subJoinStart, subJoinEnd);
     }
 
-    console.log("baseJoinString:", baseJoinString);
-    console.log("subJoinString:", subJoinString);
+    // console.log("baseJoinString:", baseJoinString);
+    // console.log("subJoinString:", subJoinString);
 
     // create a join out of baseJoinString
-    // recursively call this function, passing in subJoinString for valueString
+    const baseJoinModel = parseSimpleJoinString(baseJoinString);
+    // console.log("baseJoinModel", baseJoinModel)
 
+    // recursively call this function, passing in subJoinString for valueString
+    if (subJoinString !== "") {
+      const subJoinModels = parseJoinParameter(subJoinString);
+  
+      if (!!subJoinModels) {
+        baseJoinModel.joins = subJoinModels;
+      }
+    }
+
+    siblingJoinModels.push(baseJoinModel);
   });
 
-  return true;
+  return siblingJoinModels;
 }
 
 function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
@@ -606,7 +689,7 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
     const keyValuePair = keyString.split(":");
     const [key, value] = keyValuePair;
 
-    if (!JOIN_KEYS.includes(key) && splitKeys.indexOf(keyString) === 0 && QueryEnums.collection.includes(key)) {
+    if (!JOIN_KEYS.includes(key) && splitKeys.indexOf(keyString) === 0 && QueryEnums.Collections.includes(key)) {
       joinModel.collection = key;
       seenKeys.push("type");
       return;
@@ -671,7 +754,7 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
 
       case "terms":
         if (!seenKeys.includes(key)) {
-          // joinModel. = value;
+          joinModel.terms = parseConditionsParameter(value, "'", true);
         }
         break;
 
@@ -688,98 +771,6 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
 
   return joinModel;
 }
-
-
-function getJoinStringIndices(joinString) {
-  let delimData = joinStringDelimiterData(0, joinString);
-  
-  
-  let siblingSplitIndices = [0];
-  
-  let parentJoins = [];
-  
-  let openParenthesesIndices = [];
-  let closeParenthesesIndices = [];
-  let commaIndices = [];
-
-  let parenthesesDepth = 0;
-  let prevSplitIndex = -1;
-  
-  let allParenthesesPairs = [];
-  let currentParenthesesPairs = [];
-  
-  let currentParent = null;
-  let currentSibling = joinSiblingDelimiterData("");
-
-  let currentiblingIndex = 0;
-  delimData.siblingsData.push(currentSibling);
-
-  for (let i = 0; i < joinString.length; i++) {
-    let char = joinString.charAt(i);
-
-    if (char === "(") {
-      // 1. set baseJoinEnd on current sibling/parent
-      // 2. update parentPairs on current sibling/parent
-      // 3. create a new joinStringDelimiterData with depth = parentDepth + 1
-      //      -> set subJoinData on current sibling/parent
-      //      -> set baseJoinsubJoinStart
-      //      -> 
-      
-      currentParenthesesPairs[parenthesesDepth] = {
-        open: i,
-        close: null,
-      };
-      
-      parenthesesDepth++;
-      openParenthesesIndices.push(i);
-    } else if (char === ")") {
-      // 1. set subJoinEnd on current subJoinData
-      // 2. update parentPairs on current sibling/parent
-      // 3. create a new joinStringDelimiterData with depth = parentDepth + 1
-      //      -> set subJoinData on current sibling/parent
-      //      -> set baseJoinsubJoinStart
-      //      -> 
-      
-      parenthesesDepth--;
-      currentParenthesesPairs[parenthesesDepth].close = i;
-      
-      closeParenthesesIndices.push(i);
-      
-      if (parenthesesDepth === 0) {
-        allParenthesesPairs.push(currentParenthesesPairs);
-        currentParenthesesPairs = [];
-      }
-    } else if (char === ",") {
-      commaIndices.push(i);
-      
-      if (parenthesesDepth === 0) {
-        siblingSplitIndices.push(i);
-
-        const parentJoin = joinString.slice(prevSplitIndex + 1, i);
-        parentJoins.push(parentJoin);
-
-        // parentSplitIndices[parentJoins.length] = i;
-
-        prevSplitIndex = i;
-      }
-    } else {
-      continue;
-    }
-  }
-
-  if (parentJoins.length === 0) {
-    parentJoins.push(joinString);
-  }
-
-  console.log(parentJoins);
-  console.log("allParenthesesPairs:", allParenthesesPairs);
-}
-
-function splitSiblingJoins(joinString) {
-
-}
-
-
 
 function filterValidFields(initFields) {
   let fields = [];
