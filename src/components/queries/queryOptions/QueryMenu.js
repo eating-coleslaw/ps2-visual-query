@@ -5,7 +5,13 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Grid from "@material-ui/core/Grid";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { useTheme } from "@material-ui/core";
+import { useTheme, makeStyles } from "@material-ui/core";
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    border: "1px solid #414152",
+  },
+}));
 
 export default function QueryMenu({
   query,
@@ -18,6 +24,7 @@ export default function QueryMenu({
   onClickRename,
   onClickImport,
 }) {
+  const classes = useStyles();
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -115,6 +122,7 @@ export default function QueryMenu({
             keepMounted
             open={open}
             onClose={handleCloseMenu}
+            classes={classes}
           >
             {isSavingEnabled && !isNewQuery && (
               <MenuItem key="SaveAs" onClick={handleClickSaveAs}>
