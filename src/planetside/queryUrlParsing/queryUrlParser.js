@@ -57,15 +57,16 @@ const SEARCH_MODIFIERS = [
 ];
 
 export function test() {
-  console.log("=============== Test 1 ===============");
-  const testUrl = "https://census.daybreakgames.com/s:example/get/ps2:v2/character/?name.first=Chirtle&name.first_lower=*chir&c:hide=times,certs,daily_ribbon&c:resolve=outfit_member&c:join=characters_item^list:true^outer:false^hide:character_id^terms:item_type_id=26^inject_at:Items(item^list:true^outer:false^hide:item_id^inject_at:Details(item_type^list:true^outer:false^inject_at:Type)characters_weapon_stat_by_faction^list:true^outer:true^inject_at:Stats)&c:lang=en&c:tree=field:Items^isList:false^start:item_id&c:limit=10";
+  // console.log("=============== Test 1 ===============");
+  // const testUrl = "https://census.daybreakgames.com/s:example/get/ps2:v2/character/?name.first=Chirtle&name.first_lower=*chir&c:hide=times,certs,daily_ribbon&c:resolve=outfit_member&c:join=characters_item^list:true^outer:false^hide:character_id^terms:item_type_id=26^inject_at:Items(item^list:true^outer:false^hide:item_id^inject_at:Details(item_type^list:true^outer:false^inject_at:Type)characters_weapon_stat_by_faction^list:true^outer:true^inject_at:Stats)&c:lang=en&c:tree=field:Items^isList:false^start:item_id&c:limit=10";
   
-  const queryModel = parseQueryUrl(testUrl);
+  // const queryModel = parseQueryUrl(testUrl);
   
-  console.log("Test 1:", queryModel);
+  // console.log("Test 1:", queryModel);
   
   console.log("=============== Join Test ===============");
-  const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^inject_at:Details)";
+  // const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^inject_at:Details)";
+  const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?c:join=a(b,c(d)),e(f),i,g(h)";
 
   const joinTestQueryModel = parseQueryUrl(joinTestUrl);
 
@@ -195,7 +196,9 @@ function parseQueryParameterString(parameter) {
     return null;
   }
 
-  const command = commandValueSplit[0];
+  const [command, value] = commandValueSplit;
+
+  // const command = commandValueSplit[0];
   if (!COMMANDS.includes(command)) {
     if (UNSUPPORTED_COMMANDS.includes(command)) {
       console.warn(`Query command ${command} is not supported yet`);
@@ -206,7 +209,7 @@ function parseQueryParameterString(parameter) {
     }
   }
 
-  const value = commandValueSplit[1];
+  // const value = commandValueSplit[1];
   if (value === "") {
     console.warn(`No value specified for ${command} command`);
     return null;
@@ -359,8 +362,9 @@ function parseTreeParameter(queryModel, valueString) {
       return;
     }
 
-    const key = splitPair[0];
-    const value = splitPair[1];
+    const [key, value] = splitPair;
+    // const key = splitPair[0];
+    // const value = splitPair[1];
 
     if (!TREE_KEYS.includes(key) || seenKeys.includes(key)) {
       return;
@@ -408,6 +412,7 @@ function parseTreeParameter(queryModel, valueString) {
   
   return true;
 }
+
 
 function parseConditionsParameter(queryModel, valueString) {
 
@@ -473,6 +478,7 @@ function parseJoinParameter(queryModel, valueString) {
 
 
   // allParenthesesPairs[i] corresponds to the subjoins for the join at parentJoins[i]
+  // allSiblingSplitIndices[i] corresponds to the subjoins for the join at parentJoins[i]
 
   let parentJoins = [];
 
@@ -481,6 +487,11 @@ function parseJoinParameter(queryModel, valueString) {
 
   let allParenthesesPairs = [];
   let currentParenthesesPairs = [];
+
+  let allSiblingSplitIndices = [];
+  let currentSiblingSplitIndices = [];
+
+  let currentSiblingIndex = 0;
 
   for (let i = 0; i < valueString.length; i++) {
     let char = valueString.charAt(i);
@@ -500,19 +511,27 @@ function parseJoinParameter(queryModel, valueString) {
       closeParenthesesIndices.push(i);
       
       if (parenthesesDepth === 0) {
-        allParenthesesPairs.push(currentParenthesesPairs);
+        allParenthesesPairs[currentSiblingIndex] = currentParenthesesPairs;
+        // allParenthesesPairs.push(currentParenthesesPairs);
+
         currentParenthesesPairs = [];
       }
     } else if (char === ",") {
       commaIndices.push(i);
+
+      currentSiblingSplitIndices.push(i);
       
       if (parenthesesDepth === 0) {
-        parentSplitIndices.push(i);
-
+        // parentSplitIndices.push(i);
+        
         const parentJoin = valueString.slice(prevSplitIndex + 1, i);
-        parentJoins.push(parentJoin);
-
+        parentJoins[currentSiblingIndex] = parentJoin;
+        // parentJoins.push(parentJoin);
+        
         // parentSplitIndices[parentJoins.length] = i;
+        
+        currentSiblingIndex++;
+        parentSplitIndices[currentSiblingIndex] = i;
 
         prevSplitIndex = i;
       }
@@ -523,12 +542,19 @@ function parseJoinParameter(queryModel, valueString) {
 
   if (parentJoins.length === 0) {
     parentJoins.push(valueString);
+  } else {
+    const finalSibling = valueString.slice(prevSplitIndex + 1);
+    parentJoins.push(finalSibling);
   }
 
-  console.log(parentJoins);
+  console.log("commaIndices:", commaIndices);
+  console.log("parentSplitIndices:", parentSplitIndices);
+
+  console.log("parentJoins:", parentJoins);
   console.log("allParenthesesPairs:", allParenthesesPairs);
 
   parentJoins.forEach((joinString) => {
+    console.log("----- parentString:", joinString);
     const index = parentJoins.indexOf(joinString);
 
     let parenthesesPairs = undefined;
@@ -545,6 +571,9 @@ function parseJoinParameter(queryModel, valueString) {
         offset = parentSplitIndices[index] + 1;
       }
 
+      console.log("parenthesesPairs:", parenthesesPairs);
+      console.log("offset:", offset);
+
       const outermostPair = parenthesesPairs[0];
       const baseJoinEnd = outermostPair.open - offset;
       const subJoinStart = outermostPair.open + 1 - offset;
@@ -558,12 +587,107 @@ function parseJoinParameter(queryModel, valueString) {
     console.log("baseJoinString:", baseJoinString);
     console.log("subJoinString:", subJoinString);
 
-  })
+    // create a join out of baseJoinString
+    // recursively call this function, passing in subJoinString for valueString
+
+  });
 
   return true;
 }
 
+function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
+  let joinModel = QueryJoin(parentJoinId);
+  
+  const splitKeys = baseJoinString.split("^");
 
+  const seenKeys = [];
+
+  splitKeys.forEach((keyString) => {
+    const keyValuePair = keyString.split(":");
+    const [key, value] = keyValuePair;
+
+    if (!JOIN_KEYS.includes(key) && splitKeys.indexOf(keyString) === 0 && QueryEnums.collection.includes(key)) {
+      joinModel.collection = key;
+      seenKeys.push("type");
+      return;
+    }
+
+    switch (key) {
+      case "type":
+        if (!seenKeys.includes(key)) {
+          joinModel.collection = value;
+        }
+        break;
+
+      case "on":
+        if (!seenKeys.includes(key)) {
+          joinModel.onField = value;
+        }
+        break;
+
+      case "to":
+        if (!seenKeys.includes(key)) {
+          joinModel.toField = value;
+        }
+        break;
+
+      case "list":
+        if (!seenKeys.includes(key)) {
+          joinModel.isList = (value === 1 || value === "true");
+        }
+        break;
+
+      case "show":
+        if (!seenKeys.includes(key) || !seenKeys.includes("hide")) {
+          const values = value.split("'");
+          
+          let fields = filterValidFields(values);
+          
+          if (fields.length > 0) {
+            joinModel.filterType = key;
+            joinModel.filterFields = fields;
+          }
+        }
+        break;
+
+      case "hide":
+        if (!seenKeys.includes(key) || !seenKeys.includes("show")) {
+          const values = value.split("'");
+          
+          let fields = filterValidFields(values);
+          
+          if (fields.length > 0) {
+            joinModel.filterType = key;
+            joinModel.filterFields = fields;
+          }
+        }
+        break;
+
+      case "inject_at":
+        if (!seenKeys.includes(key)) {
+          joinModel.injectAt = value;
+        }
+        break;
+
+      case "terms":
+        if (!seenKeys.includes(key)) {
+          // joinModel. = value;
+        }
+        break;
+
+      case "outer":
+        if (!seenKeys.includes(key)) {
+          joinModel.isOuterJoin = (value === 1 || value === "true");
+        }
+        break;
+        
+      default:
+        return;
+    }
+  });
+
+  return joinModel;
+}
 
 
 function getJoinStringIndices(joinString) {
@@ -594,6 +718,13 @@ function getJoinStringIndices(joinString) {
     let char = joinString.charAt(i);
 
     if (char === "(") {
+      // 1. set baseJoinEnd on current sibling/parent
+      // 2. update parentPairs on current sibling/parent
+      // 3. create a new joinStringDelimiterData with depth = parentDepth + 1
+      //      -> set subJoinData on current sibling/parent
+      //      -> set baseJoinsubJoinStart
+      //      -> 
+      
       currentParenthesesPairs[parenthesesDepth] = {
         open: i,
         close: null,
@@ -602,6 +733,13 @@ function getJoinStringIndices(joinString) {
       parenthesesDepth++;
       openParenthesesIndices.push(i);
     } else if (char === ")") {
+      // 1. set subJoinEnd on current subJoinData
+      // 2. update parentPairs on current sibling/parent
+      // 3. create a new joinStringDelimiterData with depth = parentDepth + 1
+      //      -> set subJoinData on current sibling/parent
+      //      -> set baseJoinsubJoinStart
+      //      -> 
+      
       parenthesesDepth--;
       currentParenthesesPairs[parenthesesDepth].close = i;
       

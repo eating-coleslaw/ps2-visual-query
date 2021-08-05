@@ -13,7 +13,7 @@ const joinSiblingDelimiterData = (siblingString = "") => {
         baseJoinEnd: null,
         subJoinStart: null,
         subJoinEnd: null,
-        subJoinData: joinStringDelimiterData(),
+        subJoinData: null, //joinStringDelimiterData(),
     };
 };
 
