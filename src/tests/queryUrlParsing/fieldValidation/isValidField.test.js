@@ -54,8 +54,10 @@ test("Two-word field: contains numbers", () =>
 // so make sure they don't pass
 test("Contains carrot (^)", () => expect(isValidField("name^")).toBe(false));
 
-test("Contains open bracket ([)", () => expect(isValidField("name[")).toBe(false));
+test("Contains open bracket ([)", () =>
+  expect(isValidField("name[")).toBe(false));
 
-test("Contains close bracket (])", () => expect(isValidField("name]")).toBe(false));
+test("Contains close bracket (])", () =>
+  expect(isValidField("name]")).toBe(false));
 
 test("Contains tick (`)", () => expect(isValidField("name`")).toBe(false));
