@@ -6,7 +6,7 @@ export default function parse(command, valueString) {
   if (!VALID_COMMANDS.includes(command)) {
     return null;
   }
-  
+
   if (!valueString) {
     return null;
   }
