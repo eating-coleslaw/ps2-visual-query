@@ -4,14 +4,17 @@ test("Invalid Command", () =>
   expect(parse("fields", "name,field2")).toBe(null));
 
 test("show: empty fields string", () => expect(parse("show", "")).toBe(null));
+
 test("hide: empty fields string", () => expect(parse("hide", "")).toBe(null));
 
 test("show: invalid fields", () =>
   expect(parse("show", "Invalid!Field")).toBe(null));
+
 test("hide: invalid fields", () =>
   expect(parse("hide", "Invalid!Field")).toBe(null));
 
 test("show: empty fields", () => expect(parse("show", ",")).toBe(null));
+
 test("hide: empty fields", () => expect(parse("hide", ",")).toBe(null));
 
 test("show: single field", () => {
