@@ -1,6 +1,6 @@
-import { isValidField } from '../fieldValidation';
-import QueryEnums from '../../QueryEnums';
-import QueryCondition from '../../QueryCondition';
+import { isValidField } from "../fieldValidation";
+import QueryEnums from "../../QueryEnums";
+import QueryCondition from "../../QueryCondition";
 
 const SEARCH_MODIFIERS = [
   "<",
@@ -13,24 +13,28 @@ const SEARCH_MODIFIERS = [
 ];
 
 const REGEX_MODIFIERS = [
-  "^", // Starts With 
+  "^", // Starts With
   "*", // Contains
 ];
 
-export default function parse(valueString, delimiter ="&", excludeRegex = false) {
-  if (!valueString) {
-      return null;
+export default function parse(
+  valueString,
+  delimiter = "&",
+  excludeRegex = false
+) {
+  if (!valueString || !delimiter) {
+    return null;
   }
 
   const conditions = [];
-  
+
   const splitConditions = valueString.split(delimiter);
 
   splitConditions.forEach((conditionString) => {
     const keyValuePair = conditionString.split("=");
     const key = keyValuePair[0];
     let value = keyValuePair[1];
-    
+
     if (!value) {
       return;
     }
@@ -46,17 +50,23 @@ export default function parse(valueString, delimiter ="&", excludeRegex = false)
       if (excludeRegex && REGEX_MODIFIERS.includes(firstValueChar)) {
         return;
       }
-      
+
       value = value.slice(1);
 
+      if (!value) {
+        return;
+      }
+
       const operatorValue = `=${firstValueChar}`;
-      operatorName =  QueryEnums.Operators.find((op) => op.value === operatorValue)?.name;
+      operatorName = QueryEnums.Operators.find(
+        (op) => op.value === operatorValue
+      )?.name;
     }
 
     const condition = QueryCondition(operatorName);
     condition.field = key;
     condition.value = value;
-    
+
     conditions.push(condition);
   });
 

@@ -1,172 +1,393 @@
 import parse from "../../../planetside/queryUrlParsing/parameters/conditions";
-import QueryCondition from "../../../planetside/QueryCondition";
 import QueryOperator from "../../../planetside/QueryOperator";
 
-test("Empty valueString parameter", () => expect(parse("")).toBe(null));
+describe("Invalid parameters", () => {
+  test("Returns null with empty valueString parameter", () =>
+    expect(parse("")).toBe(null));
 
-test("Single condition: equals", () => {
-  const input = "name=Chirtle";
-
-  expect(parse(input)).toHaveLength(1);
-  expect(parse(input)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("equals"),
-  }));
+  test("Returns null with empty delimiter", () => {
+    const input = "name=Chirtle";
+    expect(parse(input, "")).toBe(null);
+  });
 });
 
-test("Single condition: notEquals", () => {
-  const input = "name=!Chirtle";
+describe("Single condition", () => {
+  describe("Include RegEx operators", () => {
+    test("equals is included", () => {
+      const input = "name=Chirtle";
 
-  expect(parse(input)).toHaveLength(1);
-  expect(parse(input)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("notEquals"),
-  }));
+      const result = parse(input);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("equals"),
+        })
+      );
+    });
+
+    test("notEquals is included", () => {
+      const input = "name=!Chirtle";
+
+      const result = parse(input);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("notEquals"),
+        })
+      );
+    });
+
+    test("isLessThan is included", () => {
+      const input = "name=<Chirtle";
+
+      const result = parse(input);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("isLessThan"),
+        })
+      );
+    });
+
+    test("isLessThanOrEquals is included", () => {
+      const input = "name=[Chirtle";
+
+      const result = parse(input);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("isLessThanOrEquals"),
+        })
+      );
+    });
+
+    test("isGreaterThan is included", () => {
+      const input = "name=>Chirtle";
+
+      const result = parse(input);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("isGreaterThan"),
+        })
+      );
+    });
+
+    test("isGreaterThanOrEquals is included", () => {
+      const input = "name=]Chirtle";
+
+      const result = parse(input);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("isGreaterThanOrEquals"),
+        })
+      );
+    });
+
+    test("startsWith is included", () => {
+      const input = "name=^Chirtle";
+
+      const result = parse(input);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("startsWith"),
+        })
+      );
+    });
+
+    test("contains is included", () => {
+      const input = "name=*Chirtle";
+
+      const result = parse(input);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("contains"),
+        })
+      );
+    });
+  });
+
+  describe("Exclude RegEx operators", () => {
+    test("equals is included", () => {
+      const input = "name=Chirtle";
+
+      const result = parse(input, "&", true);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("equals"),
+        })
+      );
+    });
+
+    test("notEquals is included", () => {
+      const input = "name=!Chirtle";
+
+      const result = parse(input, "&", true);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("notEquals"),
+        })
+      );
+    });
+
+    test("isLessThan is included", () => {
+      const input = "name=<Chirtle";
+
+      const result = parse(input, "&", true);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("isLessThan"),
+        })
+      );
+    });
+
+    test("isLessThanOrEquals is included", () => {
+      const input = "name=[Chirtle";
+
+      const result = parse(input, "&", true);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("isLessThanOrEquals"),
+        })
+      );
+    });
+
+    test("isGreaterThan is included", () => {
+      const input = "name=>Chirtle";
+
+      const result = parse(input, "&", true);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("isGreaterThan"),
+        })
+      );
+    });
+
+    test("isGreaterThanOrEquals is included", () => {
+      const input = "name=]Chirtle";
+
+      const result = parse(input, "&", true);
+
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("isGreaterThanOrEquals"),
+        })
+      );
+    });
+
+    test("startsWith is excluded", () => {
+      const input = "name=^Chirtle";
+
+      expect(parse(input, "&", true)).toBe(null);
+    });
+
+    test("contains is excluded", () => {
+      const input = "name=*Chirtle";
+
+      expect(parse(input, "&", true)).toBe(null);
+    });
+  });
 });
 
-test("Single condition: isLessThan", () => {
-  const input = "name=<Chirtle";
+describe("Multiple conditions", () => {
+  describe("& delimiter", () => {
+    test("Works and includes RegEx conditions", () => {
+      const input = "name=*Chirtle&battle_rank=>30&world_id=13&title=^Recruit";
 
-  expect(parse(input)).toHaveLength(1);
-  expect(parse(input)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("isLessThan"),
-  }));
-});
+      const result = parse(input);
 
-test("Single condition: isLessThanOrEquals", () => {
-  const input = "name=[Chirtle";
+      expect(result).toHaveLength(4);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("contains"),
+        })
+      );
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "battle_rank",
+          value: "30",
+          operator: QueryOperator("isGreaterThan"),
+        })
+      );
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "world_id",
+          value: "13",
+          operator: QueryOperator("equals"),
+        })
+      );
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "title",
+          value: "Recruit",
+          operator: QueryOperator("startsWith"),
+        })
+      );
+    });
 
-  expect(parse(input)).toHaveLength(1);
-  expect(parse(input)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("isLessThanOrEquals"),
-  }));
-});
+    test("Excludes condition with no value", () => {
+      const input = "name=Chirtle&battle_rank=>";
 
-test("Single condition: isGreaterThan", () => {
-  const input = "name=>Chirtle";
+      const result = parse(input);
 
-  expect(parse(input)).toHaveLength(1);
-  expect(parse(input)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("isGreaterThan"),
-  }));
-});
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("equals"),
+        })
+      );
+    });
 
-test("Single condition: isGreaterThanOrEquals", () => {
-  const input = "name=]Chirtle";
+    test("Excludes RegEx operators correctly", () => {
+      const input = "name=*Chirtle&battle_rank=]10&world_id=13&title=^Recruit";
 
-  expect(parse(input)).toHaveLength(1);
-  expect(parse(input)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("isGreaterThanOrEquals"),
-  }));
-});
+      const result = parse(input, "&", true);
 
-test("Single condition: startsWith", () => {
-  const input = "name=^Chirtle";
+      expect(result).toHaveLength(2);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "battle_rank",
+          value: "10",
+          operator: QueryOperator("isGreaterThanOrEquals"),
+        })
+      );
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "world_id",
+          value: "13",
+          operator: QueryOperator("equals"),
+        })
+      );
+    });
 
-  expect(parse(input)).toHaveLength(1);
-  expect(parse(input)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("startsWith"),
-  }));
-});
+    test("Exclude conditions with invalid field", () => {
+      const input = "name=Chirtle&Invalid!Field=25";
 
-test("Single condition: contains", () => {
-  const input = "name=*Chirtle";
+      const result = parse(input);
 
-  expect(parse(input)).toHaveLength(1);
-  expect(parse(input)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("contains"),
-  }));
-});
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("equals"),
+        })
+      );
+    });
+  });
 
+  describe("' delimiter", () => {
+    test("Works for valid conditions", () => {
+      const input = "name=Chirtle'battle_rank=>30";
 
-test("Single condition - exclude RegEx: equals", () => {
-  const input = "name=Chirtle";
+      const result = parse(input, "'");
 
-  expect(parse(input, "&", true)).toHaveLength(1);
-  expect(parse(input, "&", true)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("equals"),
-  }));
-});
+      expect(result).toHaveLength(2);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("equals"),
+        })
+      );
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "battle_rank",
+          value: "30",
+          operator: QueryOperator("isGreaterThan"),
+        })
+      );
+    });
 
-test("Single condition - exclude RegEx: notEquals", () => {
-  const input = "name=!Chirtle";
+    test("Excludes condition with no value", () => {
+      const input = "name=Chirtle'battle_rank=>";
 
-  expect(parse(input, "&", true)).toHaveLength(1);
-  expect(parse(input, "&", true)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("notEquals"),
-  }));
-});
+      const result = parse(input, "'");
 
-test("Single condition - exclude RegEx: isLessThan", () => {
-  const input = "name=<Chirtle";
+      expect(result).toHaveLength(1);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "name",
+          value: "Chirtle",
+          operator: QueryOperator("equals"),
+        })
+      );
+    });
 
-  expect(parse(input, "&", true)).toHaveLength(1);
-  expect(parse(input, "&", true)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("isLessThan"),
-  }));
-});
+    test("Excludes RegEx operators correctly", () => {
+      const input = "name=*Chirtle'battle_rank=]30'world_id=13'title=^Recruit";
 
-test("Single condition - exclude RegEx: isLessThanOrEquals", () => {
-  const input = "name=[Chirtle";
+      const result = parse(input, "'", true);
 
-  expect(parse(input, "&", true)).toHaveLength(1);
-  expect(parse(input, "&", true)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("isLessThanOrEquals"),
-  }));
-});
-
-test("Single condition - exclude RegEx: isGreaterThan", () => {
-  const input = "name=>Chirtle";
-
-  expect(parse(input, "&", true)).toHaveLength(1);
-  expect(parse(input, "&", true)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("isGreaterThan"),
-  }));
-});
-
-test("Single condition - exclude RegEx: isGreaterThanOrEquals", () => {
-  const input = "name=]Chirtle";
-
-  expect(parse(input, "&", true)).toHaveLength(1);
-  expect(parse(input, "&", true)).toContainEqual(expect.objectContaining({
-    field: "name",
-    value: "Chirtle",
-    operator: QueryOperator("isGreaterThanOrEquals"),
-  }));
-});
-
-test("Single condition - exclude RegEx: startsWith", () => {
-  const input = "name=^Chirtle";
-
-  expect(parse(input, "&", true)).toBe(null);
-});
-
-test("Single condition - exclude RegEx: contains", () => {
-  const input = "name=*Chirtle";
-
-  expect(parse(input, "&", true)).toBe(null);
+      expect(result).toHaveLength(2);
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "battle_rank",
+          value: "30",
+          operator: QueryOperator("isGreaterThanOrEquals"),
+        })
+      );
+      expect(result).toContainEqual(
+        expect.objectContaining({
+          field: "world_id",
+          value: "13",
+          operator: QueryOperator("equals"),
+        })
+      );
+    });
+  });
 });
