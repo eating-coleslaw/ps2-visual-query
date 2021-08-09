@@ -167,25 +167,28 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         break;
 
       case "on":
-        if (!seenKeys.includes(key)) {
+        if (!seenKeys.includes(key) && !!value) {
           joinModel.onField = value;
+          seenKeys.push(key);
         }
         break;
 
       case "to":
-        if (!seenKeys.includes(key)) {
+        if (!seenKeys.includes(key) && !!value) {
           joinModel.toField = value;
+          seenKeys.push(key);
         }
         break;
 
       case "list":
-        if (!seenKeys.includes(key)) {
+        if (!seenKeys.includes(key) && ["0", "1", "false", "true"].includes(value)) {
           joinModel.isList = value === "1" || value === "true";
+          seenKeys.push(key);
         }
         break;
 
       case "show":
-        if (!seenKeys.includes(key) || !seenKeys.includes("hide")) {
+        if (!seenKeys.includes(key) && !seenKeys.includes("hide")) {
           const values = value.split("'");
 
           let fields = filterValidFields(values);
@@ -193,12 +196,14 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
           if (fields.length > 0) {
             joinModel.filterType = key;
             joinModel.filterFields = fields;
+
+            seenKeys.push(key);
           }
         }
         break;
 
       case "hide":
-        if (!seenKeys.includes(key) || !seenKeys.includes("show")) {
+        if (!seenKeys.includes(key) && !seenKeys.includes("show")) {
           const values = value.split("'");
 
           let fields = filterValidFields(values);
@@ -206,6 +211,8 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
           if (fields.length > 0) {
             joinModel.filterType = key;
             joinModel.filterFields = fields;
+          
+            seenKeys.push(key);
           }
         }
         break;
