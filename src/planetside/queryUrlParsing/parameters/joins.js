@@ -230,8 +230,9 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         break;
 
       case "outer":
-        if (!seenKeys.includes(key)) {
+        if (!seenKeys.includes(key) && ["0", "1", "false", "true"].includes(value)) {
           joinModel.isOuterJoin = value === "1" || value === "true";
+          seenKeys.push(key);
         }
         break;
 
