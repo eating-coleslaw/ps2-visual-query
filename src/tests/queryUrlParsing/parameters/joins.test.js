@@ -1032,3 +1032,10 @@ test("Ignore joins if missing closing parentheses: a(b(c)", () => {
 
   expect(result).toBe(null);
 });
+
+test("Ignore joins if missing opening parentheses: ab(c))", () => {
+  const input = "itemitem_category_id(weapon))";
+  const result = () => parse(input);
+
+  expect(result).toThrow();
+});

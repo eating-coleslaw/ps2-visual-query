@@ -62,6 +62,12 @@ export default function parse(valueString, parentJoinId = null) {
       parenthesesDepth++;
     } else if (char === ")") {
       parenthesesDepth--;
+      if (!currentParenthesesPairs[parenthesesDepth]) {
+        throw new Error(
+          "Found closing parentheses missing opening parentheses"
+        );
+      }
+
       currentParenthesesPairs[parenthesesDepth].close = i;
 
       if (parenthesesDepth === 0) {
