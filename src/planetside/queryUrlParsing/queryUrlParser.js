@@ -1,22 +1,14 @@
-import QueryConfig from '../QueryConfig';
-import QueryCondition from '../QueryCondition';
-import QueryJoin from '../QueryJoin';
-import QueryTree from '../QueryTree';
-import QueryEnums from '../QueryEnums';
+import QueryConfig from "../QueryConfig";
+import QueryCondition from "../QueryCondition";
+import QueryJoin from "../QueryJoin";
+import QueryTree from "../QueryTree";
+import QueryEnums from "../QueryEnums";
 
 const NAMESPACE = "ps2:v2";
 
 const FIELD_REGEX = /^[A-z0-9]+(\.[A-z0-9]+)?$/;
 
-const COMMANDS = [
-  "hide",
-  "show",
-  "resolve",
-  "limit",
-  "lang",
-  "join",
-  "tree",
-];
+const COMMANDS = ["hide", "show", "resolve", "limit", "lang", "join", "tree"];
 
 const UNSUPPORTED_COMMANDS = [
   "case",
@@ -33,34 +25,36 @@ const UNSUPPORTED_COMMANDS = [
 
 export function test() {
   console.log("=============== Test 1 ===============");
-  const testUrl = "https://census.daybreakgames.com/s:example/get/ps2:v2/character/?name.first=Chirtle&name.first_lower=*chir&c:hide=times,certs,daily_ribbon&c:resolve=outfit_member&c:join=characters_item^list:true^outer:false^hide:character_id^terms:item_type_id=26^inject_at:Items(item^list:true^outer:false^hide:item_id^inject_at:Details(item_type^list:true^outer:false^inject_at:Type)characters_weapon_stat_by_faction^list:true^outer:true^inject_at:Stats)&c:lang=en&c:tree=field:Items^isList:false^start:item_id&c:limit=10";
-  
+  const testUrl =
+    "https://census.daybreakgames.com/s:example/get/ps2:v2/character/?name.first=Chirtle&name.first_lower=*chir&c:hide=times,certs,daily_ribbon&c:resolve=outfit_member&c:join=characters_item^list:true^outer:false^hide:character_id^terms:item_type_id=26^inject_at:Items(item^list:true^outer:false^hide:item_id^inject_at:Details(item_type^list:true^outer:false^inject_at:Type)characters_weapon_stat_by_faction^list:true^outer:true^inject_at:Stats)&c:lang=en&c:tree=field:Items^isList:false^start:item_id&c:limit=10";
+
   const queryModel = parseQueryUrl(testUrl);
-  
+
   console.log("Test 1:", queryModel);
-  
+
   console.log("=============== Join Test 1 ===============");
-  const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^terms:repeatable=0'objective_group_id=!10014^inject_at:Details)";
+  const joinTestUrl =
+    "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^terms:repeatable=0'objective_group_id=!10014^inject_at:Details)";
   // const joinTestUrl = "http://census.daybreakgames.com/get/ps2/character?c:join=a(b,c(d)),e(f),i,g(h)";
 
   const joinTestQueryModel = parseQueryUrl(joinTestUrl);
 
   console.log("Join Test:", joinTestQueryModel);
-  
+
   console.log("=============== Join Test 2 ===============");
-  const joinTestUrl2 = "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^inject_at:Details)";
+  const joinTestUrl2 =
+    "http://census.daybreakgames.com/get/ps2/character?name.first_lower=auroram&c:show=name.first,character_id&c:join=characters_item^list:true^outer:true^show:item_id^inject_at:items(item^list:false^outer:false^show:item_id'name.en^inject_at:item_data,item_to_weapon^outer:false^terms:weapon_id=!0^on:item_id^to:item_id^inject_at:weapon),outfit_member_extended^outer:false^inject_at:outfit_membership(outfit^outer:false),characters_achievement^list:true^outer:false^inject_at:Achievements(achievement^outer:false^inject_at:Details)";
 
   const joinTestQueryModel2 = parseQueryUrl(joinTestUrl2);
 
   console.log("Join Test 2:", joinTestQueryModel2);
 }
 
-
 export default function parseQueryUrl(url) {
   if (!url) {
     throw new Error("Query URL is required");
   }
-  
+
   const unescapedUrl = unescape(url);
 
   const splitAtQueryPieces = unescapedUrl.split("?");
@@ -81,12 +75,12 @@ export default function parseQueryUrl(url) {
 
   queryParameters.forEach((parameter) => {
     const commandValuePair = parseQueryParameterString(parameter);
-    
+
     if (commandValuePair === null && queryParameters.indexOf(parameter) === 0) {
       const conditions = parseConditionsParameter(parameter, false);
-      
+
       queryModel.conditions = conditions;
-      
+
       return;
     }
 
@@ -111,19 +105,18 @@ export default function parseQueryUrl(url) {
   return queryModel;
 }
 
-
 function extractCollection(preQueryString) {
   const pieces = preQueryString.split("/");
   const lastIndex = pieces.length - 1;
 
   const lastPiece = pieces[lastIndex];
-  
+
   let collection = "";
 
   // If the collection is specified like .../ps2:v2/<collection>?...
   if (lastPiece !== "") {
     collection = lastPiece.toLowerCase();
-  // If the collection is specified like .../ps2:v2/<collection>/?...
+    // If the collection is specified like .../ps2:v2/<collection>/?...
   } else if (lastIndex > 0) {
     collection = pieces[lastIndex - 1];
   }
@@ -135,7 +128,9 @@ function extractCollection(preQueryString) {
   if (QueryEnums.Collections.includes(collection)) {
     return collection;
   } else {
-    throw new Error(`Collection value '${collection}' specified in the query URL is not a valid collection.`);
+    throw new Error(
+      `Collection value '${collection}' specified in the query URL is not a valid collection.`
+    );
   }
 }
 
@@ -143,7 +138,7 @@ function getQueryParametersArray(queryString) {
   if (queryString.charAt(0) === "c" && queryString.charAt(1) === ":") {
     queryString = `&${queryString}`;
   }
-  
+
   let splitAtMod = queryString.split("&c:");
 
   if (splitAtMod.length <= 1) {
@@ -151,19 +146,19 @@ function getQueryParametersArray(queryString) {
   } else if (splitAtMod[1] === "") {
     return null;
   } else {
-    return splitAtMod; 
+    return splitAtMod;
   }
 }
 
 function parseQueryParameterString(parameter) {
   let commandValueSplit = [];
-  
+
   if (parameter.startsWith("join=")) {
     commandValueSplit = ["join", parameter.slice(5)];
   } else {
     commandValueSplit = parameter.split("=");
   }
-  
+
   const [command, value] = commandValueSplit;
 
   if (commandValueSplit.length !== 2) {
@@ -216,7 +211,7 @@ function parseQueryParameter(queryModel, command, value) {
     case "tree":
       success = parseTreeParameter(queryModel, value);
       break;
-    
+
     case "join":
       const joins = parseJoinParameter(value);
       queryModel.joins = joins;
@@ -229,7 +224,6 @@ function parseQueryParameter(queryModel, command, value) {
 
   return success;
 }
-
 
 function parseShowHideParameter(queryModel, command, valueString) {
   const values = valueString.split(",");
@@ -256,7 +250,7 @@ function parseResolveParameter(queryModel, valueString) {
   if (values.length === 0) {
     return false;
   }
-  
+
   let resolves = [];
 
   values.forEach((value) => {
@@ -310,7 +304,7 @@ function parseLangParameter(queryModel, valueString) {
 */
 
 const TREE_KEYS = [
-  "field", 
+  "field",
   "list", // bit => boolean
   "prefix",
   "start",
@@ -352,22 +346,22 @@ function parseTreeParameter(queryModel, valueString) {
 
       case "list":
         if (+value === 0) {
-          tree.isList = false; 
+          tree.isList = false;
         } else if (+value === 1) {
           tree.isList = true;
         }
         break;
-      
+
       case "prefix":
         tree.groupPrefix = value;
         break;
-      
+
       case "start":
         if (isValidField(value)) {
           tree.startField = value;
         }
         break;
-      
+
       default:
         return;
     }
@@ -378,7 +372,7 @@ function parseTreeParameter(queryModel, valueString) {
   }
 
   queryModel.tree = tree;
-  
+
   return true;
 }
 
@@ -397,21 +391,24 @@ const SEARCH_MODIFIERS = [
 ];
 
 const REGEX_MODIFIERS = [
-  "^", // Starts With 
+  "^", // Starts With
   "*", // Contains
 ];
 
-
-function parseConditionsParameter(valueString, delimiter ="&", excludeRegex = false) {
+function parseConditionsParameter(
+  valueString,
+  delimiter = "&",
+  excludeRegex = false
+) {
   const conditions = [];
-  
+
   const splitConditions = valueString.split(delimiter);
 
   splitConditions.forEach((conditionString) => {
     const keyValuePair = conditionString.split("=");
     const key = keyValuePair[0];
     let value = keyValuePair[1];
-    
+
     if (!value) {
       return;
     }
@@ -427,23 +424,24 @@ function parseConditionsParameter(valueString, delimiter ="&", excludeRegex = fa
       if (excludeRegex && REGEX_MODIFIERS.includes(firstValueChar)) {
         return;
       }
-      
+
       value = value.slice(1);
 
       const operatorValue = `=${firstValueChar}`;
-      operatorName =  QueryEnums.Operators.find((op) => op.value === operatorValue)?.name;
+      operatorName = QueryEnums.Operators.find(
+        (op) => op.value === operatorValue
+      )?.name;
     }
 
     const condition = QueryCondition(operatorName);
     condition.field = key;
     condition.value = value;
-    
+
     conditions.push(condition);
   });
 
   return conditions;
 }
-
 
 /* ========
     JOINS
@@ -500,12 +498,12 @@ function parseJoinParameter(valueString) {
         open: i,
         close: null,
       };
-      
+
       parenthesesDepth++;
     } else if (char === ")") {
       parenthesesDepth--;
       currentParenthesesPairs[parenthesesDepth].close = i;
-      
+
       if (parenthesesDepth === 0) {
         allParenthesesPairs[currentSiblingIndex] = currentParenthesesPairs;
 
@@ -513,11 +511,11 @@ function parseJoinParameter(valueString) {
       }
     } else if (char === ",") {
       currentSiblingSplitIndices.push(i);
-      
+
       if (parenthesesDepth === 0) {
         const parentJoin = valueString.slice(prevSplitIndex + 1, i);
         parentJoins[currentSiblingIndex] = parentJoin;
-        
+
         currentSiblingIndex++;
         parentSplitIndices[currentSiblingIndex] = i;
 
@@ -545,7 +543,7 @@ function parseJoinParameter(valueString) {
       parenthesesPairs = allParenthesesPairs[index];
     }
 
-    let baseJoinString = joinString;    
+    let baseJoinString = joinString;
     let subJoinString = "";
 
     if (!!parenthesesPairs && !!parenthesesPairs[0]) {
@@ -568,7 +566,7 @@ function parseJoinParameter(valueString) {
 
     if (subJoinString !== "") {
       const subJoinModels = parseJoinParameter(subJoinString);
-  
+
       if (!!subJoinModels) {
         baseJoinModel.joins = subJoinModels;
       }
@@ -582,7 +580,7 @@ function parseJoinParameter(valueString) {
 
 function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
   let joinModel = QueryJoin(parentJoinId);
-  
+
   const splitKeys = baseJoinString.split("^");
 
   const seenKeys = [];
@@ -591,7 +589,11 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
     const keyValuePair = keyString.split(":");
     const [key, value] = keyValuePair;
 
-    if (!JOIN_KEYS.includes(key) && splitKeys.indexOf(keyString) === 0 && QueryEnums.Collections.includes(key)) {
+    if (
+      !JOIN_KEYS.includes(key) &&
+      splitKeys.indexOf(keyString) === 0 &&
+      QueryEnums.Collections.includes(key)
+    ) {
       joinModel.collection = key;
       seenKeys.push("type");
       return;
@@ -618,16 +620,17 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
 
       case "list":
         if (!seenKeys.includes(key)) {
-          joinModel.isList = (value === 1 || value === "true");
+          joinModel.isList = value === 1 || value === "true";
         }
         break;
 
+      // TODO: concat values across multiple commands
       case "show":
         if (!seenKeys.includes(key) || !seenKeys.includes("hide")) {
           const values = value.split("'");
-          
+
           let fields = filterValidFields(values);
-          
+
           if (fields.length > 0) {
             joinModel.filterType = key;
             joinModel.filterFields = fields;
@@ -635,12 +638,13 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         }
         break;
 
+      // TODO: concat values across multiple commands
       case "hide":
         if (!seenKeys.includes(key) || !seenKeys.includes("show")) {
           const values = value.split("'");
-          
+
           let fields = filterValidFields(values);
-          
+
           if (fields.length > 0) {
             joinModel.filterType = key;
             joinModel.filterFields = fields;
@@ -662,10 +666,10 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
 
       case "outer":
         if (!seenKeys.includes(key)) {
-          joinModel.isOuterJoin = (value === 1 || value === "true");
+          joinModel.isOuterJoin = value === 1 || value === "true";
         }
         break;
-        
+
       default:
         return;
     }
@@ -680,12 +684,12 @@ function filterValidFields(initFields) {
   initFields.forEach((value) => {
     if (isValidField(value) && !fields.includes(value)) {
       fields.push(value);
-    };
+    }
   });
 
   return fields;
 }
 
 function isValidField(field) {
- return  FIELD_REGEX.test(field);
+  return FIELD_REGEX.test(field);
 }
