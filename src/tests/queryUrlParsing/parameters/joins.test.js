@@ -2,7 +2,7 @@ import parse from "../../../planetside/queryUrlParsing/parameters/joins";
 import QueryJoin from "../../../planetside/QueryJoin";
 import QueryOperator from "../../../planetside/QueryOperator";
 
-describe("Simple join string [parseSimpleJoinString()]", () => {
+describe("Simple join string - parseSimpleJoinString()", () => {
   describe("Basic join keys set correctly", () => {
     describe("'type' & implicit join collection", () => {
       describe("Explicit join collection works as expected", () => {
@@ -504,6 +504,449 @@ describe("Simple join string [parseSimpleJoinString()]", () => {
           })
         );
       });
+    });
+  });
+});
+
+describe("Sibling joins with no children", () => {
+  describe("Multiple valid joins", () => {
+    const input = "character,item,characters_item";
+    const result = parse(input);
+
+    test("Has correct length", () => expect(result).toHaveLength(3));
+
+    test("Has correct joins", () => {
+      expect(result[0]).toEqual(
+        expect.objectContaining({
+          parentId: null,
+          collection: "character",
+        })
+      );
+
+      expect(result[1]).toEqual(
+        expect.objectContaining({
+          parentId: null,
+          collection: "item",
+        })
+      );
+
+      expect(result[2]).toEqual(
+        expect.objectContaining({
+          parentId: null,
+          collection: "characters_item",
+        })
+      );
+    });
+  });
+
+  describe("Mixed valid & invalid joins", () => {
+    const input = "character,birthday_presents,characters_item";
+    const result = parse(input);
+
+    test("Has correct length", () => expect(result).toHaveLength(2));
+
+    test("Has correct joins", () => {
+      expect(result[0]).toEqual(
+        expect.objectContaining({
+          parentId: null,
+          collection: "character",
+        })
+      );
+
+      expect(result[1]).toEqual(
+        expect.objectContaining({
+          parentId: null,
+          collection: "characters_item",
+        })
+      );
+    });
+  });
+
+  describe("Multiple valid joins with various keys", () => {
+    const input =
+      "character^terms:name.first=Chirtle^hide:times'certs'daily_ribbon,item^on:item_id^to:weapon_id,characters_item^list:1^outer:0";
+    const result = parse(input);
+
+    test("Has correct length", () => expect(result).toHaveLength(3));
+
+    describe("First join", () => {
+      const join = result[0];
+
+      test("Has correct collection & ID", () => {
+        expect(join).toEqual(
+          expect.objectContaining({
+            parentId: null,
+            collection: "character",
+          })
+        );
+      });
+
+      test("Key values are correct", () => {
+        expect(join.filterType).toBe("hide");
+        expect(join.filterFields).toEqual(["times", "certs", "daily_ribbon"]);
+
+        expect(join.terms).toHaveLength(1);
+        expect(join.terms[0]).toEqual(
+          expect.objectContaining({
+            field: "name.first",
+            value: "Chirtle",
+            operator: QueryOperator("equals"),
+          })
+        );
+      });
+    });
+
+    describe("Second join", () => {
+      const join = result[1];
+
+      test("Has correct collection & ID", () => {
+        expect(join).toEqual(
+          expect.objectContaining({
+            parentId: null,
+            collection: "item",
+          })
+        );
+      });
+
+      test("Key values are correct", () => {
+        expect(join.onField).toBe("item_id");
+        expect(join.toField).toBe("weapon_id");
+      });
+    });
+
+    describe("Third join", () => {
+      const join = result[2];
+
+      test("Has correct collection & ID", () => {
+        expect(join).toEqual(
+          expect.objectContaining({
+            parentId: null,
+            collection: "characters_item",
+          })
+        );
+      });
+
+      test("Key values are correct", () => {
+        expect(join.isList).toBe(true);
+        expect(join.isOuterJoin).toBe(false);
+      });
+    });
+  });
+});
+
+describe("Parent join with single child: a(b)", () => {
+  describe("Parent join has no keys", () => {
+    describe("Child had no keys", () => {
+      const input = "characters_item(item)";
+      const result = parse(input);
+
+      const parentJoin = result[0];
+
+      test("Parent join set correctly", () => {
+        expect(parentJoin).toEqual(
+          expect.objectContaining({
+            parentId: null,
+            collection: "characters_item",
+          })
+        );
+
+        expect(parentJoin.joins).toHaveLength(1);
+        expect(parentJoin.joins[0]).toEqual(
+          expect.objectContaining({
+            parentId: parentJoin.id,
+            collection: "item",
+          })
+        );
+      });
+    });
+
+    describe("Child has key values", () => {
+      const input =
+        "characters_item(type:item^terms:item_type_id=26^list:1^hide:item_id'item_type_id)";
+      const result = parse(input);
+
+      const parentJoin = result[0];
+
+      test("Parent join set correctly", () => {
+        expect(parentJoin).toEqual(
+          expect.objectContaining({
+            parentId: null,
+            collection: "characters_item",
+          })
+        );
+
+        expect(parentJoin.joins).toHaveLength(1);
+        expect(parentJoin.joins[0]).toEqual(
+          expect.objectContaining({
+            parentId: parentJoin.id,
+            collection: "item",
+            isList: true,
+            filterType: "hide",
+            filterFields: ["item_id", "item_type_id"],
+          })
+        );
+
+        expect(parentJoin.joins[0].terms).toHaveLength(1);
+        expect(parentJoin.joins[0].terms[0]).toEqual(
+          expect.objectContaining({
+            field: "item_type_id",
+            value: "26",
+            operator: QueryOperator("equals"),
+          })
+        );
+      });
+    });
+  });
+
+  describe("Parent join has key values", () => {
+    describe("Child had no keys", () => {
+      const input = "characters_item^on:character_id^to:character_id(item)";
+      const result = parse(input);
+
+      const parentJoin = result[0];
+
+      test("Parent join set correctly", () => {
+        expect(parentJoin).toEqual(
+          expect.objectContaining({
+            parentId: null,
+            collection: "characters_item",
+            onField: "character_id",
+            toField: "character_id",
+          })
+        );
+
+        expect(parentJoin.joins).toHaveLength(1);
+        expect(parentJoin.joins[0]).toEqual(
+          expect.objectContaining({
+            parentId: parentJoin.id,
+            collection: "item",
+          })
+        );
+      });
+    });
+
+    describe("Child has key values", () => {
+      const input =
+        "characters_item^on:character_id^to:character_id(type:item^terms:item_type_id=26^list:1^hide:item_id'item_type_id)";
+      const result = parse(input);
+
+      const parentJoin = result[0];
+
+      test("Parent join set correctly", () => {
+        expect(parentJoin).toEqual(
+          expect.objectContaining({
+            collection: "characters_item",
+            onField: "character_id",
+            toField: "character_id",
+          })
+        );
+
+        expect(parentJoin.joins).toHaveLength(1);
+        expect(parentJoin.joins[0]).toEqual(
+          expect.objectContaining({
+            parentId: parentJoin.id,
+            collection: "item",
+            isList: true,
+            filterType: "hide",
+            filterFields: ["item_id", "item_type_id"],
+          })
+        );
+
+        expect(parentJoin.joins[0].terms).toHaveLength(1);
+        expect(parentJoin.joins[0].terms[0]).toEqual(
+          expect.objectContaining({
+            field: "item_type_id",
+            value: "26",
+            operator: QueryOperator("equals"),
+          })
+        );
+      });
+    });
+  });
+});
+
+describe("Parent join with sibling children: a(b,c)", () => {
+  const input = "characters_item(item,item_to_weapon)";
+  const result = parse(input);
+
+  const parentJoin = result[0];
+
+  test("Parent join is correct", () => {
+    expect(parentJoin).toEqual(
+      expect.objectContaining({
+        parentId: null,
+        collection: "characters_item",
+      })
+    );
+    expect(parentJoin.joins).toHaveLength(2);
+  });
+
+  describe("Children joins are correct", () => {
+    test("First child", () => {
+      expect(parentJoin.joins[0]).toEqual(
+        expect.objectContaining({
+          parentId: parentJoin.id,
+          collection: "item",
+        })
+      );
+    });
+
+    test("Second child", () => {
+      expect(parentJoin.joins[1]).toEqual(
+        expect.objectContaining({
+          parentId: parentJoin.id,
+          collection: "item_to_weapon",
+        })
+      );
+    });
+  });
+});
+
+describe("Sibling joins each with sibling children: a(b,c),d(e,f,g)", () => {
+  const input =
+    "characters_item(item,item_to_weapon),characters_directive(directive,directive_tree,directive_tier)";
+  const result = parse(input);
+
+  describe("First parent & children", () => {
+    const parentJoin = result[0];
+
+    test("Parent join is correct", () => {
+      expect(parentJoin).toEqual(
+        expect.objectContaining({
+          parentId: null,
+          collection: "characters_item",
+        })
+      );
+
+      expect(parentJoin.joins).toHaveLength(2);
+    });
+
+    describe("Children joins are correct", () => {
+      test("First child", () => {
+        expect(parentJoin.joins[0]).toEqual(
+          expect.objectContaining({
+            parentId: parentJoin.id,
+            collection: "item",
+          })
+        );
+      });
+
+      test("Second child", () => {
+        expect(parentJoin.joins[1]).toEqual(
+          expect.objectContaining({
+            parentId: parentJoin.id,
+            collection: "item_to_weapon",
+          })
+        );
+      });
+    });
+  });
+
+  describe("Second parent & children", () => {
+    const parentJoin = result[1];
+
+    test("Parent join is correct", () => {
+      expect(parentJoin).toEqual(
+        expect.objectContaining({
+          parentId: null,
+          collection: "characters_directive",
+        })
+      );
+
+      expect(parentJoin.joins).toHaveLength(3);
+    });
+
+    describe("Children joins are correct", () => {
+      test("First child", () => {
+        expect(parentJoin.joins[0]).toEqual(
+          expect.objectContaining({
+            parentId: parentJoin.id,
+            collection: "directive",
+          })
+        );
+      });
+
+      test("Second child", () => {
+        expect(parentJoin.joins[1]).toEqual(
+          expect.objectContaining({
+            parentId: parentJoin.id,
+            collection: "directive_tree",
+          })
+        );
+      });
+
+      test("Third child", () => {
+        expect(parentJoin.joins[2]).toEqual(
+          expect.objectContaining({
+            parentId: parentJoin.id,
+            collection: "directive_tier",
+          })
+        );
+      });
+    });
+  });
+});
+
+describe("Parent join with multi-nested children: a(b(c(d,e)))", () => {
+  const input =
+    "item_to_weapon(weapon(weapon_to_fire_group(fire_group_to_fire_mode,projectile)))";
+  const result = parse(input);
+
+  const parentJoin = result[0];
+  test("Parent join is correct", () => {
+    expect(parentJoin).toEqual(
+      expect.objectContaining({
+        parentId: null,
+        collection: "item_to_weapon",
+      })
+    );
+
+    expect(parentJoin.joins).toHaveLength(1);
+  });
+
+  const depth1Join = parentJoin.joins[0];
+  test("Depth 1 child", () => {
+    expect(depth1Join).toEqual(
+      expect.objectContaining({
+        parentId: result[0].id,
+        collection: "weapon",
+      })
+    );
+
+    expect(depth1Join.joins).toHaveLength(1);
+  });
+
+  const depth2Join = depth1Join.joins[0];
+  test("Depth 2 child", () => {
+    expect(depth2Join).toEqual(
+      expect.objectContaining({
+        parentId: depth1Join.id,
+        collection: "weapon_to_fire_group",
+      })
+    );
+  });
+
+  describe("Depth 3 children", () => {
+    test("First child", () => {
+      const join = depth2Join.joins[0];
+
+      expect(join).toEqual(
+        expect.objectContaining({
+          parentId: depth2Join.id,
+          collection: "fire_group_to_fire_mode",
+        })
+      );
+    });
+
+    test("Second child", () => {
+      const join = depth2Join.joins[1];
+
+      expect(join).toEqual(
+        expect.objectContaining({
+          parentId: depth2Join.id,
+          collection: "projectile",
+        })
+      );
     });
   });
 });
