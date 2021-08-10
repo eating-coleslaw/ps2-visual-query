@@ -25,14 +25,14 @@ describe("Simple join string - parseSimpleJoinString()", () => {
             const input = "type:";
             const result = parse(input);
 
-            expect(result).toEqual([]);
+            expect(result).toEqual(null);
           });
 
           test("Non-collection value", () => {
             const input = "type:";
             const result = parse(input);
 
-            expect(result).toEqual([]);
+            expect(result).toEqual(null);
           });
         });
 
@@ -73,14 +73,14 @@ describe("Simple join string - parseSimpleJoinString()", () => {
             const input = "^inject_at:presents";
             const result = parse(input);
 
-            expect(result).toEqual([]);
+            expect(result).toEqual(null);
           });
 
           test("Non-collection value", () => {
             const input = "birthday_presents^inject_at:presents";
             const result = parse(input);
 
-            expect(result).toEqual([]);
+            expect(result).toEqual(null);
           });
         });
       });
@@ -951,19 +951,84 @@ describe("Parent join with multi-nested children: a(b(c(d,e)))", () => {
   });
 });
 
-// test("Simple join works as expected - explicit join collection", () => {
-//   const input = "item^list:1^outer:1^on:item_id^to:item_id";
+describe("Ignore invalid sibling & nested joins", () => {
+  test("Root sibling is invalid: a,,c", () => {
+    const input = "item,,character";
+    const result = parse(input);
 
-//   const result = parse(input);
+    expect(result).toHaveLength(2);
 
-//   expect(result).toHaveLength(1);
-//   expect(result).toContainEqual(
-//     expect.objectContaining({
-//       collection: "item",
-//       isOuterJoin: true,
-//       isList: true,
-//       onField: "item_id",
-//       toField: "item_id",
-//     })
-//   );
-// });
+    expect(result[0]).toEqual(
+      expect.objectContaining({
+        parentId: null,
+        collection: "item",
+      })
+    );
+
+    expect(result[1]).toEqual(
+      expect.objectContaining({
+        parentId: null,
+        collection: "character",
+      })
+    );
+  });
+
+  test("Child sibling is invalid: a(b,,d)", () => {
+    const input = "item(character,,characters_item)";
+    const result = parse(input);
+
+    const parentJoin = result[0];
+
+    expect(result).toHaveLength(1);
+
+    expect(parentJoin).toEqual(
+      expect.objectContaining({
+        parentId: null,
+        collection: "item",
+      })
+    );
+
+    expect(parentJoin.joins).toHaveLength(2);
+
+    expect(parentJoin.joins[0]).toEqual(
+      expect.objectContaining({
+        parentId: parentJoin.id,
+        collection: "character",
+      })
+    );
+
+    expect(parentJoin.joins[1]).toEqual(
+      expect.objectContaining({
+        parentId: parentJoin.id,
+        collection: "characters_item",
+      })
+    );
+  });
+
+  test("No valid children: a()", () => {
+    const input = "item()";
+    const result = parse(input);
+
+    expect(result[0]).toEqual(
+      expect.objectContaining({
+        parentId: null,
+        collection: "item",
+        joins: [],
+      })
+    );
+  });
+});
+
+test("Ignore joins if missing closing parentheses: a(b", () => {
+  const input = "item(item_category_id";
+  const result = parse(input);
+
+  expect(result).toBe(null);
+});
+
+test("Ignore joins if missing closing parentheses: a(b(c)", () => {
+  const input = "item(item_category_id(weapon)";
+  const result = parse(input);
+
+  expect(result).toBe(null);
+});
