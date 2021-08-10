@@ -137,7 +137,7 @@ export default function parse(valueString, parentJoinId = null) {
     }
   });
 
-  return siblingJoinModels;
+  return siblingJoinModels.length > 0 ? siblingJoinModels : null;
 }
 
 function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
