@@ -36,7 +36,7 @@ const JOIN_KEYS = [
   "outer", // bit => boolean
 ];
 
-export default function parse(valueString) {
+export default function parse(valueString, parentJoinId = null) {
   let parentJoins = [];
 
   let parentSplitIndices = [0];
@@ -122,11 +122,11 @@ export default function parse(valueString) {
       subJoinString = joinString.slice(subJoinStart, subJoinEnd);
     }
 
-    const baseJoinModel = parseSimpleJoinString(baseJoinString);
+    const baseJoinModel = parseSimpleJoinString(baseJoinString, parentJoinId);
 
     if (baseJoinModel !== null) {
       if (subJoinString !== "") {
-        const subJoinModels = parse(subJoinString);
+        const subJoinModels = parse(subJoinString, baseJoinModel.id);
 
         if (!!subJoinModels) {
           baseJoinModel.joins = subJoinModels;
