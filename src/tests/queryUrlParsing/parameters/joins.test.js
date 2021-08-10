@@ -298,11 +298,11 @@ describe("Simple join string [parseSimpleJoinString()]", () => {
       });
 
       describe("Duplicate key handling", () => {
-        test("Ignore second 'show' if first has valid values", () => {
-          const input = "item^show:item_id^show:item_type";
+        test("Concat values from multiple 'show' keys", () => {
+          const input = "show:item_id^type:item^show:item_type";
           const result = parse(input);
 
-          expect(result[0].filterFields).toEqual(["item_id"]);
+          expect(result[0].filterFields).toEqual(["item_id", "item_type"]);
         });
 
         test("Ignore 'show' if preceded by 'hide' with valid values", () => {
@@ -358,11 +358,11 @@ describe("Simple join string [parseSimpleJoinString()]", () => {
       });
 
       describe("Duplicate key handling", () => {
-        test("Ignore second 'hide' if first has valid values", () => {
-          const input = "item^hide:item_id^hide:item_type";
+        test("Concat values from multiple 'hide' keys", () => {
+          const input = "hide:item_id^type:item^hide:item_type";
           const result = parse(input);
 
-          expect(result[0].filterFields).toEqual(["item_id"]);
+          expect(result[0].filterFields).toEqual(["item_id", "item_type"]);
         });
 
         test("Ignore 'hide' if preceded by 'show' with valid values", () => {

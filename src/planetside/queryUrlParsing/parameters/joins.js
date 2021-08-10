@@ -193,32 +193,30 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         }
         break;
 
-      // TODO: append extra 'show' lists instead of ignoring them
       case "show":
-        if (!seenKeys.includes(key) && !seenKeys.includes("hide")) {
+        if (!seenKeys.includes("hide")) {
           const values = value.split("'");
 
           let fields = filterValidFields(values);
 
           if (fields.length > 0) {
             joinModel.filterType = key;
-            joinModel.filterFields = fields;
+            joinModel.filterFields = [...joinModel.filterFields, ...fields];
 
             seenKeys.push(key);
           }
         }
         break;
 
-      // append extra 'hide' lists instead of ignoring them
       case "hide":
-        if (!seenKeys.includes(key) && !seenKeys.includes("show")) {
+        if (!seenKeys.includes("show")) {
           const values = value.split("'");
 
           let fields = filterValidFields(values);
 
           if (fields.length > 0) {
             joinModel.filterType = key;
-            joinModel.filterFields = fields;
+            joinModel.filterFields = [...joinModel.filterFields, ...fields];
 
             seenKeys.push(key);
           }
@@ -235,7 +233,7 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
       case "terms":
         const newTerms = parseTerms(value, "'", true);
         if (newTerms !== null) {
-          joinModel.terms = joinModel.terms.concat(newTerms);
+          joinModel.terms = [...joinModel.terms, ...newTerms];
         }
         break;
 
