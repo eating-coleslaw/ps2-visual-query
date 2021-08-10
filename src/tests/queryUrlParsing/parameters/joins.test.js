@@ -1,40 +1,105 @@
 import parse from "../../../planetside/queryUrlParsing/parameters/joins";
 import QueryJoin from "../../../planetside/QueryJoin";
 
-describe("Simple join", () => {  
-  describe("Explicit join collection works as expected", () => {
-    const input = "type:item"; //^list:1^outer:1^on:item_id^to:item_id";
-    const result = parse(input);
+describe("Simple join string [parseSimpleJoinString()]", () => {  
+  describe("Basic join keys set correctly", () => {  
     
-    test("Has correct number of joins", () => expect(result).toHaveLength(1));
-    test("collection is correct", () => expect(result[0].collection).toBe("item"));
-    // test("isOuterJoin is correct", () => expect(result[0].isOuterJoin).toBe(true));
-    // test("isList is correct", () => expect(result[0].isList).toBe(true));
-    // test("onField is correct", () => expect(result[0].onField).toBe("item_id"));
-    // test("toField is correct", () => expect(result[0].toField).toBe("item_id"));
-  });
-  
-  describe("Implicit join collection works as expected", () => {
-    const input = "item"; //^list:1^outer:1^on:item_id^to:item_id";
-    const result = parse(input);
+    describe("'type' & implicit join collection", () => {  
+      describe("Explicit join collection works as expected", () => {
+        test("Has correct number of joins", () => {
+          const input = "type:item";
+          const result = parse(input);
+
+          expect(result).toHaveLength(1);
+        });
+
+        test("collection is correct", () => {
+          const input = "type:item";
+          const result = parse(input);
+          
+          expect(result[0].collection).toBe("item");
+        });
+
+        describe("Invalid explicit collection is ignored", () => {
+          test("Empty value", () => {
+            const input = "type:";
+            const result = parse(input);
     
-    test("Has correct number of joins", () => expect(result).toHaveLength(1));
-    test("collection is correct", () => expect(result[0].collection).toBe("item"));
-    // test("isOuterJoin is correct", () => expect(result[0].isOuterJoin).toBe(true));
-    // test("isList is correct", () => expect(result[0].isList).toBe(true));
-    // test("onField is correct", () => expect(result[0].onField).toBe("item_id"));
-    // test("toField is correct", () => expect(result[0].toField).toBe("item_id"));
-  });
+            expect(result).toEqual([]);
+          });
+    
+          test("Non-collection value", () => {
+            const input = "type:"
+            const result = parse(input);
+    
+            expect(result).toEqual([]);
+          });
+        });
+    
+        describe("Duplicate handling works correctly", () => {
+          test("Second value ignored if first is valid", () => {
+            const input = "type:item^type:character";
+            const result = parse(input);
+    
+            expect(result[0].collection).toBe("item");
+          });
 
-  describe("Implicit collection followed by explicit uses implicit value", () => {
-    const input = "item^type:characters_item";
-    const result = parse(input);
+          test("Second value used if first is invalid", () => {
+            const input = "type:birthday_presents^type:item";
+            const result = parse(input);
 
-    test("Has correct number of joins", () => expect(result).toHaveLength(1));
-    test("collection is correct", () => expect(result[0].collection).toBe("item"));
-  });
+            expect(result[0].collection).toBe("item");
+          });
+        });
+      });
+    
+      describe("Implicit join collection works as expected", () => {
+        test("Has correct number of joins", () => {
+          const input = "item";
+          const result = parse(input);
+
+          expect(result).toHaveLength(1)
+        });
+
+        test("collection is correct", () => {
+          const input = "item";
+          const result = parse(input);
+
+          expect(result[0].collection).toBe("item")
+        });
+
+        describe("Invalid implicit collection is ignored", () => {
+          test("Empty value", () => {
+            const input = "^inject_at:presents";
+            const result = parse(input);
+            
+            expect(result).toEqual([]);
+          });
+
+          test("Non-collection value", () => {
+            const input = "birthday_presents^inject_at:presents";
+            const result = parse(input);
+            
+            expect(result).toEqual([]);
+          });
+        });
+      });
+
+      test("Implicit collection followed by explicit uses implicit value", () => {
+        const input = "item^type:characters_item";
+        const result = parse(input);
+        
+        expect(result[0].collection).toBe("item");
+      });
+
+      test("'type' value used if a non-type join key is the first key", () => {
+        const input = "inject_at:items^type:item";
+        const result = parse(input);
+
+        expect(result[0].collection).toBe("item");
+      });
+    });
   
-  describe("Basic join keys set correctly", () => {
     describe("'on'", () =>{
       test("Valid value set correctly", () => {
         const input = "item^on:item_id";
@@ -362,7 +427,7 @@ describe("Simple join", () => {
     });
   });
 });
-  
+
 // test("Simple join works as expected - explicit join collection", () => {
 //   const input = "item^list:1^outer:1^on:item_id^to:item_id";
     

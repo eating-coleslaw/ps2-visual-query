@@ -124,15 +124,17 @@ export default function parse(valueString) {
 
     const baseJoinModel = parseSimpleJoinString(baseJoinString);
 
-    if (subJoinString !== "") {
-      const subJoinModels = parse(subJoinString);
-
-      if (!!subJoinModels) {
-        baseJoinModel.joins = subJoinModels;
+    if (baseJoinModel !== null) {
+      if (subJoinString !== "") {
+        const subJoinModels = parse(subJoinString);
+        
+        if (!!subJoinModels) {
+          baseJoinModel.joins = subJoinModels;
+        }
       }
+      
+      siblingJoinModels.push(baseJoinModel);
     }
-
-    siblingJoinModels.push(baseJoinModel);
   });
 
   return siblingJoinModels;
@@ -161,8 +163,9 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
 
     switch (key) {
       case "type":
-        if (!seenKeys.includes(key)) {
+        if (!seenKeys.includes(key) && QueryEnums.Collections.includes(value)) {
           joinModel.collection = value;
+          seenKeys.push("type");
         }
         break;
 
@@ -242,6 +245,10 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         return;
     }
   });
+
+  if (!joinModel.collection) {
+    return null;
+  }
 
   return joinModel;
 }
