@@ -87,6 +87,7 @@ export default function parseQueryUrl(url) {
     const command = commandValuePair[0];
     const valueString = commandValuePair[1];
 
+    // TODO: allow multiple join, show, & hide commands
     if (seenCommands.includes(command)) {
       return;
     } else if (command === "show" && seenCommands.includes("hide")) {
