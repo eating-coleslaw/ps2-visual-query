@@ -1,6 +1,6 @@
 import QueryJoin from "../../QueryJoin";
 import QueryEnums from "../../QueryEnums";
-import { filterValidFields } from "../fieldValidation";
+import { filterValidFields, isValidField } from "../fieldValidation";
 import { parse as parseTerms } from "./conditions";
 
 /* ========
@@ -167,14 +167,14 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         break;
 
       case "on":
-        if (!seenKeys.includes(key) && !!value) {
+        if (!seenKeys.includes(key) && isValidField(value)) {
           joinModel.onField = value;
           seenKeys.push(key);
         }
         break;
 
       case "to":
-        if (!seenKeys.includes(key) && !!value) {
+        if (!seenKeys.includes(key) && isValidField(value)) {
           joinModel.toField = value;
           seenKeys.push(key);
         }
@@ -218,8 +218,10 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         break;
 
       case "inject_at":
-        if (!seenKeys.includes(key)) {
+        if (!seenKeys.includes(key) && !!value) {
           joinModel.injectAt = value;
+          seenKeys.push(key);
+
         }
         break;
 

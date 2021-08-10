@@ -43,6 +43,13 @@ describe("Simple join", () => {
         expect(result[0].onField).toBe("item_id");
       });
 
+      test("Invalid value ignored", () => {
+        const input = "item^on:Invalid!Field";
+        const result = parse(input);
+
+        expect(result[0].onField).toBe("");
+      });
+
       test("Duplicate key ignored if first value is valid", () => {
         const input = "item^on:item_id^on:item_category_id";
         const result = parse(input);
@@ -64,6 +71,13 @@ describe("Simple join", () => {
         const result = parse(input);
         
         expect(result[0].toField).toBe("item_id");
+      });
+
+      test("Invalid value ignored", () => {
+        const input = "item^to:Invalid!Field";
+        const result = parse(input);
+
+        expect(result[0].toField).toBe("");
       });
 
       test("Duplicate key ignored if first value is valid", () => {
@@ -117,6 +131,13 @@ describe("Simple join", () => {
         });
       });
 
+      test("Invalid value ignored", () => {
+        const input = "item^list:yes";
+        const result = parse(input);
+
+        expect(result[0].isList).toBe(false);
+      });
+
       test("Duplicate key ignored if first value is valid", () => {
         const input = "item^list:1^list:0";
         const result = parse(input);
@@ -168,6 +189,13 @@ describe("Simple join", () => {
         });
       });
 
+      test("Invalid value ignored", () => {
+        const input = "item^outer:yes";
+        const result = parse(input);
+
+        expect(result[0].isOuterJoin).toBe(false);
+      });
+
       test("Duplicate key ignored if first value is valid", () => {
         const input = "item^outer:1^outer:0";
         const result = parse(input);
@@ -183,125 +211,153 @@ describe("Simple join", () => {
       });
     });
 
-    describe("'show' / 'hide' fields", () => {
-      describe("'show'", () => {
+    describe("'show'", () => {
 
-        describe("Multiple valid fields", () => {
-          const input = "item^show:item_id'item_category_id'item_type";
-          const result = parse(input);
-          
-          test("filterType is correct", () => expect(result[0].filterType).toBe("show"));
-          test("filterFields set correctly", () => {
-            const fields = result[0].filterFields;
-            expect(fields).toEqual([ "item_id", "item_category_id", "item_type"]);
-          });
-
-          test("Exclude invalid fields", () => {
-            const input = "item^show:item_id'Invalid!Field'item_type";
-            const result = parse(input);
-
-            expect(result[0].filterFields).toEqual([ "item_id", "item_type"]);
-          });
-
-          test("Exclude empty fields", () => {
-            const input = "item^show:item_id''item_type";
-            const result = parse(input);
-
-            expect(result[0].filterFields).toEqual([ "item_id", "item_type"]);
-          });
+      describe("Multiple valid fields", () => {
+        const input = "item^show:item_id'item_category_id'item_type";
+        const result = parse(input);
+        
+        test("filterType is correct", () => expect(result[0].filterType).toBe("show"));
+        test("filterFields set correctly", () => {
+          const fields = result[0].filterFields;
+          expect(fields).toEqual([ "item_id", "item_category_id", "item_type"]);
         });
 
-        describe("Duplicate key handling", () => {
-          test("Ignore second 'show' if first has valid values", () => {
-            const input = "item^show:item_id^show:item_type";
-            const result = parse(input);
+        test("Exclude invalid fields", () => {
+          const input = "item^show:item_id'Invalid!Field'item_type";
+          const result = parse(input);
 
-            expect(result[0].filterFields).toEqual(["item_id"]);
-          });
+          expect(result[0].filterFields).toEqual([ "item_id", "item_type"]);
+        });
 
-          test("Ignore 'show' if preceded by 'hide' with valid values", () => {
-            const input = "item^hide:item_id^show:item_type";
-            const result = parse(input);
+        test("Exclude empty fields", () => {
+          const input = "item^show:item_id''item_type";
+          const result = parse(input);
 
-            expect(result[0].filterType).toBe("hide");
-            expect(result[0].filterFields).toEqual(["item_id"]);
-          });
-
-          test("Use second 'show' if first doesn't have valid values", () => {
-            const input = "item^show:^show:item_type";
-            const result = parse(input);
-
-            expect(result[0].filterFields).toEqual(["item_type"]);
-          });
-
-          test("Use 'show' if preceded by 'hide' without valid values", () => {
-            const input = "item^hide:^show:item_type";
-            const result = parse(input);
-
-            expect(result[0].filterType).toBe("show");
-            expect(result[0].filterFields).toEqual(["item_type"]);
-          });
+          expect(result[0].filterFields).toEqual([ "item_id", "item_type"]);
         });
       });
 
-      describe("'hide'", () => {
-
-        describe("Multiple valid fields", () => {
-          const input = "item^hide:item_id'item_category_id'item_type";
+      describe("Duplicate key handling", () => {
+        test("Ignore second 'show' if first has valid values", () => {
+          const input = "item^show:item_id^show:item_type";
           const result = parse(input);
-          
-          test("filterType is correct", () => expect(result[0].filterType).toBe("hide"));
-          test("filterFields set correctly", () => {
-            const fields = result[0].filterFields;
-            expect(fields).toEqual([ "item_id", "item_category_id", "item_type"]);
-          });
 
-          test("Exclude invalid fields", () => {
-            const input = "item^hide:item_id'Invalid!Field'item_type";
-            const result = parse(input);
-
-            expect(result[0].filterFields).toEqual([ "item_id", "item_type"]);
-          });
-
-          test("Exclude empty fields", () => {
-            const input = "item^hide:item_id''item_type";
-            const result = parse(input);
-
-            expect(result[0].filterFields).toEqual([ "item_id", "item_type"]);
-          });
+          expect(result[0].filterFields).toEqual(["item_id"]);
         });
 
-        describe("Duplicate key handling", () => {
-          test("Ignore second 'hide' if first has valid values", () => {
-            const input = "item^hide:item_id^hide:item_type";
-            const result = parse(input);
+        test("Ignore 'show' if preceded by 'hide' with valid values", () => {
+          const input = "item^hide:item_id^show:item_type";
+          const result = parse(input);
 
-            expect(result[0].filterFields).toEqual(["item_id"]);
-          });
-
-          test("Ignore 'hide' if preceded by 'show' with valid values", () => {
-            const input = "item^show:item_id^hide:item_type";
-            const result = parse(input);
-
-            expect(result[0].filterType).toBe("show");
-            expect(result[0].filterFields).toEqual(["item_id"]);
-          });
-
-          test("Use second 'hide' if first doesn't have valid values", () => {
-            const input = "item^hide:^hide:item_type";
-            const result = parse(input);
-
-            expect(result[0].filterFields).toEqual(["item_type"]);
-          });
-
-          test("Use 'hide' if preceded by 'show' without valid values", () => {
-            const input = "item^show:^hide:item_type";
-            const result = parse(input);
-
-            expect(result[0].filterType).toBe("hide");
-            expect(result[0].filterFields).toEqual(["item_type"]);
-          });
+          expect(result[0].filterType).toBe("hide");
+          expect(result[0].filterFields).toEqual(["item_id"]);
         });
+
+        test("Use second 'show' if first doesn't have valid values", () => {
+          const input = "item^show:^show:item_type";
+          const result = parse(input);
+
+          expect(result[0].filterFields).toEqual(["item_type"]);
+        });
+
+        test("Use 'show' if preceded by 'hide' without valid values", () => {
+          const input = "item^hide:^show:item_type";
+          const result = parse(input);
+
+          expect(result[0].filterType).toBe("show");
+          expect(result[0].filterFields).toEqual(["item_type"]);
+        });
+      });
+    });
+    
+    describe("'hide'", () => {
+
+      describe("Multiple valid fields", () => {
+        const input = "item^hide:item_id'item_category_id'item_type";
+        const result = parse(input);
+        
+        test("filterType is correct", () => expect(result[0].filterType).toBe("hide"));
+        test("filterFields set correctly", () => {
+          const fields = result[0].filterFields;
+          expect(fields).toEqual([ "item_id", "item_category_id", "item_type"]);
+        });
+
+        test("Exclude invalid fields", () => {
+          const input = "item^hide:item_id'Invalid!Field'item_type";
+          const result = parse(input);
+
+          expect(result[0].filterFields).toEqual([ "item_id", "item_type"]);
+        });
+
+        test("Exclude empty fields", () => {
+          const input = "item^hide:item_id''item_type";
+          const result = parse(input);
+
+          expect(result[0].filterFields).toEqual([ "item_id", "item_type"]);
+        });
+      });
+
+      describe("Duplicate key handling", () => {
+        test("Ignore second 'hide' if first has valid values", () => {
+          const input = "item^hide:item_id^hide:item_type";
+          const result = parse(input);
+
+          expect(result[0].filterFields).toEqual(["item_id"]);
+        });
+
+        test("Ignore 'hide' if preceded by 'show' with valid values", () => {
+          const input = "item^show:item_id^hide:item_type";
+          const result = parse(input);
+
+          expect(result[0].filterType).toBe("show");
+          expect(result[0].filterFields).toEqual(["item_id"]);
+        });
+
+        test("Use second 'hide' if first doesn't have valid values", () => {
+          const input = "item^hide:^hide:item_type";
+          const result = parse(input);
+
+          expect(result[0].filterFields).toEqual(["item_type"]);
+        });
+
+        test("Use 'hide' if preceded by 'show' without valid values", () => {
+          const input = "item^show:^hide:item_type";
+          const result = parse(input);
+
+          expect(result[0].filterType).toBe("hide");
+          expect(result[0].filterFields).toEqual(["item_type"]);
+        });
+      });
+    });
+
+    describe("'inject_at'", () =>{
+      test("Valid value set correctly", () => {
+        const input = "item^inject_at:Items";
+        const result = parse(input);
+        
+        expect(result[0].injectAt).toBe("Items");
+      });
+
+      test("Invalid value ignored", () => {
+        const input = "item^inject_at:";
+        const result = parse(input);
+
+        expect(result[0].injectAt).toBe("");
+      });
+
+      test("Duplicate key ignored if first value is valid", () => {
+        const input = "item^inject_at:FirstItems^inject_at:SecondItems";
+        const result = parse(input);
+
+        expect(result[0].injectAt).toBe("FirstItems");
+      });
+      
+      test("Duplicate key used if first value is invalid", () => {
+        const input = "item^on:^inject_at:^inject_at:SecondItems";
+        const result = parse(input);
+
+        expect(result[0].injectAt).toBe("SecondItems");
       });
     });
   });
