@@ -1,7 +1,7 @@
 import QueryJoin from "../../QueryJoin";
 import QueryEnums from "../../QueryEnums";
 import { filterValidFields, isValidField } from "../fieldValidation";
-import { parse as parseTerms } from "./conditions";
+import parseTerms from "./conditions";
 
 /* ========
     JOINS
@@ -127,12 +127,12 @@ export default function parse(valueString) {
     if (baseJoinModel !== null) {
       if (subJoinString !== "") {
         const subJoinModels = parse(subJoinString);
-        
+
         if (!!subJoinModels) {
           baseJoinModel.joins = subJoinModels;
         }
       }
-      
+
       siblingJoinModels.push(baseJoinModel);
     }
   });
@@ -184,12 +184,16 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         break;
 
       case "list":
-        if (!seenKeys.includes(key) && ["0", "1", "false", "true"].includes(value)) {
+        if (
+          !seenKeys.includes(key) &&
+          ["0", "1", "false", "true"].includes(value)
+        ) {
           joinModel.isList = value === "1" || value === "true";
           seenKeys.push(key);
         }
         break;
 
+      // TODO: append extra 'show' lists instead of ignoring them
       case "show":
         if (!seenKeys.includes(key) && !seenKeys.includes("hide")) {
           const values = value.split("'");
@@ -205,6 +209,7 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         }
         break;
 
+      // append extra 'hide' lists instead of ignoring them
       case "hide":
         if (!seenKeys.includes(key) && !seenKeys.includes("show")) {
           const values = value.split("'");
@@ -214,7 +219,7 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
           if (fields.length > 0) {
             joinModel.filterType = key;
             joinModel.filterFields = fields;
-          
+
             seenKeys.push(key);
           }
         }
@@ -224,18 +229,21 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         if (!seenKeys.includes(key) && !!value) {
           joinModel.injectAt = value;
           seenKeys.push(key);
-
         }
         break;
 
       case "terms":
-        if (!seenKeys.includes(key)) {
-          joinModel.terms = parseTerms(value, "'", true);
+        const newTerms = parseTerms(value, "'", true);
+        if (newTerms !== null) {
+          joinModel.terms = joinModel.terms.concat(newTerms);
         }
         break;
 
       case "outer":
-        if (!seenKeys.includes(key) && ["0", "1", "false", "true"].includes(value)) {
+        if (
+          !seenKeys.includes(key) &&
+          ["0", "1", "false", "true"].includes(value)
+        ) {
           joinModel.isOuterJoin = value === "1" || value === "true";
           seenKeys.push(key);
         }
