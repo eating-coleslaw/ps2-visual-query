@@ -15,10 +15,32 @@ var defaultSettings = {
   inject_at: null,
 };
 
+const convertTermToString = (term) => {
+  const field = term.field;
+  const operator = term.operator;
+  const value = term.value;
+
+  if (!!field && !!operator && !!value) {
+    return field + operator.value + value;
+  }
+
+  return "";
+};
+
 const convertToCensusJoin = (appJoin) => {
   let joins = [];
   if (appJoin.joins.length > 0) {
     joins = appJoin.joins.map((join) => convertToCensusJoin(join));
+  }
+
+  const joinTerms = appJoin.terms;
+  let terms = [];
+  for (let i = 0; i < joinTerms.length; i++) {
+    const term = joinTerms[i];
+    const termString = convertTermToString(term);
+    if (!!termString) {
+      terms.push(termString);
+    }
   }
 
   return {
@@ -28,7 +50,7 @@ const convertToCensusJoin = (appJoin) => {
       outer: appJoin.isOuterJoin,
       show: appJoin.filterType === "show" ? [...appJoin.filterFields] : [],
       hide: appJoin.filterType === "hide" ? [...appJoin.filterFields] : [],
-      terms: appJoin.terms,
+      terms: terms,
       on: !!appJoin.onField ? appJoin.onField : null,
       to: !!appJoin.toField ? appJoin.toField : null,
       inject_at: !!appJoin.injectAt ? appJoin.injectAt : null,
