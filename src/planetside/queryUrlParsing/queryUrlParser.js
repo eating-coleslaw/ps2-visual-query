@@ -4,6 +4,16 @@ import QueryJoin from "../QueryJoin";
 import QueryTree from "../QueryTree";
 import QueryEnums from "../QueryEnums";
 
+import parseConditions from "./parameters/conditions";
+import parseFilterField from "./parameters/fieldFilter";
+import parseJoins from "./parameters/joins";
+import parseLanguage from "./parameters/language";
+import parseLimit from "./parameters/limit";
+import parseResolves from "./parameters/resolves";
+import parseTree from "./parameters/tree";
+
+import { v4 as uuidv4 } from "uuid";
+
 const NAMESPACE = "ps2:v2";
 
 const FIELD_REGEX = /^[A-z0-9]+(\.[A-z0-9]+)?$/;
@@ -77,9 +87,12 @@ export default function parseQueryUrl(url) {
     const commandValuePair = parseQueryParameterString(parameter);
 
     if (commandValuePair === null && queryParameters.indexOf(parameter) === 0) {
-      const conditions = parseConditionsParameter(parameter, false);
+      // const conditions = parseConditionsParameter(parameter, false);
+      const conditions = parseConditions(parameter, "&", false);
 
-      queryModel.conditions = conditions;
+      if (conditions !== null) {
+        queryModel.conditions = conditions;
+      }
 
       return;
     }
@@ -88,7 +101,7 @@ export default function parseQueryUrl(url) {
     const valueString = commandValuePair[1];
 
     // TODO: allow multiple join, show, & hide commands
-    if (seenCommands.includes(command)) {
+    if (seenCommands.includes(command) && !(["show", "hide", "resolve", "join"].includes(command))) {
       return;
     } else if (command === "show" && seenCommands.includes("hide")) {
       return;
@@ -163,22 +176,22 @@ function parseQueryParameterString(parameter) {
   const [command, value] = commandValueSplit;
 
   if (commandValueSplit.length !== 2) {
-    console.warn("Failed to parse query parameter:", parameter);
+    // console.warn("Failed to parse query parameter:", parameter);
     return null;
   }
 
   if (!COMMANDS.includes(command)) {
     if (UNSUPPORTED_COMMANDS.includes(command)) {
-      console.warn(`Query command ${command} is not supported yet`);
+      // console.warn(`Query command ${command} is not supported yet`);
       return null;
     } else {
-      console.warn(`${command} is not a valid query command`);
+      // console.warn(`${command} is not a valid query command`);
       return null;
     }
   }
 
   if (value === "") {
-    console.warn(`No value specified for ${command} command`);
+    // console.warn(`No value specified for ${command} command`);
     return null;
   }
 
@@ -187,36 +200,76 @@ function parseQueryParameterString(parameter) {
 
 function parseQueryParameter(queryModel, command, value) {
   let success = false;
+  let result;
 
   switch (command) {
     case "hide":
-      success = parseShowHideParameter(queryModel, command, value);
+      result = parseFilterField(command, value);
+      if (result !== null) {
+        queryModel.filterType = result.filterType;
+        queryModel.filterFields = [ ...queryModel.filterFields, ...result.filterFields ];
+        
+        success = true;
+      }
+      // success = parseShowHideParameter(queryModel, command, value);
       break;
 
     case "show":
-      success = parseShowHideParameter(queryModel, command, value);
+      result = parseFilterField(command, value);
+      if (result !== null) {
+        queryModel.filterType = result.filterType;
+        queryModel.filterFields = [ ...queryModel.filterFields, ...result.filterFields ];
+
+        success = true;
+      }
+      // success = parseShowHideParameter(queryModel, command, value);
       break;
 
     case "resolve":
-      success = parseResolveParameter(queryModel, value);
+      result = parseResolves(value);
+      if (result !== null) {
+        queryModel.resolves = [ ...queryModel.resolves, ...result ];
+
+        success = true;
+      }
+      // success = parseResolveParameter(queryModel, value);
       break;
 
     case "limit":
-      success = parseLimitParameter(queryModel, value);
+      queryModel.limit = parseLimit(value);
+      success = true;
       break;
 
     case "lang":
-      success = parseLangParameter(queryModel, value);
+      result = parseLanguage(value);
+      if (result !== null) {
+        queryModel.language = value;
+
+        success = true;
+      }  
+      // success = parseLangParameter(queryModel, value);
       break;
 
     case "tree":
-      success = parseTreeParameter(queryModel, value);
+      result = parseTree(value);
+      if (result !== null) {
+        queryModel.tree = value;
+
+        success = true;
+      }
+      // success = parseTreeParameter(queryModel, value);
       break;
 
     case "join":
-      const joins = parseJoinParameter(value);
-      queryModel.joins = joins;
-      success = joins.length > 0;
+      result = parseJoins(value);
+      if (result !== null) {
+        queryModel.joins = [ ...queryModel.joins, ...result ];
+
+        success = true;
+      }
+      // const joins = parseJoinParameter(value);
+      // queryModel.joins = joins;
+      // success = joins.length > 0;
       break;
 
     default:
