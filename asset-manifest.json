@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/ps2-visual-query/static/css/main.ccaf4b85.chunk.css",
-    "main.js": "/ps2-visual-query/static/js/main.c5d63bc9.chunk.js",
-    "main.js.map": "/ps2-visual-query/static/js/main.c5d63bc9.chunk.js.map",
+    "main.css": "/ps2-visual-query/static/css/main.4edc8741.chunk.css",
+    "main.js": "/ps2-visual-query/static/js/main.7f908437.chunk.js",
+    "main.js.map": "/ps2-visual-query/static/js/main.7f908437.chunk.js.map",
     "runtime-main.js": "/ps2-visual-query/static/js/runtime-main.014e279a.js",
     "runtime-main.js.map": "/ps2-visual-query/static/js/runtime-main.014e279a.js.map",
-    "static/js/2.1751a5dc.chunk.js": "/ps2-visual-query/static/js/2.1751a5dc.chunk.js",
-    "static/js/2.1751a5dc.chunk.js.map": "/ps2-visual-query/static/js/2.1751a5dc.chunk.js.map",
+    "static/js/2.0669f0bc.chunk.js": "/ps2-visual-query/static/js/2.0669f0bc.chunk.js",
+    "static/js/2.0669f0bc.chunk.js.map": "/ps2-visual-query/static/js/2.0669f0bc.chunk.js.map",
     "index.html": "/ps2-visual-query/index.html",
-    "static/css/main.ccaf4b85.chunk.css.map": "/ps2-visual-query/static/css/main.ccaf4b85.chunk.css.map",
-    "static/js/2.1751a5dc.chunk.js.LICENSE.txt": "/ps2-visual-query/static/js/2.1751a5dc.chunk.js.LICENSE.txt"
+    "static/css/main.4edc8741.chunk.css.map": "/ps2-visual-query/static/css/main.4edc8741.chunk.css.map",
+    "static/js/2.0669f0bc.chunk.js.LICENSE.txt": "/ps2-visual-query/static/js/2.0669f0bc.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.014e279a.js",
-    "static/js/2.1751a5dc.chunk.js",
-    "static/css/main.ccaf4b85.chunk.css",
-    "static/js/main.c5d63bc9.chunk.js"
+    "static/js/2.0669f0bc.chunk.js",
+    "static/css/main.4edc8741.chunk.css",
+    "static/js/main.7f908437.chunk.js"
   ]
 }
