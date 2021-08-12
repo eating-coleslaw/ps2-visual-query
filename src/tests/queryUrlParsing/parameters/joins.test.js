@@ -1,5 +1,4 @@
 import parse from "../../../planetside/queryUrlParsing/parameters/joins";
-import QueryJoin from "../../../planetside/QueryJoin";
 import QueryOperator from "../../../planetside/QueryOperator";
 
 describe("Simple join string - parseSimpleJoinString()", () => {
