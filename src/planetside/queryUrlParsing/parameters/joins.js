@@ -176,14 +176,14 @@ function parseSimpleJoinString(baseJoinString, parentJoinId = null) {
         break;
 
       case "on":
-        if (!seenKeys.includes(key) && isValidField(value)) {
+        if (!seenKeys.includes(key) && isValidField(value.toLowerCase())) {
           joinModel.onField = value;
           seenKeys.push(key);
         }
         break;
 
       case "to":
-        if (!seenKeys.includes(key) && isValidField(value)) {
+        if (!seenKeys.includes(key) && isValidField(value.toLowerCase())) {
           joinModel.toField = value;
           seenKeys.push(key);
         }
