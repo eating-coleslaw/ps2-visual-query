@@ -39,11 +39,20 @@ test("Nested field: two-word parent", () =>
 test("Nested field: two-word child", () =>
   expect(isValidField("name.first_lower")).toBe(true));
 
+  test("Nested field: three-word child", () =>
+  expect(isValidField("name.first_lower_three")).toBe(true));
+
 test("Nested field: two-word parent & child", () =>
   expect(isValidField("battle_rank.prestive_level")).toBe(true));
 
+  test("Nested field: three-word parent & child", () =>
+  expect(isValidField("one_two_three.one_two_three")).toBe(true));
+
 test("Double-nested field", () =>
-  expect(isValidField("name.first.lower")).toBe(false));
+  expect(isValidField("name.first.lower")).toBe(true));
+
+  test("Triple-nested field", () =>
+  expect(isValidField("name.first.lower.four")).toBe(true));
 
 test("Contains capital letter", () => expect(isValidField("Name")).toBe(false));
 

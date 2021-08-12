@@ -1,4 +1,4 @@
-const FIELD_REGEX = /^([a-z0-9]+_?[a-z0-9]+)+(\.([a-z0-9]+_?[a-z0-9]+))?$/;
+const FIELD_REGEX = /^([a-z0-9]+(_?[a-z0-9]+)*)+(\.([a-z0-9]+_?[a-z0-9]+)+)*$/;
 
 export function isValidField(field) {
  return FIELD_REGEX.test(field);
