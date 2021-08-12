@@ -1,4 +1,5 @@
-import QueryEnums from "../../QueryEnums";
+// import QueryEnums from "../../QueryEnums";
+import { isValidField } from "../fieldValidation";
 
 export default function parse(valueString) {
   if (!valueString) {
@@ -14,7 +15,8 @@ export default function parse(valueString) {
   let resolves = [];
 
   values.forEach((value) => {
-    if (QueryEnums.Collections.includes(value) && !resolves.includes(value)) {
+    // if (QueryEnums.Collections.includes(value) && !resolves.includes(value)) {
+    if (isValidField(value) && !resolves.includes(value)) {
       resolves.push(value);
     }
   });
