@@ -622,7 +622,6 @@ export default function App() {
           const operator = condition.operator;
           const value = condition.value;
 
-          // if (condition.isValid(field, operator, value)) {
           if (!!field && !!operator && !!value) {
             censusQuery.where(field)[operator.name](value);
           }
@@ -670,7 +669,6 @@ export default function App() {
                 const operator = term.operator;
                 const value = term.value;
 
-                // if (term.isValid(field, operator, value)) {
                 if (!!field && !!operator && !!value) {
                   serviceJoin.where(field)[operator.name](value);
                 }
