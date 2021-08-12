@@ -115,23 +115,17 @@ const useStyles = makeStyles((theme) => ({
 export default function App() {
   const classes = useStyles();
 
-  const [namespace, setNamespace] = useState("ps2:v2");
-  useEffect(() => {
-    dbgcensus.SetGlobalNamespace("ps2:v2");
-  }, [namespace]);
+  const namespace = "ps2:v2";
+  dbgcensus.SetGlobalNamespace(namespace);
 
   const [storeKey, setStoreKey] = useState(userPreferenceStore.getServiceId());
-  const [serviceKey, setServiceKey] = useState("example");
   useEffect(() => {
     const storedKey = userPreferenceStore.getServiceId();
     if (storedKey !== null) {
       dbgcensus.SetGlobalServiceKey(storedKey);
       setStoreKey(storedKey);
-      setServiceKey(storedKey);
     }
   }, []);
-
-  const [loading, setLoading] = useState(false);
 
   const [query, setQuery] = useState(QueryConfig("character", namespace));
 
@@ -275,7 +269,6 @@ export default function App() {
   function onServiceKeyChange(key) {
     dbgcensus.SetGlobalServiceKey(key);
     userPreferenceStore.saveServiceId(key); // TODO: make sure this doesn't cause problems with the store key effect above
-    setServiceKey(key);
   }
 
   function onDeleteStoredServiceKey() {
@@ -732,6 +725,7 @@ export default function App() {
     }
   }, [query, loadedQueryId]);
 
+  const [loading, setLoading] = useState(false);
   const [queryResult, setQueryResult] = useState("");
   async function onSubmitQuery() {
     if (!!queryUrl && !loading) {
