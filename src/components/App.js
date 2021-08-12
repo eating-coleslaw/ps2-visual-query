@@ -43,8 +43,8 @@ import {
 } from "../persistence/queryStore";
 import QueryOptionsContainer from "./queries/queryOptions/QueryOptionsContainer";
 import QueryCreatorHeader from "./queries/QueryCreatorHeader";
+import createQueryUrl from "../planetside/createQueryUrl/createQueryUrl";
 
-const CensusQuery = require("dbgcensus").Query;
 const dbgcensus = require("dbgcensus");
 
 const useStyles = makeStyles((theme) => ({
@@ -589,138 +589,7 @@ export default function App() {
 
   const [queryUrl, setQueryUrl] = useState("");
   useEffect(() => {
-    function convertToCensusQuery() {
-      let censusQuery = new CensusQuery(query.collection, query.namespace);
-
-      if (!!query.language && query.language !== "All") {
-        censusQuery.setLanguage(query.language.toLowerCase());
-      }
-
-      if (query.limit !== null && query.limit !== 0) {
-        censusQuery.setLimit(query.limit);
-      }
-
-      if (query.start !== null) {
-        censusQuery.setStart(query.start);
-      }
-
-      if (query.filterFields.length > 0) {
-        censusQuery[`${query.filterType}Fields`](query.filterFields);
-      }
-
-      if (query.resolves.length > 0) {
-        censusQuery.resolve(query.resolves);
-      }
-
-      if (query.sortFields.length > 0) {
-        censusQuery.sort(query.sortFields);
-      }
-
-      if (query.conditions.length > 0) {
-        query.conditions.forEach((condition) => {
-          const field = condition.field;
-          const operator = condition.operator;
-          const value = condition.value;
-
-          if (!!field && !!operator && !!value) {
-            censusQuery.where(field)[operator.name](value);
-          }
-        });
-      }
-
-      if (query.joins.length > 0) {
-        censusQuery = addQueryJoins(censusQuery, query.joins);
-      }
-
-      return censusQuery;
-    }
-
-    function addQueryJoins(censusQuery, joinsArray, censusJoin = null) {
-      if (joinsArray.length > 0) {
-        joinsArray.forEach((join) => {
-          if (!!join.collection) {
-            let serviceJoin =
-              censusJoin !== null
-                ? censusJoin.joinService(join.collection)
-                : censusQuery.joinService(join.collection);
-
-            serviceJoin.isList(join.isList);
-            serviceJoin.isOuterJoin(join.isOuterJoin);
-
-            if (!!join.injectAt) {
-              serviceJoin.injectAt(join.injectAt);
-            }
-
-            if (!!join.onField) {
-              serviceJoin.onField(join.onField);
-            }
-
-            if (!!join.toField) {
-              serviceJoin.toField(join.toField);
-            }
-
-            if (join.filterFields.length > 0) {
-              serviceJoin[`${join.filterType}Fields`](join.filterFields);
-            }
-
-            if (join.terms.length > 0) {
-              join.terms.forEach((term) => {
-                const field = term.field;
-                const operator = term.operator;
-                const value = term.value;
-
-                if (!!field && !!operator && !!value) {
-                  serviceJoin.where(field)[operator.name](value);
-                }
-              });
-            }
-
-            if (join.joins.length > 0) {
-              addQueryJoins(censusQuery, join.joins, serviceJoin);
-            }
-          }
-        });
-      }
-
-      return censusQuery;
-    }
-
-    // The dbgcensus package doesn't process trees correctly, so we do it manually
-    function getTreeViewUrlString() {
-      const treeField = query.tree.treeField || query.tree.startField;
-
-      if (!!treeField) {
-        let treeViewString = `&c:tree=field:${treeField}`;
-
-        treeViewString = `${treeViewString}^isList:${query.tree.isList}`;
-
-        if (!!query.tree.groupPrefix) {
-          treeViewString = `${treeViewString}^prefix:${query.tree.groupPrefix}`;
-        }
-
-        if (!!query.tree.startField) {
-          treeViewString = `${treeViewString}^start:${query.tree.startField}`;
-        }
-
-        return treeViewString;
-      }
-    }
-
-    try {
-      const censusQuery = convertToCensusQuery();
-      let url = censusQuery.toUrl();
-      url = url.replace("http://", "https://");
-
-      let treeViewString = getTreeViewUrlString();
-
-      if (!!treeViewString) {
-        url = url + treeViewString;
-      }
-
-      setQueryUrl(url);
-    } catch (error) {
-      console.log("Error getting query URL: ", error);
-    }
+    setQueryUrl(createQueryUrl(query));
   }, [query, loadedQueryId]);
 
   const [loading, setLoading] = useState(false);
